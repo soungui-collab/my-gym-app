@@ -1,6 +1,6 @@
 // Function to send a new member registration to your Google Sheet
 function registerMember(id, name, email) {
-  const url = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+  const url = "https://script.google.com/macros/s/AKfycbz8pKhE5iHG2lglKOpJOCTBCY2xpRW0TaICPpVcD8Gy1xLgrSh92bN_mR5-8877qZJI/exec";
 
   const payload = {
     memberId: id,
