@@ -1,6 +1,6 @@
 // Function to send a new member registration to your Google Sheet
 function registerMember(id, name, email) {
-  const url = "https://script.google.com/macros/s/AKfycbz8pKhE5iHG2lglKOpJOCTBCY2xpRW0TaICPpVcD8Gy1xLgrSh92bN_mR5-8877qZJI/exec";
+  const url = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 
   const payload = {
     memberId: id,
@@ -66,12 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
         email: email
       };
 
-      // Send the payload to your Google Sheet database via Apps Script
+       // Send the payload to your Google Sheet database via Apps Script
       fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: "POST",
         mode: "cors", 
         headers: {
-          "Content-Type": "text/plain" // Prevents complex CORS pre-flight triggers in Apps Script
+          // Changing this to text/plain bypasses complex browser pre-flight checks
+          "Content-Type": "text/plain;charset=utf-8" 
         },
         body: JSON.stringify(payload)
       })
