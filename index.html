@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gym Member Portal</title>
+  <!-- Link to your PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF5733">
+  
+  <!-- CDN link for JsBarcode library (Generates the check-in barcode) -->
+  <script src="https://jsdelivr.net"></script>
+
+  <style>
+    /* Minimalist Dark Theme for a Gym Vibe */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #121212; color: #ffffff; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+    .app-container { width: 100%; max-width: 450px; background: #1e1e1e; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    header { text-align: center; margin-bottom: 25px; }
+    header h1 { color: #FF5733; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* Card Component */
+    .card { background: #2a2a2a; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #3a3a3a; text-align: center; }
+    .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: #dddddd; text-transform: uppercase; font-weight: 600; }
+    
+    /* Barcode Display Styling */
+    .barcode-container { background: #ffffff; padding: 15px; border-radius: 8px; display: inline-block; margin-top: 10px; }
+    #barcode { max-width: 100%; height: auto; }
+    .member-id-text { font-size: 0.85rem; color: #888888; margin-top: 8px; font-family: monospace; }
+
+    /* Schedule List Styling */
+    .class-item { display: flex; justify-content: space-between; align-items: center; background: #333333; padding: 12px; border-radius: 8px; margin-bottom: 8px; text-align: left; }
+    .class-info h3 { font-size: 0.95rem; color: #ffffff; }
+    .class-info p { font-size: 0.8rem; color: #aaaaaa; }
+    .book-btn { background: #FF5733; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: background 0.2s; }
+    .book-btn:hover { background: #e04c2b; }
+
+    /* Registration Form Styling */
+    .form-group { text-align: left; margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #aaaaaa; margin-bottom: 4px; }
+    .form-group input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #333; color: white; font-size: 0.95rem; }
+    .submit-btn { width: 100%; background: #00cc66; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>Iron Pulse Gym</h1>
+      <p style="color: #888; font-size: 0.85rem;">Member Digital Access App</p>
+    </header>
+
+    <!-- SECTION 1: Member Registration (Saves to Google Sheets) -->
+    <div class="card" id="registration-card">
+      <h2>Create Member Account</h2>
+      <form id="reg-form">
+        <div class="form-group">
+          <label for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" placeholder="john@example.com" required>
+        </div>
+        <button type="submit" class="submit-btn">Register & Get Digital Pass</button>
+      </form>
+    </div>
+
+    <!-- SECTION 2: Digital Keytag / Barcode Check-In (Hidden until registered/logged in) -->
+    <div class="card" id="checkin-card" style="display: none;">
+      <h2>Your Digital Keytag</h2>
+      <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 10px;">Scan at the front desk or entry reader to check in</p>
+      <div class="barcode-container">
+        <!-- JsBarcode targets this SVG element to inject the barcode graphic -->
+        <svg id="barcode"></svg>
+      </div>
+      <div class="member-id-text" id="member-id-display">ID: MBR-XXXXX</div>
+    </div>
+
+    <!-- SECTION 3: Class Schedule & Booking (Triggers Google Apps Script logic) -->
+    <div class="card">
+      <h2>Today's Classes</h2>
+      <div id="schedule-container">
+        
+        <div class="class-item">
+          <div class="class-info">
+            <h3>Morning HIIT Circuit</h3>
+            <p>06:00 AM • Coach Marcus</p>
+          </div>
+          <button class="book-btn" onclick="handleBooking('Morning HIIT')">Book</button>
+        </div>
+
+        <div class="class-item">
+          <div class="class-info">
+            <h3>Power Lifting 101</h3>
+            <p>12:00 PM • Coach Sarah</p>
+          </div>
+          <button class="book-btn" onclick="handleBooking('Power Lifting 101')">Book</button>
+        </div>
+
+        <div class="class-item">
+          <div class="class-info">
+            <h3>Vinyasa Yoga Flow</h3>
+            <p>06:30 PM • Coach Elena</p>
+          </div>
+          <button class="book-btn" onclick="handleBooking('Vinyasa Yoga')">Book</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Inline Script to activate PWA Service Worker right away -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+          .catch(err => console.log('PWA registration failed:', err));
+      });
+    }
+  </script>
+  
+  <!-- Link to your external main JavaScript file where we will handle Google Sheet integrations -->
+  <script src="js/app.js"></script>
+</body>
+</html>
