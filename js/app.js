@@ -37,7 +37,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // 1. Paste your exact Google Apps Script URL here between the quotes
-const GOOGLE_APPS_SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL_HERE";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8pKhE5iHG2lglKOpJOCTBCY2xpRW0TaICPpVcD8Gy1xLgrSh92bN_mR5-8877qZJI/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   const regForm = document.getElementById("reg-form");
