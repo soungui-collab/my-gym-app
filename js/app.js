@@ -53,9 +53,8 @@ function sendToGoogle(payload, formElement) {
   fetch(GOOGLE_APPS_SCRIPT_URL, {
     method: "POST",
     mode: "cors",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
+        headers: {},
+
     body: JSON.stringify(payload)
   })
   .then(response => {
