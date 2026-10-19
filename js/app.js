@@ -29,8 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Class Booking Transmission using a highly stable Image ping script structure
+// Class Booking Engine - Now includes Member Name in the transmission
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
+  const currentName = localStorage.getItem("iron_pulse_name"); // Pulls name from local storage
   const currentEmail = localStorage.getItem("iron_pulse_email");
 
   if (!currentId) {
@@ -47,17 +49,18 @@ function handleBooking(className) {
     btn.innerText = "Booking...";
   }
 
-  // Construct parameter query string
+  // Construct parameter query string (Adding name to the data packet)
   const payload = {
     action: "bookClass",
     memberId: currentId,
+    name: currentName, 
     email: currentEmail,
     className: className
   };
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  // Use Image ping to send data safely to Google Sheets without cross-site blocking issues
+  // Use Image ping to send data safely to Google Sheets without blocks
   const ping = new Image();
   
   ping.onload = () => { processBookingSuccess(btn, className); };
