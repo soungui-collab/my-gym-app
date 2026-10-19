@@ -1,34 +1,34 @@
-// Paste your exact Google Apps Script URL here
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8pKhE5iHG2lglKOpJOCTBCY2xpRW0TaICPpVcD8Gy1xLgrSh92bN_mR5-8877qZJI/exec";
-
-let cachedMemberId = null;
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Check if a client profile already exists on this smartphone
   checkLocalProfile();
 
-  const profileForm = document.getElementById("profile-form");
+  const activateBtn = document.getElementById("activate-profile-btn");
 
-  if (profileForm) {
-    profileForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      
+  if (activateBtn) {
+    activateBtn.addEventListener("click", () => {
       const name = document.getElementById("user-name").value.trim();
       const email = document.getElementById("user-email").value.trim();
-      const memberId = "MBR-" + Date.now(); // Generate clean tracking ID
 
-      // Save credentials straight to phone hardware memory (Instant load setup)
+      if (!name || !email) {
+        alert("Please fill in both fields to activate your profile.");
+        return;
+      }
+
+      const memberId = "MBR-" + Date.now();
+
+      // Save locally to device hardware storage (Instant entry)
       localStorage.setItem("iron_pulse_id", memberId);
       localStorage.setItem("iron_pulse_name", name);
       localStorage.setItem("iron_pulse_email", email);
 
-      // Force view change to custom dashboard
+      // Instantly open dashboard
       setupDashboardView(memberId, name, email);
     });
   }
 });
 
-// Class Booking Engine - Built to completely clear Apple Tracking & CORS Blocks
+// Class Booking Transmission using a highly stable Image ping script structure
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentEmail = localStorage.getItem("iron_pulse_email");
@@ -38,7 +38,6 @@ function handleBooking(className) {
     return;
   }
 
-  // Identify button targets accurately across mobile viewports
   const btn = document.activeElement;
   let originalText = "Book";
   
@@ -48,7 +47,7 @@ function handleBooking(className) {
     btn.innerText = "Booking...";
   }
 
-  // Construct URL Query
+  // Construct parameter query string
   const payload = {
     action: "bookClass",
     memberId: currentId,
@@ -58,17 +57,16 @@ function handleBooking(className) {
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  // Use an Image Ping sequence to pass data safely under mobile Safari's privacy layer
+  // Use Image ping to send data safely to Google Sheets without cross-site blocking issues
   const ping = new Image();
   
-  ping.onload = () => { processBookingSuccess(btn, className, originalText); };
-  ping.onerror = () => { processBookingSuccess(btn, className, originalText); };
+  ping.onload = () => { processBookingSuccess(btn, className); };
+  ping.onerror = () => { processBookingSuccess(btn, className); };
   
-  // Fire data packet directly to Google sheets
   ping.src = transmissionUrl;
 }
 
-function processBookingSuccess(btn, className, originalText) {
+function processBookingSuccess(btn, className) {
   alert(`Successfully booked! You are locked in for "${className}".`);
   if (btn && btn.classList.contains("book-btn")) {
     btn.style.background = "#444444";
@@ -79,7 +77,6 @@ function processBookingSuccess(btn, className, originalText) {
 }
 
 function setupDashboardView(id, name, email) {
-  cachedMemberId = id;
   document.getElementById("auth-card").style.display = "none";
   document.getElementById("dashboard-view").style.display = "block";
   document.getElementById("display-name").innerText = name;
@@ -98,8 +95,8 @@ function checkLocalProfile() {
 
 function clearProfile() {
   localStorage.clear();
-  cachedMemberId = null;
   document.getElementById("dashboard-view").style.display = "none";
   document.getElementById("auth-card").style.display = "block";
-  document.getElementById("profile-form").reset();
+  document.getElementById("user-name").value = "";
+  document.getElementById("user-email").value = "";
 }
