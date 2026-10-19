@@ -14,9 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle Login Form Submission
   if (loginForm) {
     loginForm.addEventListener("submit", (event) => {
-      // CRUCIAL: Stops the browser from refreshing the page on submit
       event.preventDefault(); 
-      
       const email = document.getElementById("login-email").value;
       const submitBtn = loginForm.querySelector(".action-btn");
       
@@ -30,8 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle Registration Form Submission
   if (regForm) {
     regForm.addEventListener("submit", (event) => {
-      event.preventDefault(); // Stops the browser refresh
-      
+      event.preventDefault(); 
       const name = document.getElementById("reg-name").value;
       const email = document.getElementById("reg-email").value;
       const memberId = "MBR-" + Date.now(); 
@@ -50,36 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-  // Handle Registration Form Submission
-  if (regForm) {
-    regForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const name = document.getElementById("reg-name").value;
-      const email = document.getElementById("reg-email").value;
-      const memberId = "MBR-" + Date.now(); // Generate unique ID
-
-      const submitBtn = regForm.querySelector(".action-btn");
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Registering...";
-
-      sendToGoogle({
-        action: "register",
-        memberId: memberId,
-        name: name,
-        email: email
-      }, regForm);
-    });
-  }
-});
-
-// 2. Centralized Network function to send requests to your Google Sheet database
+// 2. Network function to send requests via safe GET parameters
 function sendToGoogle(payload, formElement) {
-  // Convert your data block into a simple URL query string
   let queryParams = new URLSearchParams(payload).toString();
   let finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  // Switching method to GET bypasses almost all mobile security walls completely
   fetch(finalUrl, {
     method: "GET",
     mode: "cors"
@@ -96,10 +68,8 @@ function sendToGoogle(payload, formElement) {
     }
 
     if (data.status === "success") {
-      if (payload.action === "register" || payload.action === "login") {
-        saveSession(data.memberId, data.name);
-        loadDashboard(data.memberId, data.name);
-      }
+      saveSession(data.memberId, data.name);
+      loadDashboard(data.memberId, data.name);
     } else {
       alert("Error: " + data.message);
     }
@@ -115,38 +85,22 @@ function sendToGoogle(payload, formElement) {
   });
 }
 
-    if (data.status === "success") {
-      // Process successful account registration or lookups
-      if (payload.action === "register" || payload.action === "login") {
-        saveSession(data.memberId, data.name);
-        loadDashboard(data.memberId, data.name);
-      }
-    } else {
-      alert("Error: " + data.message);
-    }
-  })
-  .catch(error => {
-    console.error("Database connection fault:", error);
-    alert("Connection Failed: " + error.toString());
-    const submitBtn = formElement.querySelector(".action-btn");
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerText = formElement.id === "login-form" ? "Sign In" : "Register Account";
-    }
-  });
-}
-
-// 3. Class Booking Logic (Sends logs to the "Bookings" tab)
+// 3. Class Booking Logic (Passing the HTML button explicitly to prevent mobile Safari crashes)
 function handleBooking(className) {
   if (!activeMemberId) {
     alert("Please sign into your profile to book gym classes.");
     return;
   }
 
-  const btn = event.target;
-  const originalText = btn.innerText;
-  btn.disabled = true;
-  btn.innerText = "Booking...";
+  // Safely find the exact button that clicked this function without using global window events
+  const btn = window.event ? window.event.target : null;
+  let originalText = "Book";
+  
+  if (btn) {
+    originalText = btn.innerText;
+    btn.disabled = true;
+    btn.innerText = "Booking...";
+  }
 
   const payload = {
     action: "bookClass",
@@ -163,36 +117,38 @@ function handleBooking(className) {
   })
   .then(response => response.json())
   .then(data => {
-    btn.disabled = false;
-    btn.innerText = originalText;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = originalText;
+    }
 
     if (data.status === "success") {
       alert(`Success! You are locked in for "${className}".`);
-      btn.style.background = "#555";
-      btn.innerText = "Reserved";
-      btn.disabled = true;
+      if (btn) {
+        btn.style.background = "#555";
+        btn.innerText = "Reserved";
+        btn.disabled = true;
+      }
     } else {
       alert("Booking failed: " + data.message);
     }
   })
   .catch(error => {
-    btn.disabled = false;
-    btn.innerText = originalText;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = originalText;
+    }
     console.error("Booking error:", error);
     alert("Could not process booking. Check your internet connection.");
   });
 }
 
-
 // 4. View Controllers & Dashboard Handlers
 function loadDashboard(id, name) {
   activeMemberId = id;
-  
-  // Hide Auth screen, reveal custom member dashboard views
   document.getElementById("auth-card").style.display = "none";
   document.getElementById("dashboard-view").style.display = "block";
   document.getElementById("user-welcome").innerText = "Welcome back, " + name + "!";
-  
   generateBarcode(id);
 }
 
@@ -224,7 +180,7 @@ function toggleAuthView(showRegister) {
   }
 }
 
-// 5. Session Memory Hooks (Keeps client logged in even if they close the app)
+// 5. Session Memory Hooks
 function saveSession(id, name) {
   localStorage.setItem("gym_member_id", id);
   localStorage.setItem("gym_member_name", name);
@@ -234,7 +190,8 @@ function checkSession() {
   const savedId = localStorage.getItem("gym_member_id");
   const savedName = localStorage.getItem("gym_member_name");
   if (savedId && savedName) {
-    loadDashboard(savedId, savedName);
+    // Wrap in a tiny timeout to ensure HTML elements exist before drawing dashboard
+    setTimeout(() => { loadDashboard(savedId, savedName); }, 100);
   }
 }
 
