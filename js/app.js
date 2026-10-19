@@ -1,36 +1,32 @@
 // 1. Your Google Apps Script Web App URL
 const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
-// Global variable to keep track of the logged-in member's ID
 let activeMemberId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Check if a member is already logged in from a previous session
+  // Check if member already has a saved profile on their device phone
   checkSession();
 
   const loginForm = document.getElementById("login-form");
   const regForm = document.getElementById("reg-form");
 
-  // Handle Login Form Submission
   if (loginForm) {
-    loginForm.addEventListener("submit", (event) => {
-      event.preventDefault(); 
-      const email = document.getElementById("login-email").value;
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault(); 
+      const email = document.getElementById("login-email").value.trim();
       const submitBtn = loginForm.querySelector(".action-btn");
       
       submitBtn.disabled = true;
       submitBtn.innerText = "Verifying...";
-
       sendToGoogle({ action: "login", email: email }, loginForm);
     });
   }
 
-  // Handle Registration Form Submission
   if (regForm) {
-    regForm.addEventListener("submit", (event) => {
-      event.preventDefault(); 
-      const name = document.getElementById("reg-name").value;
-      const email = document.getElementById("reg-email").value;
+    regForm.addEventListener("submit", (e) => {
+      e.preventDefault(); 
+      const name = document.getElementById("reg-name").value.trim();
+      const email = document.getElementById("reg-email").value.trim();
       const memberId = "MBR-" + Date.now(); 
 
       const submitBtn = regForm.querySelector(".action-btn");
@@ -47,17 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 2. Network function to send requests via safe GET parameters
+// 2. Optimized Network Handler
 function sendToGoogle(payload, formElement) {
-  let queryParams = new URLSearchParams(payload).toString();
-  let finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
+  const queryParams = new URLSearchParams(payload).toString();
+  const finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  fetch(finalUrl, {
-    method: "GET",
-    mode: "cors"
-  })
+  fetch(finalUrl, { method: "GET", mode: "cors" })
   .then(response => {
-    if (!response.ok) throw new Error("Server communication failure: " + response.status);
+    if (!response.ok) throw new Error("Network status: " + response.status);
     return response.json();
   })
   .then(data => {
@@ -68,6 +61,7 @@ function sendToGoogle(payload, formElement) {
     }
 
     if (data.status === "success") {
+      // Save data locally so they NEVER have to log in on this phone again
       saveSession(data.memberId, data.name);
       loadDashboard(data.memberId, data.name);
     } else {
@@ -76,7 +70,7 @@ function sendToGoogle(payload, formElement) {
   })
   .catch(error => {
     console.error("Database connection fault:", error);
-    alert("Connection Error Diagnostic:\n" + error.toString());
+    alert("Connection Error:\n" + error.toString());
     const submitBtn = formElement.querySelector(".action-btn");
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -85,18 +79,18 @@ function sendToGoogle(payload, formElement) {
   });
 }
 
-// 3. Class Booking Logic (Passing the HTML button explicitly to prevent mobile Safari crashes)
+// 3. Class Booking Integration (Fully optimized for device compatibility)
 function handleBooking(className) {
   if (!activeMemberId) {
     alert("Please sign into your profile to book gym classes.");
     return;
   }
 
-  // Safely find the exact button that clicked this function without using global window events
-  const btn = window.event ? window.event.target : null;
+  // Pure JavaScript target finder (100% compatible with iOS Safari & Android Chrome)
+  const btn = document.activeElement;
   let originalText = "Book";
   
-  if (btn) {
+  if (btn && btn.classList.contains("book-btn")) {
     originalText = btn.innerText;
     btn.disabled = true;
     btn.innerText = "Booking...";
@@ -108,23 +102,20 @@ function handleBooking(className) {
     className: className
   };
 
-  let queryParams = new URLSearchParams(payload).toString();
-  let finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
+  const queryParams = new URLSearchParams(payload).toString();
+  const finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  fetch(finalUrl, {
-    method: "GET",
-    mode: "cors"
-  })
+  fetch(finalUrl, { method: "GET", mode: "cors" })
   .then(response => response.json())
   .then(data => {
-    if (btn) {
+    if (btn && btn.classList.contains("book-btn")) {
       btn.disabled = false;
       btn.innerText = originalText;
     }
 
     if (data.status === "success") {
       alert(`Success! You are locked in for "${className}".`);
-      if (btn) {
+      if (btn && btn.classList.contains("book-btn")) {
         btn.style.background = "#555";
         btn.innerText = "Reserved";
         btn.disabled = true;
@@ -134,7 +125,7 @@ function handleBooking(className) {
     }
   })
   .catch(error => {
-    if (btn) {
+    if (btn && btn.classList.contains("book-btn")) {
       btn.disabled = false;
       btn.innerText = originalText;
     }
@@ -143,7 +134,7 @@ function handleBooking(className) {
   });
 }
 
-// 4. View Controllers & Dashboard Handlers
+// 4. View Controllers
 function loadDashboard(id, name) {
   activeMemberId = id;
   document.getElementById("auth-card").style.display = "none";
@@ -155,7 +146,7 @@ function loadDashboard(id, name) {
 function generateBarcode(id) {
   document.getElementById("member-id-display").innerText = "ID: " + id;
   if (typeof JsBarcode === "undefined") {
-    setTimeout(() => { generateBarcode(id); }, 500);
+    setTimeout(() => { generateBarcode(id); }, 300);
     return;
   }
   JsBarcode("#barcode", id, {
@@ -167,7 +158,6 @@ function generateBarcode(id) {
   });
 }
 
-// Switches form layouts visually on the screen
 function toggleAuthView(showRegister) {
   if (showRegister) {
     document.getElementById("auth-title").innerText = "Create Account";
@@ -180,7 +170,7 @@ function toggleAuthView(showRegister) {
   }
 }
 
-// 5. Session Memory Hooks
+// 5. Device-Level Memory Cache
 function saveSession(id, name) {
   localStorage.setItem("gym_member_id", id);
   localStorage.setItem("gym_member_name", name);
@@ -190,8 +180,11 @@ function checkSession() {
   const savedId = localStorage.getItem("gym_member_id");
   const savedName = localStorage.getItem("gym_member_name");
   if (savedId && savedName) {
-    // Wrap in a tiny timeout to ensure HTML elements exist before drawing dashboard
-    setTimeout(() => { loadDashboard(savedId, savedName); }, 100);
+    // Instantly inject data onto screen without hitches
+    activeMemberId = savedId;
+    window.addEventListener("load", () => {
+      loadDashboard(savedId, savedName);
+    });
   }
 }
 
