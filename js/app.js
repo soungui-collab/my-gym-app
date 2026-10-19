@@ -1,4 +1,4 @@
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8pKhE5iHG2lglKOpJOCTBCY2xpRW0TaICPpVcD8Gy1xLgrSh92bN_mR5-8877qZJI/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
