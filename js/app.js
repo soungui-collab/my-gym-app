@@ -50,24 +50,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 2. Centralized Network function to send requests to your Google Sheet database
 function sendToGoogle(payload, formElement) {
-  fetch(GOOGLE_APPS_SCRIPT_URL, {
-    method: "POST",
-    mode: "cors",
-        headers: {},
+  // Convert your data block into a simple URL query string
+  let queryParams = new URLSearchParams(payload).toString();
+  let finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-    body: JSON.stringify(payload)
+  // Switching method to GET bypasses almost all mobile security walls completely
+  fetch(finalUrl, {
+    method: "GET",
+    mode: "cors"
   })
   .then(response => {
     if (!response.ok) throw new Error("Server communication failure: " + response.status);
     return response.json();
   })
   .then(data => {
-    // Reset buttons inside the calling form
     const submitBtn = formElement.querySelector(".action-btn");
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.innerText = formElement.id === "login-form" ? "Sign In" : "Register Account";
     }
+
+    if (data.status === "success") {
+      if (payload.action === "register" || payload.action === "login") {
+        saveSession(data.memberId, data.name);
+        loadDashboard(data.memberId, data.name);
+      }
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error("Database connection fault:", error);
+    alert("Connection Error Diagnostic:\n" + error.toString());
+    const submitBtn = formElement.querySelector(".action-btn");
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = formElement.id === "login-form" ? "Sign In" : "Register Account";
+    }
+  });
+}
 
     if (data.status === "success") {
       // Process successful account registration or lookups
@@ -97,7 +118,6 @@ function handleBooking(className) {
     return;
   }
 
-  // Target the specific book button to give active visual confirmation
   const btn = event.target;
   const originalText = btn.innerText;
   btn.disabled = true;
@@ -109,13 +129,12 @@ function handleBooking(className) {
     className: className
   };
 
-  fetch(GOOGLE_APPS_SCRIPT_URL, {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    body: JSON.stringify(payload)
+  let queryParams = new URLSearchParams(payload).toString();
+  let finalUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
+
+  fetch(finalUrl, {
+    method: "GET",
+    mode: "cors"
   })
   .then(response => response.json())
   .then(data => {
@@ -138,6 +157,7 @@ function handleBooking(className) {
     alert("Could not process booking. Check your internet connection.");
   });
 }
+
 
 // 4. View Controllers & Dashboard Handlers
 function loadDashboard(id, name) {
