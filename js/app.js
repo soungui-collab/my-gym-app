@@ -1,110 +1,203 @@
 // 1. Your Google Apps Script Web App URL
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8pKhE5iHG2lglKOpJOCTBCY2xpRW0TaICPpVcD8Gy1xLgrSh92bN_mR5-8877qZJI/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
-// 2. Fixed Service Worker Registration (Fixed path for GitHub Pages)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    // Using a relative path 'sw.js' allows it to load correctly inside your GitHub subfolder
-    navigator.serviceWorker.register('sw.js')
-      .then((registration) => {
-        console.log('PWA Service Worker registered successfully!', registration.scope);
-      })
-      .catch((error) => {
-        console.error('PWA Service Worker registration failed:', error);
-      });
-  });
-}
+// Global variable to keep track of the logged-in member's ID
+let activeMemberId = null;
 
-// 3. Form Submission Handling
 document.addEventListener("DOMContentLoaded", () => {
+  // Check if a member is already logged in from a previous session
+  checkSession();
+
+  // Setup form submission listeners
+  const loginForm = document.getElementById("login-form");
   const regForm = document.getElementById("reg-form");
-  
+
+  // Handle Login Form Submission
+  if (loginForm) {
+    loginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const submitBtn = loginForm.querySelector(".action-btn");
+      
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Verifying...";
+
+      sendToGoogle({ action: "login", email: email }, loginForm);
+    });
+  }
+
+  // Handle Registration Form Submission
   if (regForm) {
     regForm.addEventListener("submit", (event) => {
-      event.preventDefault(); // Stop page from reloading
-
+      event.preventDefault();
       const name = document.getElementById("reg-name").value;
       const email = document.getElementById("reg-email").value;
-      const memberId = "MBR-" + Date.now(); // Unique ID
+      const memberId = "MBR-" + Date.now(); // Generate unique ID
 
-      const submitBtn = regForm.querySelector(".submit-btn");
+      const submitBtn = regForm.querySelector(".action-btn");
       submitBtn.disabled = true;
-      submitBtn.innerText = "Generating Pass...";
+      submitBtn.innerText = "Registering...";
 
-      const payload = {
+      sendToGoogle({
+        action: "register",
         memberId: memberId,
         name: name,
         email: email
-      };
-
-      // Send data to Google Sheets
-      fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "cors", 
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8" 
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Google server responded with status: " + response.status);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.status === "success") {
-          // Success! Show keytag
-          document.getElementById("registration-card").style.display = "none";
-          document.getElementById("checkin-card").style.display = "block";
-          generateBarcode(memberId);
-        } else {
-          alert("Google Database Error: " + data.message);
-          submitBtn.disabled = false;
-          submitBtn.innerText = "Register & Get Digital Pass";
-        }
-      })
-      .catch(error => {
-        console.error("Connection Error:", error);
-        // This will pop up the EXACT internal reason your phone browser is failing
-        alert("Connection Failed.\n\nReason: " + error.toString() + "\n\nPlease verify that your Google Web App configuration is deployed as a New Version accessible to 'Anyone'.");
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Register & Get Digital Pass";
-      });
+      }, regForm);
     });
   }
 });
 
-// 4. Function to generate Barcode safely via JsBarcode library
-function generateBarcode(id) {
-  document.getElementById("member-id-display").innerText = "ID: " + id;
-  
-  // Guard Check: If the library is still downloading, wait 500ms and try again
-  if (typeof JsBarcode === "undefined") {
-    console.warn("JsBarcode library not ready yet, retrying in 500ms...");
-    setTimeout(() => { generateBarcode(id); }, 500);
-    return;
-  }
+// 2. Centralized Network function to send requests to your Google Sheet database
+function sendToGoogle(payload, formElement) {
+  fetch(GOOGLE_APPS_SCRIPT_URL, {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Server communication failure: " + response.status);
+    return response.json();
+  })
+  .then(data => {
+    // Reset buttons inside the calling form
+    const submitBtn = formElement.querySelector(".action-btn");
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = formElement.id === "login-form" ? "Sign In" : "Register Account";
+    }
 
-  // Once safely loaded, draw the high-contrast barcode graphic
-  JsBarcode("#barcode", id, {
-    format: "CODE128", 
-    lineColor: "#121212",
-    width: 2,
-    height: 70,
-    displayValue: false 
+    if (data.status === "success") {
+      // Process successful account registration or lookups
+      if (payload.action === "register" || payload.action === "login") {
+        saveSession(data.memberId, data.name);
+        loadDashboard(data.memberId, data.name);
+      }
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error("Database connection fault:", error);
+    alert("Connection Failed: " + error.toString());
+    const submitBtn = formElement.querySelector(".action-btn");
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = formElement.id === "login-form" ? "Sign In" : "Register Account";
+    }
   });
 }
 
-// 5. Class Booking Logic
+// 3. Class Booking Logic (Sends logs to the "Bookings" tab)
 function handleBooking(className) {
-  const memberIdText = document.getElementById("member-id-display").innerText;
-  
-  if (memberIdText.includes("MBR-XXXXX")) {
-    alert("Please register a member profile before booking classes.");
+  if (!activeMemberId) {
+    alert("Please sign into your profile to book gym classes.");
     return;
   }
+
+  // Target the specific book button to give active visual confirmation
+  const btn = event.target;
+  const originalText = btn.innerText;
+  btn.disabled = true;
+  btn.innerText = "Booking...";
+
+  const payload = {
+    action: "bookClass",
+    memberId: activeMemberId,
+    className: className
+  };
+
+  fetch(GOOGLE_APPS_SCRIPT_URL, {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+    btn.disabled = false;
+    btn.innerText = originalText;
+
+    if (data.status === "success") {
+      alert(`Success! You are locked in for "${className}".`);
+      btn.style.background = "#555";
+      btn.innerText = "Reserved";
+      btn.disabled = true;
+    } else {
+      alert("Booking failed: " + data.message);
+    }
+  })
+  .catch(error => {
+    btn.disabled = false;
+    btn.innerText = originalText;
+    console.error("Booking error:", error);
+    alert("Could not process booking. Check your internet connection.");
+  });
+}
+
+// 4. View Controllers & Dashboard Handlers
+function loadDashboard(id, name) {
+  activeMemberId = id;
   
-  const memberId = memberIdText.replace("ID: ", "");
-  alert(`Booking request sent for "${className}" using Member ID: ${memberId}`);
+  // Hide Auth screen, reveal custom member dashboard views
+  document.getElementById("auth-card").style.display = "none";
+  document.getElementById("dashboard-view").style.display = "block";
+  document.getElementById("user-welcome").innerText = "Welcome back, " + name + "!";
+  
+  generateBarcode(id);
+}
+
+function generateBarcode(id) {
+  document.getElementById("member-id-display").innerText = "ID: " + id;
+  if (typeof JsBarcode === "undefined") {
+    setTimeout(() => { generateBarcode(id); }, 500);
+    return;
+  }
+  JsBarcode("#barcode", id, {
+    format: "CODE128",
+    lineColor: "#121212",
+    width: 2,
+    height: 70,
+    displayValue: false
+  });
+}
+
+// Switches form layouts visually on the screen
+function toggleAuthView(showRegister) {
+  if (showRegister) {
+    document.getElementById("auth-title").innerText = "Create Account";
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("reg-form").style.display = "block";
+  } else {
+    document.getElementById("auth-title").innerText = "Member Login";
+    document.getElementById("login-form").style.display = "block";
+    document.getElementById("reg-form").style.display = "none";
+  }
+}
+
+// 5. Session Memory Hooks (Keeps client logged in even if they close the app)
+function saveSession(id, name) {
+  localStorage.setItem("gym_member_id", id);
+  localStorage.setItem("gym_member_name", name);
+}
+
+function checkSession() {
+  const savedId = localStorage.getItem("gym_member_id");
+  const savedName = localStorage.getItem("gym_member_name");
+  if (savedId && savedName) {
+    loadDashboard(savedId, savedName);
+  }
+}
+
+function logout() {
+  localStorage.clear();
+  activeMemberId = null;
+  document.getElementById("dashboard-view").style.display = "none";
+  document.getElementById("auth-card").style.display = "block";
+  toggleAuthView(false);
 }
