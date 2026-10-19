@@ -8,14 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Check if a member is already logged in from a previous session
   checkSession();
 
-  // Setup form submission listeners
   const loginForm = document.getElementById("login-form");
   const regForm = document.getElementById("reg-form");
 
   // Handle Login Form Submission
   if (loginForm) {
     loginForm.addEventListener("submit", (event) => {
-      event.preventDefault();
+      // CRUCIAL: Stops the browser from refreshing the page on submit
+      event.preventDefault(); 
+      
       const email = document.getElementById("login-email").value;
       const submitBtn = loginForm.querySelector(".action-btn");
       
@@ -25,6 +26,30 @@ document.addEventListener("DOMContentLoaded", () => {
       sendToGoogle({ action: "login", email: email }, loginForm);
     });
   }
+
+  // Handle Registration Form Submission
+  if (regForm) {
+    regForm.addEventListener("submit", (event) => {
+      event.preventDefault(); // Stops the browser refresh
+      
+      const name = document.getElementById("reg-name").value;
+      const email = document.getElementById("reg-email").value;
+      const memberId = "MBR-" + Date.now(); 
+
+      const submitBtn = regForm.querySelector(".action-btn");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Registering...";
+
+      sendToGoogle({
+        action: "register",
+        memberId: memberId,
+        name: name,
+        email: email
+      }, regForm);
+    });
+  }
+});
+
 
   // Handle Registration Form Submission
   if (regForm) {
