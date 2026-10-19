@@ -1,6 +1,6 @@
 {
-  "name": "Iron Pulse Gym Portal",
-  "short_name": "Iron Pulse",
+  "name": "Soungui Fitness Gym Portal",
+  "short_name": "Soungui Fitness",
   "description": "Member Access and Class Booking Portal",
   "start_url": "/my-gym-app/index.html",
   "display": "standalone",
