@@ -99,4 +99,4 @@ function handleBooking(className) {
   
   const memberId = memberIdText.replace("ID: ", "");
   alert(`Booking request sent for "${className}" using Member ID: ${memberId}`);
-
+}
