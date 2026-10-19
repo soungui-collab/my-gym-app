@@ -1,21 +1,45 @@
-{
-  "short_name": "GymApp",
-  "name": "My Custom Gym Member App",
-  "icons": [
-    {
-      "src": "assets/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "assets/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+function doGet(e) {
+  var lock = LockService.getPublicLock();
+  lock.waitLock(10000); 
+
+  try {
+    if (!e || !e.parameter || !e.parameter.action) {
+      return ContentService.createTextOutput("Error: Missing parameters.");
     }
-  ],
-  "start_url": "/index.html",
-  "background_color": "#121212",
-  "theme_color": "#FF5733",
-  "display": "standalone",
-  "orientation": "portrait"
+
+    var data = e.parameter;
+    var action = data.action;
+
+    if (action === "bookClass") {
+      var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Bookings");
+      
+      if (!sheet) {
+        sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Bookings");
+        // Added Member Name column to the baseline header template
+        sheet.appendRow(["Booking ID", "Member ID", "Class Name", "Date/Time", "Email", "Member Name"]);
+      }
+
+      var bookingId = "BK-" + Date.now();
+      var timestamp = new Date().toLocaleString();
+
+      // Write parameters directly into your columns (Adding data.name at the end)
+      sheet.appendRow([
+        bookingId, 
+        data.memberId, 
+        data.className, 
+        timestamp,
+        data.email,
+        data.name 
+      ]);
+      
+      SpreadsheetApp.flush(); 
+    }
+    
+    return ContentService.createTextOutput("Success");
+
+  } catch(error) {
+    return ContentService.createTextOutput("Backend Error: " + error.toString());
+  } finally {
+    lock.releaseLock(); 
+  }
 }
