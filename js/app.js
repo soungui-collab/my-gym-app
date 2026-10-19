@@ -75,10 +75,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 4. Function to generate Barcode via JsBarcode library
+// 4. Function to generate Barcode safely via JsBarcode library
 function generateBarcode(id) {
   document.getElementById("member-id-display").innerText = "ID: " + id;
   
+  // Guard Check: If the library is still downloading, wait 500ms and try again
+  if (typeof JsBarcode === "undefined") {
+    console.warn("JsBarcode library not ready yet, retrying in 500ms...");
+    setTimeout(() => { generateBarcode(id); }, 500);
+    return;
+  }
+
+  // Once safely loaded, draw the high-contrast barcode graphic
   JsBarcode("#barcode", id, {
     format: "CODE128", 
     lineColor: "#121212",
