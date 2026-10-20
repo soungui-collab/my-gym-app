@@ -1,86 +1,4 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
-
-// URL for Fitness Assessments & Workouts Sheet (Your new dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwbrNybFqkzn2pataodVL7dHUjS4FH6OGusx1ciHm_Zl6y0OT5bmUv2JGoHRJq1tP4H/exec"; 
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Check if user is already logged in locally on this device
-  checkLocalProfile();
-
-  const activateBtn = document.getElementById("activate-profile-btn");
-
-  if (activateBtn) {
-    activateBtn.addEventListener("click", async () => {
-      const name = document.getElementById("user-name").value.trim();
-      const email = document.getElementById("user-email").value.trim();
-
-      if (!name || !email) {
-        alert("Please fill in both fields to activate your profile.");
-        return;
-      }
-
-      // Generate or retrieve booking ID
-      let memberId = localStorage.getItem("iron_pulse_id");
-      if (!memberId) {
-        memberId = "MBR-" + Date.now();
-      }
-
-      // 1. Core Profile Local Storage Sync (Maintains Booking Engines)
-      localStorage.setItem("iron_pulse_id", memberId);
-      localStorage.setItem("iron_pulse_name", name);
-      localStorage.setItem("iron_pulse_email", email);
-
-      // 2. Instantly launch user interface layout view
-      setupDashboardView(memberId, name, email);
-
-      // 3. Fetch Workout & Assessment sheets updates in the background
-      await fetchFitnessData(email);
-    });
-  }
-});
-
-// Asynchronous background engine to fetch workout and assessment sheets data
-async function fetchFitnessData(email) {
-    const workoutDisplay = document.getElementById('workout-display');
-    const assessmentDisplay = document.getElementById('assessment-display');
-
-    if (workoutDisplay) workoutDisplay.innerText = "Loading your customized routine...";
-    if (assessmentDisplay) assessmentDisplay.innerText = "Loading your metrics...";
-
-    try {
-        const response = await fetch(`${GOOGLE_API_URL}?email=${encodeURIComponent(email)}`);
-        const result = await response.json();
-        
-        if (result.success) {
-            // NOTE: Replace 'WorkoutColumn' and 'AssessmentColumn' with your exact column header titles from row 1 of your sheet
-            if (workoutDisplay) workoutDisplay.innerText = result.user.Workout || "No workout assigned.";
-            if (assessmentDisplay) assessmentDisplay.innerText = result.user.Assessment || "No recent metrics.";
-        } else {
-            if (workoutDisplay) workoutDisplay.innerText = "Account activated! Contact coach to assign custom workouts.";
-            if (assessmentDisplay) assessmentDisplay.innerText = "No recent fitness assessments found.";
-        }
-    } catch (error) {
-        console.error("Dashboard Sheet Data Sync failed:", error);
-        if (workoutDisplay) workoutDisplay.innerText = "Offline mode: Could not fetch daily workout rules right now.";
-        if (assessmentDisplay) assessmentDisplay.innerText = "Offline mode: Could not verify body composition metrics.";
-    }
-}
-
-// Class Booking Transmission using a highly stable Image ping script structure
-function handleBooking(className) {
-  const currentId = localStorage.getItem("iron_pulse_id");
-  const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentEmail = localStorage.getItem("iron_pulse_email");
-
-  if (!currentId) {
-    alert("Please set up a profile before booking gym classes.");
-    return;
-  }
-
-  const btn = document.activeElement;
-  
- // URL for Class Bookings Sheet (Your original connection)
 const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your new dashboard connection)
@@ -95,19 +13,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (activateBtn) {
     activateBtn.addEventListener("click", async () => {
       const name = document.getElementById("user-name").value.trim();
-      const email = document.getElementById("user-email").value.trim();
+      const email = document.getElementById("user-email").value.trim().toLowerCase();
+      const password = document.getElementById("user-password").value.trim();
 
-      if (!email) {
-        alert("Please enter your email address to access your portal.");
+      if (!email || !password) {
+        alert("Please enter both your email and password to log in.");
         return;
       }
 
-      // Visual feedback so the user knows the app is searching the database
-      activateBtn.innerText = "Verifying Account...";
+      // Visual feedback so the user knows the app is reading the spreadsheet
+      activateBtn.innerText = "Verifying Credentials...";
       activateBtn.disabled = true;
 
       try {
-        // 1. Check your Google Sheet backend first to see if this profile exists
+        // 1. Fetch your Google Sheet user entry matching this email
         const response = await fetch(`${GOOGLE_API_URL}?email=${encodeURIComponent(email)}`);
         const result = await response.json();
 
@@ -115,65 +34,71 @@ document.addEventListener("DOMContentLoaded", () => {
         let displayName = name || "Guest Member";
 
         if (result.success) {
-            // A. EXISTING PROFILE FOUND: Pull their saved data from Google Sheets!
-            // Look for a Member ID column in your sheet, fallback to email if missing
-            memberId = result.user.MemberID || result.user.memberId || "MBR-" + Date.now();
-            if (result.user.Name || result.user.Full_Name) {
-                displayName = result.user.Name || result.user.Full_Name;
-            }
-            
-            // Save their true sheet details locally to device hardware storage
-            localStorage.setItem("iron_pulse_id", memberId);
-            localStorage.setItem("iron_pulse_name", displayName);
-            localStorage.setItem("iron_pulse_email", email);
+            // 2. PASSWORD VERIFICATION LAYER
+            // NOTE: Replace 'Password' with the EXACT header name of your password column in row 1 of your sheet
+            const correctPassword = result.user.Password || result.user.password;
 
-            // Open dashboard view with their database records
-            setupDashboardView(memberId, displayName, email);
-            
-            // Populate the workout and assessment sections with their sheet data
-            // NOTE: Replace 'WorkoutColumn' and 'AssessmentColumn' with your exact column header names!
-            document.getElementById('workout-display').innerText = result.user.WorkoutColumn || "No workout assigned.";
-            document.getElementById('assessment-display').innerText = result.user.AssessmentColumn || "No recent metrics.";
+            if (correctPassword && String(correctPassword).trim() === password) {
+                // SUCCESS: Passwords match perfectly!
+                memberId = result.user.MemberID || result.user.memberId || "MBR-" + Date.now();
+                if (result.user.Name || result.user.Full_Name) {
+                    displayName = result.user.Name || result.user.Full_Name;
+                }
+                
+                // Save profile tokens securely onto the physical device
+                localStorage.setItem("iron_pulse_id", memberId);
+                localStorage.setItem("iron_pulse_name", displayName);
+                localStorage.setItem("iron_pulse_email", email);
+
+                // Initialize layout views
+                setupDashboardView(memberId, displayName, email);
+                
+                // Populate metrics and training rows 
+                // NOTE: Change 'WorkoutColumn' and 'AssessmentColumn' to your exact column header labels
+                document.getElementById('workout-display').innerText = result.user.WorkoutColumn || "No workout assigned.";
+                document.getElementById('assessment-display').innerText = result.user.AssessmentColumn || "No recent metrics.";
+            } else {
+                // FAILURE: Password didn't match the row value
+                alert("Incorrect password. Please try again.");
+                document.getElementById("user-password").value = "";
+            }
 
         } else {
-            // B. NEW CLIENT REGISTERING: Create a brand new profile
+            // 3. REGISTRATION FALLBACK (If account doesn't exist yet)
             if (!name) {
-                alert("We couldn't find an existing account with that email. If you are new, please fill in your Full Name to register!");
-                activateBtn.innerText = "Activate Account";
+                alert("Account not found. If you are registering a brand new profile, please type your Full Name as well!");
+                activateBtn.innerText = "Enter Portal";
                 activateBtn.disabled = false;
                 return;
             }
 
+            // Create a brand new local deployment ID
             memberId = "MBR-" + Date.now();
             localStorage.setItem("iron_pulse_id", memberId);
             localStorage.setItem("iron_pulse_name", displayName);
             localStorage.setItem("iron_pulse_email", email);
 
             setupDashboardView(memberId, displayName, email);
-            document.getElementById('workout-display').innerText = "Welcome! Your customized workout plan will appear here soon.";
-            document.getElementById('assessment-display').innerText = "No recent fitness assessments found.";
+            document.getElementById('workout-display').innerText = "Profile activated! Your custom workout schedules will load here shortly.";
+            document.getElementById('assessment-display').innerText = "No assessment metrics loaded for this profile yet.";
         }
 
       } catch (error) {
-          console.error("Database connection error during login:", error);
-          alert("Could not connect to the Soungui Fitness servers. Please check your internet connection.");
-          
-          // Fallback basic registration mode if your sheet server goes down entirely
-          if (name) {
-              memberId = "MBR-" + Date.now();
-              localStorage.setItem("iron_pulse_id", memberId);
-              localStorage.setItem("iron_pulse_name", name);
-              localStorage.setItem("iron_pulse_email", email);
-              setupDashboardView(memberId, name, email);
-          }
+          console.error("Authentication handshake failed:", error);
+          alert("Could not connect to authentication grid. Please check your network.");
       } finally {
-          // Reset button text
-          activateBtn.innerText = "Activate Account";
+          // Restore button parameters
+          activateBtn.innerText = "Enter Portal";
           activateBtn.disabled = false;
       }
     });
   }
 });
+
+// =========================================================================
+// LEAVE ALL REMAINING BOOKING AND VIEW LOGIC UNTOUCHED BELOW THIS LINE
+// =========================================================================
+
 
 // =========================================================================
 // REMAINING BOOKING AND VIEW FUNCTIONS STAY EXACTLY THE SAME BELOW THIS LINE
