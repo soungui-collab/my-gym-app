@@ -54,8 +54,8 @@ async function fetchFitnessData(email) {
         
         if (result.success) {
             // NOTE: Replace 'WorkoutColumn' and 'AssessmentColumn' with your exact column header titles from row 1 of your sheet
-            if (workoutDisplay) workoutDisplay.innerText = result.user.WorkoutColumn || "No workout assigned.";
-            if (assessmentDisplay) assessmentDisplay.innerText = result.user.AssessmentColumn || "No recent metrics.";
+            if (workoutDisplay) workoutDisplay.innerText = result.user.Workout || "No workout assigned.";
+            if (assessmentDisplay) assessmentDisplay.innerText = result.user.Assessment || "No recent metrics.";
         } else {
             if (workoutDisplay) workoutDisplay.innerText = "Account activated! Contact coach to assign custom workouts.";
             if (assessmentDisplay) assessmentDisplay.innerText = "No recent fitness assessments found.";
