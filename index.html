@@ -52,18 +52,24 @@
     <p>Member Access Portal</p>
   </header>
 
-    <!-- SINGLE LOGIN / ACTIVATION CARD -->
+     <!-- SINGLE UNIFIED AUTHENTICATION CARD -->
   <div class="card" id="auth-card">
     <h2>Access Member Portal</h2>
-    <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">Returning members: Simply enter your email address to sync your data. New members: Fill out both fields to activate your profile.</p>
+    <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">
+      Enter your login credentials to sync your training data and schedule daily gym classes.
+    </p>
     
     <div class="form-group">
-      <label for="user-name">Full Name (New Members Only)</label>
+      <label for="user-name">Full Name <span style="color: #666; font-size: 0.75rem;">(New Members Only)</span></label>
       <input type="text" id="user-name" placeholder="John Doe">
     </div>
     <div class="form-group">
       <label for="user-email">Email Address</label>
       <input type="text" id="user-email" placeholder="john@example.com">
+    </div>
+    <div class="form-group">
+      <label for="user-password">Password</label>
+      <input type="password" id="user-password" placeholder="••••••••" style="width: 100%; padding: 10px; border: 1px solid #444; background: #222; color: #fff; border-radius: 6px; box-sizing: border-box;">
     </div>
     <button id="activate-profile-btn" class="action-btn">Enter Portal</button>
   </div>
