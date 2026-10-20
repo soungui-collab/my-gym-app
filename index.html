@@ -46,6 +46,26 @@
   </style>
 </head>
 <body>
+  <!-- CLIENT LOGIN SCREEN -->
+<div id="login-screen">
+    <h2>Client Portal Login</h2>
+    <input type="email" id="clientEmail" placeholder="Enter your email address">
+    <button onclick="clientLogin()">Access Dashboard</button>
+</div>
+
+<!-- CLIENT DASHBOARD VIEW (Hidden until login succeeds) -->
+<div id="dashboard-screen" style="display: none;">
+    <h1 id="client-name">Loading Dashboard...</h1>
+    <div>
+        <h3>🏋️ Your Workouts</h3>
+        <p id="workout-display">Fetching your workout plan...</p>
+    </div>
+    <div>
+        <h3>📊 Fitness Assessment</h3>
+        <p id="assessment-display">Fetching your metrics...</p>
+    </div>
+</div>
+
 
   <div class="app-container">
     <header>
