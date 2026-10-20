@@ -1,12 +1,17 @@
+// URL for Class Bookings Sheet (Your original connection)
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
 
+// URL for Fitness Assessments & Workouts Sheet (Your new dashboard connection)
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwbrNybFqkzn2pataodVL7dHUjS4FH6OGusx1ciHm_Zl6y0OT5bmUv2JGoHRJq1tP4H/exec"; 
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Check if user is already logged in locally on this device
   checkLocalProfile();
 
   const activateBtn = document.getElementById("activate-profile-btn");
 
   if (activateBtn) {
-    activateBtn.addEventListener("click", () => {
+    activateBtn.addEventListener("click", async () => {
       const name = document.getElementById("user-name").value.trim();
       const email = document.getElementById("user-email").value.trim();
 
@@ -15,24 +20,57 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const memberId = "MBR-" + Date.now();
+      // Generate or retrieve booking ID
+      let memberId = localStorage.getItem("iron_pulse_id");
+      if (!memberId) {
+        memberId = "MBR-" + Date.now();
+      }
 
-      // Save locally to device hardware storage (Instant entry)
+      // 1. Core Profile Local Storage Sync (Maintains Booking Engines)
       localStorage.setItem("iron_pulse_id", memberId);
       localStorage.setItem("iron_pulse_name", name);
       localStorage.setItem("iron_pulse_email", email);
 
-      // Instantly open dashboard
+      // 2. Instantly launch user interface layout view
       setupDashboardView(memberId, name, email);
+
+      // 3. Fetch Workout & Assessment sheets updates in the background
+      await fetchFitnessData(email);
     });
   }
 });
 
+// Asynchronous background engine to fetch workout and assessment sheets data
+async function fetchFitnessData(email) {
+    const workoutDisplay = document.getElementById('workout-display');
+    const assessmentDisplay = document.getElementById('assessment-display');
+
+    if (workoutDisplay) workoutDisplay.innerText = "Loading your customized routine...";
+    if (assessmentDisplay) assessmentDisplay.innerText = "Loading your metrics...";
+
+    try {
+        const response = await fetch(`${GOOGLE_API_URL}?email=${encodeURIComponent(email)}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            // NOTE: Replace 'WorkoutColumn' and 'AssessmentColumn' with your exact column header titles from row 1 of your sheet
+            if (workoutDisplay) workoutDisplay.innerText = result.user.WorkoutColumn || "No workout assigned.";
+            if (assessmentDisplay) assessmentDisplay.innerText = result.user.AssessmentColumn || "No recent metrics.";
+        } else {
+            if (workoutDisplay) workoutDisplay.innerText = "Account activated! Contact coach to assign custom workouts.";
+            if (assessmentDisplay) assessmentDisplay.innerText = "No recent fitness assessments found.";
+        }
+    } catch (error) {
+        console.error("Dashboard Sheet Data Sync failed:", error);
+        if (workoutDisplay) workoutDisplay.innerText = "Offline mode: Could not fetch daily workout rules right now.";
+        if (assessmentDisplay) assessmentDisplay.innerText = "Offline mode: Could not verify body composition metrics.";
+    }
+}
+
 // Class Booking Transmission using a highly stable Image ping script structure
-// Class Booking Engine - Now includes Member Name in the transmission
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
-  const currentName = localStorage.getItem("iron_pulse_name"); // Pulls name from local storage
+  const currentName = localStorage.getItem("iron_pulse_name"); 
   const currentEmail = localStorage.getItem("iron_pulse_email");
 
   if (!currentId) {
@@ -41,15 +79,13 @@ function handleBooking(className) {
   }
 
   const btn = document.activeElement;
-  let originalText = "Book";
   
   if (btn && btn.classList.contains("book-btn")) {
-    originalText = btn.innerText;
     btn.disabled = true;
     btn.innerText = "Booking...";
   }
 
-  // Construct parameter query string (Adding name to the data packet)
+  // Construct parameter query string (Adding name data packet)
   const payload = {
     action: "bookClass",
     memberId: currentId,
@@ -93,6 +129,8 @@ function checkLocalProfile() {
 
   if (id && name && email) {
     setupDashboardView(id, name, email);
+    // Automatically retrieve sheet items if profile is cached
+    fetchFitnessData(email);
   }
 }
 
@@ -103,50 +141,3 @@ function clearProfile() {
   document.getElementById("user-name").value = "";
   document.getElementById("user-email").value = "";
 }
-
-// 1. Paste your exact Google Apps Script URL between the quotation marks below:
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwbrNybFqkzn2pataodVL7dHUjS4FH6OGusx1ciHm_Zl6y0OT5bmUv2JGoHRJq1tP4H/exec"; 
-
-// 2. The function that triggers when a client clicks your new button
-async function clientLogin() {
-    const emailInput = document.getElementById('clientEmail').value.trim();
-    
-    if (!emailInput) {
-        alert("Please enter your email address.");
-        return;
-    }
-
-    try {
-        // This sends the email to your Google Sheet Script
-        const response = await fetch(`${GOOGLE_API_URL}?email=${encodeURIComponent(emailInput)}`);
-        const result = await response.json();
-        
-        if (result.success) {
-            // Save email to remember them next time
-            localStorage.setItem('loggedInClientEmail', emailInput);
-            
-            // Switch screens and show the data
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'block';
-            
-            // Change 'WorkoutColumn' and 'AssessmentColumn' to match your exact spreadsheet column headers!
-            document.getElementById('client-name').innerText = `Welcome back!`;
-            document.getElementById('workout-display').innerText = result.user.WorkoutColumn || "No workout assigned.";
-            document.getElementById('assessment-display').innerText = result.user.AssessmentColumn || "No recent metrics.";
-        } else {
-            alert("Login failed: Email not found.");
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred. Please try again.");
-    }
-}
-
-// 3. Auto-Login: Check if they logged in before so they don't have to re-type it
-window.addEventListener('DOMContentLoaded', () => {
-    const savedEmail = localStorage.getItem('loggedInClientEmail');
-    if (savedEmail) {
-        document.getElementById('clientEmail').value = savedEmail;
-        clientLogin();
-    }
-});
