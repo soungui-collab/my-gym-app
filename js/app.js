@@ -103,3 +103,50 @@ function clearProfile() {
   document.getElementById("user-name").value = "";
   document.getElementById("user-email").value = "";
 }
+
+// 1. Paste your exact Google Apps Script URL between the quotation marks below:
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwbrNybFqkzn2pataodVL7dHUjS4FH6OGusx1ciHm_Zl6y0OT5bmUv2JGoHRJq1tP4H/exec"; 
+
+// 2. The function that triggers when a client clicks your new button
+async function clientLogin() {
+    const emailInput = document.getElementById('clientEmail').value.trim();
+    
+    if (!emailInput) {
+        alert("Please enter your email address.");
+        return;
+    }
+
+    try {
+        // This sends the email to your Google Sheet Script
+        const response = await fetch(`${GOOGLE_API_URL}?email=${encodeURIComponent(emailInput)}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            // Save email to remember them next time
+            localStorage.setItem('loggedInClientEmail', emailInput);
+            
+            // Switch screens and show the data
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+            
+            // Change 'WorkoutColumn' and 'AssessmentColumn' to match your exact spreadsheet column headers!
+            document.getElementById('client-name').innerText = `Welcome back!`;
+            document.getElementById('workout-display').innerText = result.user.WorkoutColumn || "No workout assigned.";
+            document.getElementById('assessment-display').innerText = result.user.AssessmentColumn || "No recent metrics.";
+        } else {
+            alert("Login failed: Email not found.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+    }
+}
+
+// 3. Auto-Login: Check if they logged in before so they don't have to re-type it
+window.addEventListener('DOMContentLoaded', () => {
+    const savedEmail = localStorage.getItem('loggedInClientEmail');
+    if (savedEmail) {
+        document.getElementById('clientEmail').value = savedEmail;
+        clientLogin();
+    }
+});
