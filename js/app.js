@@ -85,8 +85,8 @@ async function handleAuthAction() {
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           
-          if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
-          if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent fitness metrics logged.";
+          if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
+          if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
           // =========================================================================
           
         } else {
