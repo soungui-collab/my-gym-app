@@ -1,19 +1,17 @@
+// URL for Class Bookings Sheet (Your original connection)
 const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+
+// URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
 const GOOGLE_API_URL = "https://google.com"; 
 
-// Absolute configuration state
+// Active session validation states
 let isLoginMode = true;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Safe initialization
-  const authCard = document.getElementById("auth-card");
-  const dashView = document.getElementById("dashboard-view");
-  if (authCard) authCard.style.display = "block";
-  if (dashView) dashView.style.display = "none";
-  
   checkLocalProfile();
 });
 
+// Switches layout presentation variables crash-free
 function toggleAuthMode(event) {
   if (event && typeof event.preventDefault === "function") event.preventDefault();
   isLoginMode = !isLoginMode;
@@ -45,13 +43,14 @@ function toggleAuthMode(event) {
   }
 }
 
+// Global execution router for credential matching loops
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
   const passwordElem = document.getElementById("user-password");
   const activateBtn = document.getElementById("activate-profile-btn");
 
   if (!usernameElem || !passwordElem) {
-    alert("Input elements missing from display layout tree.");
+    alert("System configuration error: UI Input fields missing.");
     return;
   }
 
@@ -70,7 +69,7 @@ async function handleAuthAction() {
 
   if (isLoginMode) {
     // ==========================================
-    // TRACK A: CREDENTIAL PORTAL LOGIN
+    // MODULE A: SYSTEM LOG IN LOGIC
     // ==========================================
     try {
       const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
@@ -89,12 +88,11 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // Print your workouts/assessments onto the UI cards smoothly
+          // Print row arrays (⚠️ Change 'WorkoutPlan' & 'Assessments' to match row 1 text)
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent fitness metrics logged.";
-          
         } else {
           alert("Incorrect password. Please try again.");
           passwordElem.value = "";
@@ -114,7 +112,7 @@ async function handleAuthAction() {
 
   } else {
     // ==========================================
-    // TRACK B: PORTAL NEW PROFILE REGISTRATION
+    // MODULE B: SYSTEM REGISTRATION LOGIC
     // ==========================================
     const nameElem = document.getElementById("user-name");
     const emailElem = document.getElementById("user-email");
@@ -150,6 +148,7 @@ async function handleAuthAction() {
   }
 }
 
+// Stable image ping class transaction pipeline
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
@@ -223,8 +222,8 @@ async function checkLocalProfile() {
             if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
         }
     } catch (e) {
-      const workoutDisp = document.getElementById('workout-display');
-      if (workoutDisp) workoutDisp.innerText = "Loaded offline mode cached routine.";
+        const workoutDisp = document.getElementById('workout-display');
+        if (workoutDisp) workoutDisp.innerText = "Loaded offline mode cached routine.";
     }
   }
 }
@@ -246,8 +245,6 @@ function clearProfile() {
   if (userName) userName.value = "";
   if (userEmail) userEmail.value = "";
   
-  // Safe interface restoration layout assignments
-  isLoginMode = true;
-  const title = document.getElementById("auth-title");
-  const subtitle = document.getElementById("auth-subtitle");
-  const nameGroup = document.getElementById("reg-name-group");
+  isLoginMode = false; 
+  toggleAuthMode();
+}
