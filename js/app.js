@@ -1,8 +1,5 @@
-// URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
-
-// URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_API_URL = "https://google.com"; 
 
 let isLoginMode = true;
 
@@ -79,15 +76,11 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // =========================================================================
-          // ⚠️ COLUMN HEADER MAPPING RULES (Edit the text after 'result.user.' below)
-          // =========================================================================
+          // ⚠️ ENTER PORTAL COLUMN ALIGNMENT (Ensure these keywords match your exact sheet columns without spaces)
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
-          
-          if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
-          if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
-          // =========================================================================
+          if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
+          if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent fitness metrics logged.";
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -141,7 +134,6 @@ async function handleAuthAction() {
   }
 }
 
-// Your verified, working booking engine
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
@@ -212,9 +204,9 @@ async function checkLocalProfile() {
             const workoutDisp = document.getElementById('workout-display');
             const assessDisp = document.getElementById('assessment-display');
             
-            // ⚠️ Ensure these matching keywords match your lines 66/67 exactly!
-            if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No workout assigned.";
-            if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent metrics.";
+            // ⚠️ AUTOMATIC RE-LOG IN SYNC: Mirror your columns here identically!
+            if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
+            if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
         }
     } catch (e) {
       const workoutDisp = document.getElementById('workout-display');
