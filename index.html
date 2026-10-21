@@ -52,8 +52,7 @@
     <p>Member Access Portal</p>
   </header>
 
-  <!-- RESTORED: YOUR EXACT ORIGINAL LOGIN CARD -->
-    <!-- RESTORED: DUAL-ACTION AUTHENTICATION PORTAL -->
+    <!-- RESTORED: DUAL-ACTION AUTHENTICATION PORTAL (Function Hooks Fixed) -->
   <div class="card" id="auth-card">
     <h2 id="auth-title">Access Member Portal</h2>
     <p id="auth-subtitle" style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">
@@ -82,11 +81,13 @@
       <input type="password" id="user-password" placeholder="••••••••" style="width: 100%; padding: 10px; border: 1px solid #444; background: #222; color: #fff; border-radius: 6px; box-sizing: border-box;">
     </div>
 
+    <!-- FIXED: Points directly to handleAuthAction() -->
     <button id="activate-profile-btn" class="action-btn" onclick="handleAuthAction()">Enter Portal</button>
     
     <!-- TOGGLE LINK TO SWITCH MODES -->
     <p style="margin-top: 15px; font-size: 0.85rem; color: #ddd; text-align: center;">
       <span id="toggle-text">Don't have an account?</span> 
+      <!-- FIXED: Points directly to toggleAuthMode() -->
       <a href="#" id="toggle-auth-btn" onclick="toggleAuthMode(event)" style="color: #4caf50; text-decoration: none; font-weight: bold;">Create an Account</a>
     </p>
   </div>
