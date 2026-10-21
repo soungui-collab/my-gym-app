@@ -2,7 +2,7 @@
 const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbw7U2-hOTeGDSpnb-McnjO2skAXyr0HXwIGNJ6L1gKp2BYSOEqiOG8bBszov2zPPCoM/exec"; 
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
