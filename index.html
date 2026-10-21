@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soungui Fitness Gym</title>
-  <!-- Link your external CSS styling library here if you have one -->
 </head>
 <body>
 
@@ -14,14 +13,14 @@
       <p>Member Access Portal</p>
     </header>
 
-    <!-- DUAL-ACTION AUTHENTICATION PORTAL CARD -->
+    <!-- YOUR ORIGINAL AUTHENTICATION CARD VISUALS -->
     <div class="card" id="auth-card">
       <h2 id="auth-title">Access Member Portal</h2>
       <p id="auth-subtitle" style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">
         Enter your credentials to access your profile, book classes, and view your routine.
       </p>
       
-      <!-- REGISTRATION ONLY FIELD -->
+      <!-- Hidden Registration Group Inputs -->
       <div class="form-group" id="reg-name-group" style="display: none;">
         <label for="user-name">Full Name</label>
         <input type="text" id="user-name" placeholder="John Doe">
@@ -32,7 +31,7 @@
         <input type="text" id="user-username" placeholder="johndoe123">
       </div>
 
-      <!-- REGISTRATION ONLY FIELD -->
+      <!-- Hidden Registration Group Inputs -->
       <div class="form-group" id="reg-email-group" style="display: none;">
         <label for="user-email">Email Address</label>
         <input type="text" id="user-email" placeholder="john@example.com">
@@ -40,7 +39,7 @@
 
       <div class="form-group">
         <label for="user-password">Password</label>
-        <input type="password" id="user-password" placeholder="••••••••" style="width: 100%; padding: 10px; border: 1px solid #444; background: #222; color: #fff; border-radius: 6px; box-sizing: border-box;">
+        <input type="password" id="user-password" placeholder="••••••••">
       </div>
 
       <button id="activate-profile-btn" class="action-btn" onclick="handleAuthAction()">Enter Portal</button>
@@ -51,7 +50,7 @@
       </p>
     </div>
 
-    <!-- YOUR ORIGINAL, PREFERRED DASHBOARD VIEW -->
+    <!-- YOUR ORIGINAL, UNTOUCHED PREFERRED DASHBOARD VIEW -->
     <div id="dashboard-view" style="display: none;">
       
       <!-- Modern Status Pass Layout -->
@@ -64,42 +63,46 @@
         </div>
       </div>
 
-      <!-- FITNESS SPREADSHEET READOUT CARDS -->
-      <div class="card" style="padding: 20px 16px; margin-bottom: 20px; text-align: left; background: #1a1a1a; border-radius: 8px;">
-        <h2 style="font-size: 1rem; margin-bottom: 10px; color: #fff; margin-top: 0;">🏋️ Your Customized Workout Plan</h2>
-        <p id="workout-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0;">Loading your routine...</p>
+      <!-- SPREADSHEET READOUT CARDS (Styled exactly like your available classes cards) -->
+      <div class="card" style="padding: 20px 16px;">
+        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 10px; margin-top: 0; padding-left: 4px;">🏋️ Customized Workout Plan</h2>
+        <div id="workout-display" style="color: #ccc; font-size: 0.9rem; line-height: 1.5; padding-left: 4px; text-align: left;">
+          Fetching your custom fitness routine from matrix...
+        </div>
       </div>
 
-      <div class="card" style="padding: 20px 16px; margin-bottom: 20px; text-align: left; background: #1a1a1a; border-radius: 8px;">
-        <h2 style="font-size: 1rem; margin-bottom: 10px; color: #fff; margin-top: 0;">📊 Recent Fitness Assessment</h2>
-        <p id="assessment-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0;">Loading your metrics...</p>
+      <div class="card" style="padding: 20px 16px;">
+        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 10px; margin-top: 0; padding-left: 4px;">📊 Fitness Assessment Metrics</h2>
+        <div id="assessment-display" style="color: #ccc; font-size: 0.9rem; line-height: 1.5; padding-left: 4px; text-align: left;">
+          Fetching your metrics data row...
+        </div>
       </div>
 
-      <!-- Class Booking Roster -->
-      <div class="card" style="padding: 20px 16px; margin-bottom: 20px; background: #1a1a1a; border-radius: 8px;">
-        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px; padding-left: 4px; margin-top: 0; color: #fff;">Available Classes Today</h2>
+      <!-- Class Booking Roster (Your exact original structure blocks) -->
+      <div class="card" style="padding: 20px 16px;">
+        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px; padding-left: 4px; margin-top: 0;">Available Classes Today</h2>
         <div id="schedule-container">
           
-          <div class="class-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div class="class-item">
             <div class="class-info">
-              <h3 style="margin: 0; font-size: 0.95rem; color: #fff;">Morning HIIT Circuit</h3>
-              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #aaa;">06:00 AM • Coach Marcus</p>
+              <h3>Morning HIIT Circuit</h3>
+              <p>06:00 AM • Coach Marcus</p>
             </div>
             <button class="book-btn" onclick="handleBooking('Morning HIIT')">Book</button>
           </div>
 
-          <div class="class-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div class="class-item">
             <div class="class-info">
-              <h3 style="margin: 0; font-size: 0.95rem; color: #fff;">Power Lifting 101</h3>
-              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #aaa;">12:00 PM • Coach Sarah</p>
+              <h3>Power Lifting 101</h3>
+              <p>12:00 PM • Coach Sarah</p>
             </div>
             <button class="book-btn" onclick="handleBooking('Power Lifting 101')">Book</button>
           </div>
 
-          <div class="class-item" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="class-item">
             <div class="class-info">
-              <h3 style="margin: 0; font-size: 0.95rem; color: #fff;">Vinyasa Yoga Flow</h3>
-              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #aaa;">06:30 PM • Coach Elena</p>
+              <h3>Vinyasa Yoga Flow</h3>
+              <p>06:30 PM • Coach Elena</p>
             </div>
             <button class="book-btn" onclick="handleBooking('Vinyasa Yoga')">Book</button>
           </div>
@@ -112,6 +115,6 @@
 
   </div>
 
-  <script src="js/app.js?v=3"></script>
+  <script src="js/app.js?v=4"></script>
 </body>
 </html>
