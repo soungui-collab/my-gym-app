@@ -46,13 +46,13 @@
   </style>
 </head>
 <body>
-  <div class="app-container">
+ <div class="app-container">
   <header>
     <h1>Soungui Fitness Gym</h1>
     <p>Member Access Portal</p>
   </header>
 
-     <!-- SINGLE UNIFIED AUTHENTICATION CARD -->
+  <!-- YOUR ORIGINAL AUTHENTICATION CARD (With Password Field Added) -->
   <div class="card" id="auth-card">
     <h2>Access Member Portal</h2>
     <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">
@@ -74,16 +74,29 @@
     <button id="activate-profile-btn" class="action-btn">Enter Portal</button>
   </div>
 
-
-    <!-- NEW: FITNESS TRACKING & WORKOUT CARDS (Merged here!) -->
-    <div class="card" style="padding: 20px 16px; margin-bottom: 20px;">
-      <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px; padding-left: 4px;">🏋️ Your Customized Workout Plan</h2>
-      <p id="workout-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; padding-left: 4px;">Fetching your workout plan...</p>
+  <!-- YOUR ORIGINAL, PREFERRED DASHBOARD VIEW -->
+  <div id="dashboard-view" style="display: none;">
+    
+    <!-- Modern Status Pass Layout -->
+    <div class="profile-pass">
+      <div class="profile-name" id="display-name">Guest Member</div>
+      <div class="profile-email" id="display-email">guest@example.com</div>
+      <div class="status-container">
+        <span class="status-label">Membership Status</span>
+        <span class="status-badge"><span class="status-dot"></span>Active</span>
+      </div>
     </div>
 
-    <div class="card" style="padding: 20px 16px; margin-bottom: 20px;">
-      <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px; padding-left: 4px;">📊 Recent Fitness Assessment</h2>
-      <p id="assessment-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; padding-left: 4px;">Fetching your metrics...</p>
+    <!-- NEW INTEGRATION: CUSTOMIZED WORKOUT CARD -->
+    <div class="card" style="padding: 20px 16px; margin-bottom: 20px; text-align: left;">
+      <h2 style="font-size: 1rem; margin-bottom: 10px; color: #fff;">🏋️ Your Customized Workout Plan</h2>
+      <p id="workout-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0;">Loading your routine...</p>
+    </div>
+
+    <!-- NEW INTEGRATION: FITNESS ASSESSMENT CARD -->
+    <div class="card" style="padding: 20px 16px; margin-bottom: 20px; text-align: left;">
+      <h2 style="font-size: 1rem; margin-bottom: 10px; color: #fff;">📊 Recent Fitness Assessment</h2>
+      <p id="assessment-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0;">Loading your metrics...</p>
     </div>
 
     <!-- Class Booking Roster -->
@@ -112,10 +125,18 @@
             <h3>Vinyasa Yoga Flow</h3>
             <p>06:30 PM • Coach Elena</p>
           </div>
-          <button class="book-btn" onclick="handleBooking('Vinyasa Yoga')">Book</button>
+          <button class="book-btn" onclick="showBookingAlert('Vinyasa Yoga Flow')">Book</button>
         </div>
 
       </div>
+    </div>
+
+    <button class="logout-btn" onclick="clearProfile()">Switch Profile Account</button>
+  </div>
+
+</div>
+
+<script src="js/app.js?v=2"></script>
     </div>
 
     <button class="logout-btn" onclick="clearProfile()">Switch Profile Account</button>
