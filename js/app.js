@@ -67,10 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Class Booking Transmission Engine (Perfected for your Booking Sheet layout)
+// Class Booking Transmission Engine (Tailored to bypass Booking script parameter filters)
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentUsername = localStorage.getItem("iron_pulse_username"); // This is their login user name
+  const currentUsername = localStorage.getItem("iron_pulse_username"); // Validated Login User Name
 
   if (!currentId) {
     alert("Please log in before booking gym classes.");
@@ -83,31 +84,39 @@ function handleBooking(className) {
     btn.innerText = "Booking...";
   }
 
-  // Generate a unique Booking ID for this specific transaction
+  // Generate background tracking values
   const bookingId = "BKG-" + Date.now();
-  
-  // Format the current date and time cleanly
   const currentDateTime = new Date().toLocaleString();
 
-  // Construct parameter query string matching your exact spreadsheet column headers
-  // Note: Spaces/underscores are stripped to safely transmit as URL parameters
+  // DUAL-MAPPING PAYLOAD: We send both old styles and new header variations 
+  // so your Google Apps Script script functions perfectly either way!
   const payload = {
     action: "bookClass",
+    
+    // Original system parameter naming tracks
+    memberId: currentId,
+    name: currentName, 
+    email: currentUsername, // Sends username profile tag into the original tracking line
+    className: className,
+    
+    // Column header mapping variations
     BookingID: bookingId,
     MemberID: currentId,
-    MemberName: currentName, 
+    MemberName: currentName,
     ClassName: className,
     DateTime: currentDateTime,
-    Email: currentUsername // Automatically maps their username to your Email column track
+    Email: currentUsername
   };
   
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  // Image ping method to send data cleanly to your Booking spreadsheet
+  // Image ping tracking transmission to your Booking script deployment
   const ping = new Image();
+  
   ping.onload = () => { processBookingSuccess(btn, className); };
   ping.onerror = () => { processBookingSuccess(btn, className); };
+  
   ping.src = transmissionUrl;
 }
 
