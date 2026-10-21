@@ -1,8 +1,8 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
+const GOOGLE_API_URL = "https://google.com"; 
 
 // Active session validation states
 let isLoginMode = true;
@@ -218,8 +218,8 @@ async function checkLocalProfile() {
         if (result.success) {
             const workoutDisp = document.getElementById('workout-display');
             const assessDisp = document.getElementById('assessment-display');
-            if (workoutDisp) workoutDisp.innerText = result.user.Workout";
-            if (assessDisp) assessDisp.innerText = result.user.Assessment";
+            if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
+            if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
         }
     } catch (e) {
         const workoutDisp = document.getElementById('workout-display');
