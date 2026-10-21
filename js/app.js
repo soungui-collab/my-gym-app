@@ -213,8 +213,8 @@ async function checkLocalProfile() {
             const assessDisp = document.getElementById('assessment-display');
             
             // ⚠️ Ensure these matching keywords match your lines 66/67 exactly!
-            if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
-            if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
+            if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No workout assigned.";
+            if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent metrics.";
         }
     } catch (e) {
       const workoutDisp = document.getElementById('workout-display');
