@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (activateBtn) {
     activateBtn.addEventListener("click", async () => {
-      const username = document.getElementById("user-username").value.trim().toLowerCase();
-      const password = document.getElementById("user-password").value.trim();
+      const username = document.getElementById("user-ClientID").value.trim().toLowerCase();
+      const password = document.getElementById("user-Password").value.trim();
 
       if (!username || !password) {
         alert("Please enter both your username and password to log in.");
