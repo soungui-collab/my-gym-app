@@ -218,8 +218,8 @@ async function checkLocalProfile() {
         if (result.success) {
             const workoutDisp = document.getElementById('workout-display');
             const assessDisp = document.getElementById('assessment-display');
-            if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
-            if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
+            if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No workout assigned.";
+            if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent metrics.";
         }
     } catch (e) {
         const workoutDisp = document.getElementById('workout-display');
