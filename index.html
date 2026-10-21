@@ -3,306 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soungui Fitness Gym - Member Portal</title>
-  
-  <!-- PREMIUM ACCENT RED & CRIMSON BLACK ARCHITECTURE -->
-  <style>
-    :root {
-      --bg-color: #050505;
-      --card-bg: #121212;
-      --text-color: #ffffff;
-      --text-muted: #a0a0a0;
-      --accent-color: #e50914; 
-      --accent-hover: #b2070f;
-      --danger-color: #ff3333;
-      --border-color: #262626;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 480px;
-      padding: 20px 16px;
-      box-sizing: border-box;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .brand-logo-frame {
-      width: 85px;
-      height: 85px;
-      border-radius: 50%;
-      background-color: #000000;
-      border: 2px solid var(--accent-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      margin-bottom: 12px;
-      box-shadow: 0 0 15px rgba(229, 9, 20, 0.4);
-    }
-
-    .brand-logo-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .brand-logo-frame svg {
-      width: 45px;
-      height: 45px;
-      fill: var(--accent-color);
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-      margin: 0 0 4px 0;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 900;
-    }
-
-    header p {
-      color: var(--accent-color);
-      margin: 0;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 22px 18px;
-      margin-bottom: 20px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
-      box-sizing: border-box;
-    }
-
-    .card h2 {
-      font-size: 1.05rem;
-      margin-top: 0;
-      margin-bottom: 14px;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--border-color);
-      background-color: #000000;
-      color: #ffffff;
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-size: 0.95rem;
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-    }
-
-    .action-btn {
-      width: 100%;
-      padding: 15px;
-      background-color: var(--accent-color);
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .action-btn:disabled {
-      background-color: #222222;
-      color: #555555;
-      cursor: not-allowed;
-    }
-
-    .profile-pass {
-      background: linear-gradient(135deg, #161616 0%, #000000 100%);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--accent-color);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
-      text-align: left;
-    }
-
-    .profile-name {
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: #ffffff;
-      margin-bottom: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    .profile-email {
-      font-size: 0.85rem;
-      color: var(--accent-color);
-      margin-bottom: 14px;
-      font-weight: 600;
-    }
-
-    .status-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid #262626;
-      padding-top: 12px;
-    }
-
-    .status-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--accent-color);
-      background-color: rgba(229, 9, 20, 0.1);
-      padding: 5px 12px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border: 1px solid rgba(229, 9, 20, 0.2);
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background-color: var(--accent-color);
-      border-radius: 50%;
-      margin-right: 6px;
-      display: inline-block;
-    }
-
-    .class-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px solid #1f1f1f;
-    }
-
-    .class-item:last-child {
-      border-bottom: none;
-    }
-
-    .class-info {
-      text-align: left;
-    }
-
-    .class-info h3 {
-      margin: 0 0 4px 0;
-      font-size: 0.95rem;
-      color: #ffffff;
-      font-weight: 700;
-    }
-
-    .class-info p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .book-btn {
-      background-color: transparent;
-      color: var(--accent-color);
-      border: 1.5px solid var(--accent-color);
-      padding: 8px 18px;
-      border-radius: 6px;
-      font-weight: 800;
-      font-size: 0.8rem;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .book-btn:disabled {
-      background-color: #1f1f1f;
-      color: #555555;
-      border-color: #1f1f1f;
-      cursor: not-allowed;
-    }
-
-    .logout-btn {
-      width: 100%;
-      background: transparent;
-      border: 1px solid #333333;
-      color: var(--text-muted);
-      padding: 14px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-top: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-  </style>
+  <title>Soungui Fitness Gym</title>
+  <!-- Link your external CSS styling library here if you have one -->
 </head>
 <body>
 
   <div class="app-container">
     <header>
-      <div class="brand-logo-frame">
-        <img src="logo.png" alt="Soungui Fitness Logo" onerror="this.style.display='none'; document.getElementById('fallback-svg').style.display='block';">
-        <svg id="fallback-svg" style="display:none;" viewBox="0 0 24 24"><path d="M5 8.5C5 7.67 5.67 7 6.5 7h11c.83 0 1.5.67 1.5 1.5v7c0 .83-.67 1.5-1.5 1.5h-11C5.67 17 5 16.33 5 15.5v-7zM4 6h16v2H4V6zm0 10h16v2H4v-2zm-2-5h2v2H2v-2zm18 0h2v2h-2v-2z"/></svg>
-      </div>
       <h1>Soungui Fitness Gym</h1>
       <p>Member Access Portal</p>
     </header>
 
-    <!-- DUAL-ACTION AUTHENTICATION PORTAL -->
+    <!-- DUAL-ACTION AUTHENTICATION PORTAL CARD -->
     <div class="card" id="auth-card">
-      <h2 id="auth-title" style="text-align: center;">Access Member Portal</h2>
-      <p id="auth-subtitle" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 22px; text-align: center;">
+      <h2 id="auth-title">Access Member Portal</h2>
+      <p id="auth-subtitle" style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">
         Enter your credentials to access your profile, book classes, and view your routine.
       </p>
       
+      <!-- REGISTRATION ONLY FIELD -->
       <div class="form-group" id="reg-name-group" style="display: none;">
         <label for="user-name">Full Name</label>
         <input type="text" id="user-name" placeholder="John Doe">
@@ -313,6 +32,7 @@
         <input type="text" id="user-username" placeholder="johndoe123">
       </div>
 
+      <!-- REGISTRATION ONLY FIELD -->
       <div class="form-group" id="reg-email-group" style="display: none;">
         <label for="user-email">Email Address</label>
         <input type="text" id="user-email" placeholder="john@example.com">
@@ -320,20 +40,21 @@
 
       <div class="form-group">
         <label for="user-password">Password</label>
-        <input type="password" id="user-password" placeholder="••••••••">
+        <input type="password" id="user-password" placeholder="••••••••" style="width: 100%; padding: 10px; border: 1px solid #444; background: #222; color: #fff; border-radius: 6px; box-sizing: border-box;">
       </div>
 
       <button id="activate-profile-btn" class="action-btn" onclick="handleAuthAction()">Enter Portal</button>
       
-      <p style="margin-top: 18px; font-size: 0.85rem; color: #ffffff; text-align: center;">
+      <p style="margin-top: 15px; font-size: 0.85rem; color: #ddd; text-align: center;">
         <span id="toggle-text">Don't have an account?</span> 
-        <a href="#" id="toggle-auth-btn" onclick="toggleAuthMode(event)" style="color: var(--accent-color); text-decoration: none; font-weight: bold;">Create an Account</a>
+        <a href="#" id="toggle-auth-btn" onclick="toggleAuthMode(event)" style="color: #4caf50; text-decoration: none; font-weight: bold;">Create an Account</a>
       </p>
     </div>
 
-    <!-- NATIVE MEMBER DASHBOARD WORKSPACE VIEW -->
+    <!-- YOUR ORIGINAL, PREFERRED DASHBOARD VIEW -->
     <div id="dashboard-view" style="display: none;">
       
+      <!-- Modern Status Pass Layout -->
       <div class="profile-pass">
         <div class="profile-name" id="display-name">Guest Member</div>
         <div class="profile-email" id="display-email">@username</div>
@@ -343,19 +64,54 @@
         </div>
       </div>
 
-      <div class="card" style="text-align: left;">
-        <h2 style="font-size: 0.95rem; color: var(--accent-color); font-weight: 800; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 12px;">🏋️ Customized Workout Plan</h2>
-        <div id="workout-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.6; padding-left: 2px;">
-          Syncing customized routine arrays...
+      <!-- FITNESS SPREADSHEET READOUT CARDS -->
+      <div class="card" style="padding: 20px 16px; margin-bottom: 20px; text-align: left; background: #1a1a1a; border-radius: 8px;">
+        <h2 style="font-size: 1rem; margin-bottom: 10px; color: #fff; margin-top: 0;">🏋️ Your Customized Workout Plan</h2>
+        <p id="workout-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0;">Loading your routine...</p>
+      </div>
+
+      <div class="card" style="padding: 20px 16px; margin-bottom: 20px; text-align: left; background: #1a1a1a; border-radius: 8px;">
+        <h2 style="font-size: 1rem; margin-bottom: 10px; color: #fff; margin-top: 0;">📊 Recent Fitness Assessment</h2>
+        <p id="assessment-display" style="color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0;">Loading your metrics...</p>
+      </div>
+
+      <!-- Class Booking Roster -->
+      <div class="card" style="padding: 20px 16px; margin-bottom: 20px; background: #1a1a1a; border-radius: 8px;">
+        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px; padding-left: 4px; margin-top: 0; color: #fff;">Available Classes Today</h2>
+        <div id="schedule-container">
+          
+          <div class="class-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="class-info">
+              <h3 style="margin: 0; font-size: 0.95rem; color: #fff;">Morning HIIT Circuit</h3>
+              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #aaa;">06:00 AM • Coach Marcus</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('Morning HIIT')">Book</button>
+          </div>
+
+          <div class="class-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="class-info">
+              <h3 style="margin: 0; font-size: 0.95rem; color: #fff;">Power Lifting 101</h3>
+              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #aaa;">12:00 PM • Coach Sarah</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('Power Lifting 101')">Book</button>
+          </div>
+
+          <div class="class-item" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="class-info">
+              <h3 style="margin: 0; font-size: 0.95rem; color: #fff;">Vinyasa Yoga Flow</h3>
+              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #aaa;">06:30 PM • Coach Elena</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('Vinyasa Yoga')">Book</button>
+          </div>
+
         </div>
       </div>
 
-      <div class="card" style="text-align: left;">
-        <h2 style="font-size: 0.95rem; color: var(--accent-color); font-weight: 800; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 12px;">📊 Fitness Assessment</h2>
-        <div id="assessment-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.6; padding-left: 2px;">
-          Syncing composition metrics data...
-        </div>
-      </div>
+      <button class="logout-btn" onclick="clearProfile()">Switch Profile Account</button>
+    </div>
 
-      <div class="card">
-        <h2>Available Classes Today</h2>
+  </div>
+
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>
