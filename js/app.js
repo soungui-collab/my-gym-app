@@ -4,16 +4,16 @@ const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
 const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
 
-// Track whether the form is in "login" mode or "register" mode
+// Active session validation states
 let isLoginMode = true;
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
 });
 
-// Switches the UI elements back and forth between Login and Sign Up views
+// Switches layout presentation variables crash-free
 function toggleAuthMode(event) {
-  if (event) event.preventDefault();
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
   isLoginMode = !isLoginMode;
   
   const title = document.getElementById("auth-title");
@@ -43,28 +43,33 @@ function toggleAuthMode(event) {
   }
 }
 
-// Master execution gatekeeper for your button click
+// Global execution router for credential matching loops
 async function handleAuthAction() {
-  const usernameInput = document.getElementById("user-username");
-  const passwordInput = document.getElementById("user-password");
+  const usernameElem = document.getElementById("user-username");
+  const passwordElem = document.getElementById("user-password");
   const activateBtn = document.getElementById("activate-profile-btn");
 
-  if (!usernameInput || !passwordInput || !activateBtn) return;
+  if (!usernameElem || !passwordElem) {
+    alert("System configuration error: UI Input fields missing.");
+    return;
+  }
 
-  const username = usernameInput.value.trim().toLowerCase();
-  const password = passwordInput.value.trim();
+  const username = usernameElem.value.trim().toLowerCase();
+  const password = passwordElem.value.trim();
 
   if (!username || !password) {
     alert("Please enter both your username and password.");
     return;
   }
 
-  activateBtn.innerText = "Processing...";
-  activateBtn.disabled = true;
+  if (activateBtn) {
+    activateBtn.innerText = "Processing...";
+    activateBtn.disabled = true;
+  }
 
   if (isLoginMode) {
     // ==========================================
-    // TRACK A: LOG IN AN EXISTING MEMBER
+    // MODULE A: SYSTEM LOG IN LOGIC
     // ==========================================
     try {
       const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
@@ -74,7 +79,6 @@ async function handleAuthAction() {
         const correctPassword = result.user.Password || result.user.password;
 
         if (correctPassword && String(correctPassword).trim() === password) {
-          // Success! Capture profile rows seamlessly
           const memberId = result.user.MemberID || result.user.memberId || "MBR-" + username;
           const displayName = result.user.Name || result.user.FullName || result.user.MemberName || username;
 
@@ -84,45 +88,48 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // Display workouts/assessments (⚠️ Customize these keywords to match your Row 1 columns exactly!)
+          // Print row arrays (⚠️ Change 'WorkoutPlan' & 'Assessments' to match row 1 text)
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent fitness metrics logged.";
         } else {
           alert("Incorrect password. Please try again.");
-          passwordInput.value = "";
+          passwordElem.value = "";
         }
       } else {
-        alert("Username not found. Check spelling or switch to 'Create an Account'.");
+        alert("Username not found. Check spelling or click 'Create an Account'.");
       }
     } catch (error) {
-      console.error("Login connection failure:", error);
-      alert("Could not connect to authentication grid. Check your connection or Apps Script deployment.");
+      console.error("handshake error:", error);
+      alert("Could not connect to authentication grid.");
     } finally {
-      activateBtn.innerText = "Enter Portal";
-      activateBtn.disabled = false;
+      if (activateBtn) {
+        activateBtn.innerText = "Enter Portal";
+        activateBtn.disabled = false;
+      }
     }
 
   } else {
     // ==========================================
-    // TRACK B: REGISTER A BRAND NEW ACCOUNT
+    // MODULE B: SYSTEM REGISTRATION LOGIC
     // ==========================================
-    const nameInput = document.getElementById("user-name");
-    const emailInput = document.getElementById("user-email");
-    const name = nameInput ? nameInput.value.trim() : "";
-    const email = emailInput ? emailInput.value.trim() : "";
+    const nameElem = document.getElementById("user-name");
+    const emailElem = document.getElementById("user-email");
+    const name = nameElem ? nameElem.value.trim() : "";
+    const email = emailElem ? emailElem.value.trim() : "";
 
     if (!name || !email) {
       alert("Please fill in your Full Name and Email Address to create an account.");
-      activateBtn.innerText = "Activate Account";
-      activateBtn.disabled = false;
+      if (activateBtn) {
+        activateBtn.innerText = "Activate Account";
+        activateBtn.disabled = false;
+      }
       return;
     }
 
     const memberId = "MBR-" + Date.now();
 
-    // Cache registration metrics to device memory architecture
     localStorage.setItem("iron_pulse_id", memberId);
     localStorage.setItem("iron_pulse_name", name);
     localStorage.setItem("iron_pulse_username", username);
@@ -134,12 +141,14 @@ async function handleAuthAction() {
     if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
     if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
     
-    activateBtn.innerText = "Activate Account";
-    activateBtn.disabled = false;
+    if (activateBtn) {
+      activateBtn.innerText = "Activate Account";
+      activateBtn.disabled = false;
+    }
   }
 }
 
-// Class Booking Transmission Engine (Stable, original structure preserved)
+// Stable image ping class transaction pipeline
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
@@ -236,6 +245,6 @@ function clearProfile() {
   if (userName) userName.value = "";
   if (userEmail) userEmail.value = "";
   
-  // Clean, crash-free interface reset to login screen mode
-  isLoginMode = true; 
-  const title = document.getElementById("auth-title");
+  isLoginMode = false; 
+  toggleAuthMode();
+}
