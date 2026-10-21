@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Switches the UI elements back and forth between Login and Sign Up views
 function toggleAuthMode(event) {
-  event.preventDefault();
+  if (event) event.preventDefault();
   isLoginMode = !isLoginMode;
   
   const title = document.getElementById("auth-title");
@@ -25,29 +25,34 @@ function toggleAuthMode(event) {
   const toggleText = document.getElementById("toggle-text");
 
   if (isLoginMode) {
-    title.innerText = "Access Member Portal";
-    subtitle.innerText = "Enter your credentials to access your profile, book classes, and view your routine.";
-    nameGroup.style.display = "none";
-    emailGroup.style.display = "none";
-    submitBtn.innerText = "Enter Portal";
-    toggleText.innerText = "Don't have an account?";
-    toggleLink.innerText = "Create an Account";
+    if (title) title.innerText = "Access Member Portal";
+    if (subtitle) subtitle.innerText = "Enter your credentials to access your profile, book classes, and view your routine.";
+    if (nameGroup) nameGroup.style.display = "none";
+    if (emailGroup) emailGroup.style.display = "none";
+    if (submitBtn) submitBtn.innerText = "Enter Portal";
+    if (toggleText) toggleText.innerText = "Don't have an account?";
+    if (toggleLink) toggleLink.innerText = "Create an Account";
   } else {
-    title.innerText = "Create Your Profile";
-    subtitle.innerText = "Activate your profile instantly to begin scheduling daily gym classes and track your workouts.";
-    nameGroup.style.display = "block";
-    emailGroup.style.display = "block";
-    submitBtn.innerText = "Activate Account";
-    toggleText.innerText = "Already have an account?";
-    toggleLink.innerText = "Log In Here";
+    if (title) title.innerText = "Create Your Profile";
+    if (subtitle) subtitle.innerText = "Activate your profile instantly to begin scheduling daily gym classes and track your workouts.";
+    if (nameGroup) nameGroup.style.display = "block";
+    if (emailGroup) emailGroup.style.display = "block";
+    if (submitBtn) submitBtn.innerText = "Activate Account";
+    if (toggleText) toggleText.innerText = "Already have an account?";
+    if (toggleLink) toggleLink.innerText = "Log In Here";
   }
 }
 
 // Master execution gatekeeper for your button click
 async function handleAuthAction() {
-  const username = document.getElementById("user-username").value.trim().toLowerCase();
-  const password = document.getElementById("user-password").value.trim();
+  const usernameInput = document.getElementById("user-username");
+  const passwordInput = document.getElementById("user-password");
   const activateBtn = document.getElementById("activate-profile-btn");
+
+  if (!usernameInput || !passwordInput || !activateBtn) return;
+
+  const username = usernameInput.value.trim().toLowerCase();
+  const password = passwordInput.value.trim();
 
   if (!username || !password) {
     alert("Please enter both your username and password.");
@@ -80,18 +85,20 @@ async function handleAuthAction() {
           setupDashboardView(memberId, displayName, username);
           
           // Display workouts/assessments (⚠️ Customize these keywords to match your Row 1 columns exactly!)
-          document.getElementById('workout-display').innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
-          document.getElementById('assessment-display').innerText = result.user.Assessments || "No recent fitness metrics logged.";
+          const workoutDisp = document.getElementById('workout-display');
+          const assessDisp = document.getElementById('assessment-display');
+          if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
+          if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent fitness metrics logged.";
         } else {
           alert("Incorrect password. Please try again.");
-          document.getElementById("user-password").value = "";
+          passwordInput.value = "";
         }
       } else {
         alert("Username not found. Check spelling or switch to 'Create an Account'.");
       }
     } catch (error) {
       console.error("Login connection failure:", error);
-      alert("Could not connect to authentication grid.");
+      alert("Could not connect to authentication grid. Check your connection or Apps Script deployment.");
     } finally {
       activateBtn.innerText = "Enter Portal";
       activateBtn.disabled = false;
@@ -101,8 +108,10 @@ async function handleAuthAction() {
     // ==========================================
     // TRACK B: REGISTER A BRAND NEW ACCOUNT
     // ==========================================
-    const name = document.getElementById("user-name").value.trim();
-    const email = document.getElementById("user-email").value.trim();
+    const nameInput = document.getElementById("user-name");
+    const emailInput = document.getElementById("user-email");
+    const name = nameInput ? nameInput.value.trim() : "";
+    const email = emailInput ? emailInput.value.trim() : "";
 
     if (!name || !email) {
       alert("Please fill in your Full Name and Email Address to create an account.");
@@ -120,8 +129,10 @@ async function handleAuthAction() {
 
     setupDashboardView(memberId, name, username);
     
-    document.getElementById('workout-display').innerText = "Welcome! Your customized workout plan will appear here soon.";
-    document.getElementById('assessment-display').innerText = "No recent fitness assessments found.";
+    const workoutDisp = document.getElementById('workout-display');
+    const assessDisp = document.getElementById('assessment-display');
+    if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
+    if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
     
     activateBtn.innerText = "Activate Account";
     activateBtn.disabled = false;
@@ -149,7 +160,7 @@ function handleBooking(className) {
     action: "bookClass",
     memberId: currentId,
     name: currentName, 
-    email: currentUsername, // Sends username to your sheet parameters line
+    email: currentUsername, 
     className: className
   };
   
@@ -173,10 +184,15 @@ function processBookingSuccess(btn, className) {
 }
 
 function setupDashboardView(id, name, username) {
-  document.getElementById("auth-card").style.display = "none";
-  document.getElementById("dashboard-view").style.display = "block";
-  document.getElementById("display-name").innerText = name;
-  document.getElementById("display-email").innerText = "@" + username;
+  const authCard = document.getElementById("auth-card");
+  const dashView = document.getElementById("dashboard-view");
+  const dispName = document.getElementById("display-name");
+  const dispEmail = document.getElementById("display-email");
+
+  if (authCard) authCard.style.display = "none";
+  if (dashView) dashView.style.display = "block";
+  if (dispName) dispName.innerText = name;
+  if (dispEmail) dispEmail.innerText = "@" + username;
 }
 
 async function checkLocalProfile() {
@@ -191,25 +207,35 @@ async function checkLocalProfile() {
         const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
         const result = await response.json();
         if (result.success) {
-            document.getElementById('workout-display').innerText = result.user.WorkoutPlan || "No workout assigned.";
-            document.getElementById('assessment-display').innerText = result.user.Assessments || "No recent metrics.";
+            const workoutDisp = document.getElementById('workout-display');
+            const assessDisp = document.getElementById('assessment-display');
+            if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
+            if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
         }
     } catch (e) {
-        document.getElementById('workout-display').innerText = "Loaded offline mode cached routine.";
+        const workoutDisp = document.getElementById('workout-display');
+        if (workoutDisp) workoutDisp.innerText = "Loaded offline mode cached routine.";
     }
   }
 }
 
 function clearProfile() {
   localStorage.clear();
-  document.getElementById("dashboard-view").style.display = "none";
-  document.getElementById("auth-card").style.display = "block";
-  document.getElementById("user-username").value = "";
-  document.getElementById("user-password").value = "";
-  document.getElementById("user-name").value = "";
-  document.getElementById("user-email").value = "";
   
-  // Revert back to login mode styles explicitly on signout
-  isLoginMode = false; 
-  toggleAuthMode({ preventDefault: () => {} });
-}
+  const dashView = document.getElementById("dashboard-view");
+  const authCard = document.getElementById("auth-card");
+  const userUsername = document.getElementById("user-username");
+  const userPassword = document.getElementById("user-password");
+  const userName = document.getElementById("user-name");
+  const userEmail = document.getElementById("user-email");
+
+  if (dashView) dashView.style.display = "none";
+  if (authCard) authCard.style.display = "block";
+  if (userUsername) userUsername.value = "";
+  if (userPassword) userPassword.value = "";
+  if (userName) userName.value = "";
+  if (userEmail) userEmail.value = "";
+  
+  // Clean, crash-free interface reset to login screen mode
+  isLoginMode = true; 
+  const title = document.getElementById("auth-title");
