@@ -69,10 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
 // Class Booking Transmission Engine (Perfected for your Booking Sheet layout)
 // Class Booking Transmission Engine (Tailored to bypass Booking script parameter filters)
 // Class Booking Transmission Engine (Targeting your 'Bookings' tab)
+// Class Booking Transmission Engine (Restored exactly to your original parameters layout)
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentUsername = localStorage.getItem("iron_pulse_username"); 
+  const currentUsername = localStorage.getItem("iron_pulse_username"); // This is their logged-in User Name
 
   if (!currentId) {
     alert("Please log in before booking gym classes.");
@@ -85,35 +86,19 @@ function handleBooking(className) {
     btn.innerText = "Booking...";
   }
 
-  // Generate automated timestamp and unique ID
-  const bookingId = "BKG-" + Date.now();
-  const currentDateTime = new Date().toLocaleString();
-
-    // DUAL-MAPPING PAYLOAD (Mapping Username to your Email column track)
+  // Construct parameter query string EXACTLY how your original working script handled it
   const payload = {
     action: "bookClass",
-    sheet: "Bookings", 
-    
-    // Original system parameter expectations
     memberId: currentId,
     name: currentName, 
-    email: currentUsername, // Maps your Username string to the script parameter link
-    className: className,
-    
-    // Exact column header mapping variations (No spaces or underscores on left)
-    BookingID: bookingId,      
-    MemberID: currentId,       
-    MemberName: currentName,   
-    ClassName: className,      
-    DateTime: currentDateTime, 
-    Email: currentUsername // Automatically types their Username into your Sheet's Email column box!
+    email: currentUsername, // Passes your username directly into the original email tracker row slot
+    className: className
   };
-
   
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  // Stable image ping method to safely push data over your network grid
+  // Use your highly stable original Image ping method to execute transmission safely
   const ping = new Image();
   
   ping.onload = () => { processBookingSuccess(btn, className); };
@@ -121,6 +106,7 @@ function handleBooking(className) {
   
   ping.src = transmissionUrl;
 }
+
 
 
 function processBookingSuccess(btn, className) {
