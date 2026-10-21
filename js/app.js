@@ -66,11 +66,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Class Booking Transmission
+// Class Booking Transmission Engine (Perfected for your Booking Sheet layout)
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentEmail = localStorage.getItem("iron_pulse_email");
+  const currentUsername = localStorage.getItem("iron_pulse_username"); // This is their login user name
 
   if (!currentId) {
     alert("Please log in before booking gym classes.");
@@ -83,16 +83,28 @@ function handleBooking(className) {
     btn.innerText = "Booking...";
   }
 
+  // Generate a unique Booking ID for this specific transaction
+  const bookingId = "BKG-" + Date.now();
+  
+  // Format the current date and time cleanly
+  const currentDateTime = new Date().toLocaleString();
+
+  // Construct parameter query string matching your exact spreadsheet column headers
+  // Note: Spaces/underscores are stripped to safely transmit as URL parameters
   const payload = {
     action: "bookClass",
-    memberId: currentId,
-    name: currentName, 
-    email: currentEmail, // Sends username profile tracker packet
-    className: className
+    BookingID: bookingId,
+    MemberID: currentId,
+    MemberName: currentName, 
+    ClassName: className,
+    DateTime: currentDateTime,
+    Email: currentUsername // Automatically maps their username to your Email column track
   };
+  
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
+  // Image ping method to send data cleanly to your Booking spreadsheet
   const ping = new Image();
   ping.onload = () => { processBookingSuccess(btn, className); };
   ping.onerror = () => { processBookingSuccess(btn, className); };
