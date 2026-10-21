@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 setupDashboardView(memberId, displayName, username);
                 
                 // Display row data (⚠️ Update 'WorkoutPlan' and 'Assessments' to match your row 1 headers)
-                document.getElementById('workout-display').innerText = result.user.WorkoutPlan || "No workout assigned.";
-                document.getElementById('assessment-display').innerText = result.user.Assessments || "No recent metrics.";
+                document.getElementById('workout-display').innerText = result.user.Workout || "No workout assigned.";
+                document.getElementById('assessment-display').innerText = result.user.Assessment || "No recent metrics.";
             } else {
                 alert("Incorrect password. Please try again.");
                 document.getElementById("user-password").value = "";
