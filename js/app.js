@@ -76,7 +76,6 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // ⚠️ ENTER PORTAL COLUMN ALIGNMENT (Ensure these keywords match your exact sheet columns without spaces)
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
@@ -203,8 +202,6 @@ async function checkLocalProfile() {
         if (result.success) {
             const workoutDisp = document.getElementById('workout-display');
             const assessDisp = document.getElementById('assessment-display');
-            
-            // ⚠️ AUTOMATIC RE-LOG IN SYNC: Mirror your columns here identically!
             if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
             if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
         }
