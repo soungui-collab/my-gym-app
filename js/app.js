@@ -1,5 +1,5 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdrT34LP3PHx0qAQUs6zqVUrH11Jy8X-Uyzudod_ewYacWgIaGGe75K5KVILqf5FZi/exec";
 
 // URL for Fitness Assessments & Workouts Sheet (Your new dashboard connection)
 const GOOGLE_API_URL = "https://google.com"; 
