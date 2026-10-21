@@ -68,10 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Class Booking Transmission Engine (Perfected for your Booking Sheet layout)
 // Class Booking Transmission Engine (Tailored to bypass Booking script parameter filters)
+// Class Booking Transmission Engine (Targeting your 'Bookings' tab)
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentUsername = localStorage.getItem("iron_pulse_username"); // Validated Login User Name
+  const currentUsername = localStorage.getItem("iron_pulse_username"); 
 
   if (!currentId) {
     alert("Please log in before booking gym classes.");
@@ -84,22 +85,22 @@ function handleBooking(className) {
     btn.innerText = "Booking...";
   }
 
-  // Generate background tracking values
+  // Generate automated timestamp and unique ID
   const bookingId = "BKG-" + Date.now();
   const currentDateTime = new Date().toLocaleString();
 
-  // DUAL-MAPPING PAYLOAD: We send both old styles and new header variations 
-  // so your Google Apps Script script functions perfectly either way!
+  // DUAL-MAPPING PAYLOAD (With your exact 'Bookings' sheet target added)
   const payload = {
     action: "bookClass",
+    sheet: "Bookings", // 👈 This explicitly forces Google to look for your 'Bookings' tab name!
     
-    // Original system parameter naming tracks
+    // Original parameter tracks
     memberId: currentId,
     name: currentName, 
-    email: currentUsername, // Sends username profile tag into the original tracking line
+    email: currentUsername, 
     className: className,
     
-    // Column header mapping variations
+    // Exact column header mapping variations
     BookingID: bookingId,
     MemberID: currentId,
     MemberName: currentName,
@@ -111,7 +112,7 @@ function handleBooking(className) {
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
-  // Image ping tracking transmission to your Booking script deployment
+  // Stable image ping method to safely push data over your network grid
   const ping = new Image();
   
   ping.onload = () => { processBookingSuccess(btn, className); };
@@ -119,6 +120,7 @@ function handleBooking(className) {
   
   ping.src = transmissionUrl;
 }
+
 
 function processBookingSuccess(btn, className) {
   alert(`Successfully booked! You are locked in for "${className}".`);
