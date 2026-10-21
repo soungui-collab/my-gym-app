@@ -89,25 +89,26 @@ function handleBooking(className) {
   const bookingId = "BKG-" + Date.now();
   const currentDateTime = new Date().toLocaleString();
 
-  // DUAL-MAPPING PAYLOAD (With your exact 'Bookings' sheet target added)
+    // DUAL-MAPPING PAYLOAD (Mapping Username to your Email column track)
   const payload = {
     action: "bookClass",
-    sheet: "Bookings", // 👈 This explicitly forces Google to look for your 'Bookings' tab name!
+    sheet: "Bookings", 
     
-    // Original parameter tracks
+    // Original system parameter expectations
     memberId: currentId,
     name: currentName, 
-    email: currentUsername, 
+    email: currentUsername, // Maps your Username string to the script parameter link
     className: className,
     
-    // Exact column header mapping variations
-    BookingID: bookingId,
-    MemberID: currentId,
-    MemberName: currentName,
-    ClassName: className,
-    DateTime: currentDateTime,
-    Email: currentUsername
+    // Exact column header mapping variations (No spaces or underscores on left)
+    BookingID: bookingId,      
+    MemberID: currentId,       
+    MemberName: currentName,   
+    ClassName: className,      
+    DateTime: currentDateTime, 
+    Email: currentUsername // Automatically types their Username into your Sheet's Email column box!
   };
+
   
   const queryParams = new URLSearchParams(payload).toString();
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
