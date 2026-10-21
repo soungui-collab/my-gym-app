@@ -1,9 +1,16 @@
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_API_URL = "https://google.com"; 
 
+// Absolute configuration state
 let isLoginMode = true;
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Safe initialization
+  const authCard = document.getElementById("auth-card");
+  const dashView = document.getElementById("dashboard-view");
+  if (authCard) authCard.style.display = "block";
+  if (dashView) dashView.style.display = "none";
+  
   checkLocalProfile();
 });
 
@@ -43,7 +50,10 @@ async function handleAuthAction() {
   const passwordElem = document.getElementById("user-password");
   const activateBtn = document.getElementById("activate-profile-btn");
 
-  if (!usernameElem || !passwordElem) return;
+  if (!usernameElem || !passwordElem) {
+    alert("Input elements missing from display layout tree.");
+    return;
+  }
 
   const username = usernameElem.value.trim().toLowerCase();
   const password = passwordElem.value.trim();
@@ -59,6 +69,9 @@ async function handleAuthAction() {
   }
 
   if (isLoginMode) {
+    // ==========================================
+    // TRACK A: CREDENTIAL PORTAL LOGIN
+    // ==========================================
     try {
       const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
       const result = await response.json();
@@ -76,6 +89,7 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
+          // Print your workouts/assessments onto the UI cards smoothly
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
@@ -99,6 +113,9 @@ async function handleAuthAction() {
     }
 
   } else {
+    // ==========================================
+    // TRACK B: PORTAL NEW PROFILE REGISTRATION
+    // ==========================================
     const nameElem = document.getElementById("user-name");
     const emailElem = document.getElementById("user-email");
     const name = nameElem ? nameElem.value.trim() : "";
@@ -229,6 +246,8 @@ function clearProfile() {
   if (userName) userName.value = "";
   if (userEmail) userEmail.value = "";
   
-  isLoginMode = false; 
-  toggleAuthMode();
-}
+  // Safe interface restoration layout assignments
+  isLoginMode = true;
+  const title = document.getElementById("auth-title");
+  const subtitle = document.getElementById("auth-subtitle");
+  const nameGroup = document.getElementById("reg-name-group");
