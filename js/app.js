@@ -1,17 +1,15 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://google.com"; 
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
 
-// Active session validation states
 let isLoginMode = true;
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
 });
 
-// Switches layout presentation variables crash-free
 function toggleAuthMode(event) {
   if (event && typeof event.preventDefault === "function") event.preventDefault();
   isLoginMode = !isLoginMode;
@@ -43,16 +41,12 @@ function toggleAuthMode(event) {
   }
 }
 
-// Global execution router for credential matching loops
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
   const passwordElem = document.getElementById("user-password");
   const activateBtn = document.getElementById("activate-profile-btn");
 
-  if (!usernameElem || !passwordElem) {
-    alert("System configuration error: UI Input fields missing.");
-    return;
-  }
+  if (!usernameElem || !passwordElem) return;
 
   const username = usernameElem.value.trim().toLowerCase();
   const password = passwordElem.value.trim();
@@ -68,9 +62,6 @@ async function handleAuthAction() {
   }
 
   if (isLoginMode) {
-    // ==========================================
-    // MODULE A: SYSTEM LOG IN LOGIC
-    // ==========================================
     try {
       const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
       const result = await response.json();
@@ -88,11 +79,16 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // Print row arrays (⚠️ Change 'WorkoutPlan' & 'Assessments' to match row 1 text)
+          // =========================================================================
+          // ⚠️ COLUMN HEADER MAPPING RULES (Edit the text after 'result.user.' below)
+          // =========================================================================
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
+          
           if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent fitness metrics logged.";
+          // =========================================================================
+          
         } else {
           alert("Incorrect password. Please try again.");
           passwordElem.value = "";
@@ -111,9 +107,6 @@ async function handleAuthAction() {
     }
 
   } else {
-    // ==========================================
-    // MODULE B: SYSTEM REGISTRATION LOGIC
-    // ==========================================
     const nameElem = document.getElementById("user-name");
     const emailElem = document.getElementById("user-email");
     const name = nameElem ? nameElem.value.trim() : "";
@@ -148,7 +141,7 @@ async function handleAuthAction() {
   }
 }
 
-// Stable image ping class transaction pipeline
+// Your verified, working booking engine
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
@@ -218,12 +211,14 @@ async function checkLocalProfile() {
         if (result.success) {
             const workoutDisp = document.getElementById('workout-display');
             const assessDisp = document.getElementById('assessment-display');
+            
+            // ⚠️ Ensure these matching keywords match your lines 66/67 exactly!
             if (workoutDisp) workoutDisp.innerText = result.user.WorkoutPlan || "No workout assigned.";
             if (assessDisp) assessDisp.innerText = result.user.Assessments || "No recent metrics.";
         }
     } catch (e) {
-        const workoutDisp = document.getElementById('workout-display');
-        if (workoutDisp) workoutDisp.innerText = "Loaded offline mode cached routine.";
+      const workoutDisp = document.getElementById('workout-display');
+      if (workoutDisp) workoutDisp.innerText = "Loaded offline mode cached routine.";
     }
   }
 }
