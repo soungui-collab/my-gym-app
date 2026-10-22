@@ -106,10 +106,7 @@ async function handleAuthAction() {
       }
     }
 
-   } else {
-    // ==========================================
-    // TRACK B: REGISTER A BRAND NEW ACCOUNT
-    // ==========================================
+ } else {
     const nameElem = document.getElementById("user-name");
     const emailElem = document.getElementById("user-email");
     const name = nameElem ? nameElem.value.trim() : "";
@@ -126,51 +123,23 @@ async function handleAuthAction() {
 
     const memberId = "MBR-" + Date.now();
 
-    // 1. CONSTRUCT REGISTRATION TRANSMISSION DATA PACKET
-    // These keys match your Google Sheet column headers (minus spaces)
-    const registrationPayload = {
-      action: "registerUser",
-      sheet: "Client_Data", // Directs data straight to your client roster tab
-      MemberID: memberId,
-      Name: name,
-      Username: Username,
-      Email: Email,
-      Password: Password // Securely pipes the typed password to your records row
-    };
+    localStorage.setItem("iron_pulse_id", memberId);
+    localStorage.setItem("iron_pulse_name", name);
+    localStorage.setItem("iron_pulse_username", username);
 
-    try {
-      // 2. Transmit the new user profile over the network grid to Google Sheets
-      const queryParams = new URLSearchParams(registrationPayload).toString();
-      
-      // Use an Image ping setup for instant tracking transmission without browser blocks
-      const registrationPing = new Image();
-      registrationPing.src = GOOGLE_API_URL + "?" + queryParams;
-      
-      // 3. Cache registration metrics locally to device storage architecture
-      localStorage.setItem("iron_pulse_id", memberId);
-      localStorage.setItem("iron_pulse_name", name);
-      localStorage.setItem("iron_pulse_username", username);
-
-      // Open the dashboard view instantly
-      setupDashboardView(memberId, name, username);
-      
-      const workoutDisp = document.getElementById('workout-display');
-      const assessDisp = document.getElementById('assessment-display');
-      if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
-      if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
-      
-      alert("Profile created successfully! Your account details have been logged.");
-
-    } catch (err) {
-      console.error("Account creation transmission failed:", err);
-      alert("Profile saved locally, but database sync timed out. Check connection.");
-    } finally {
-      if (activateBtn) {
-        activateBtn.innerText = "Enter Portal";
-        activateBtn.disabled = false;
-      }
+    setupDashboardView(memberId, name, username);
+    
+    const workoutDisp = document.getElementById('workout-display');
+    const assessDisp = document.getElementById('assessment-display');
+    if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
+    if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
+    
+    if (activateBtn) {
+      activateBtn.innerText = "Activate Account";
+      activateBtn.disabled = false;
     }
   }
+}
 
 // Your verified, working booking engine
 function handleBooking(className) {
