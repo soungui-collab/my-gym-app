@@ -2,7 +2,7 @@
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzl00dLKbw7MYQtkc8hDHycjj_3oEESVFY5dUfCFE7UO-4vn0hBzI9woY6zpUOhTxX4/exec"; 
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwQ4iUhm-5Qm15aOWkhWZ2ytqc24vgYawZjj-hJcEwp9c4QZ97wRlatZBxw9hoLCL28/exec"; 
 
 let isLoginMode = true;
 
