@@ -133,9 +133,9 @@ async function handleAuthAction() {
       sheet: "client_data", // Directs data straight to your client roster tab
       MemberID: memberId,
       Name: name,
-      Username: username,
-      Email: email,
-      Password: password // Securely pipes the typed password to your records row
+      Username: Username,
+      Email: Email,
+      Password: Password // Securely pipes the typed password to your records row
     };
 
     try {
