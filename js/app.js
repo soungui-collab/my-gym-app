@@ -9,6 +9,22 @@ let isLoginMode = true;
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
 });
+function generateGoogleCalendarUrl(title, startTime, endTime, details, location) {
+  // Helper to format JavaScript Dates to YYYYMMDDTHHMMSSZ
+  const formatUrlDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  };
+
+  const startStr = formatUrlDate(startTime);
+  const endStr = formatUrlDate(endTime);
+  
+  // Encode text inputs to safely pass into a web URL
+  const baseUrl = 'https://google.com';
+  const url = `${baseUrl}&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+  
+  return url;
+}
 
 function toggleAuthMode(event) {
   if (event && typeof event.preventDefault === "function") event.preventDefault();
