@@ -130,7 +130,7 @@ async function handleAuthAction() {
     // These keys match your Google Sheet column headers (minus spaces)
     const registrationPayload = {
       action: "registerUser",
-      sheet: "client_data", // Directs data straight to your client roster tab
+      sheet: "Client_Data", // Directs data straight to your client roster tab
       MemberID: memberId,
       Name: name,
       Username: Username,
