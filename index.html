@@ -9,17 +9,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soungui Fitness Gym - Member Portal</title>
   
-  <!-- ORIGINAL DARK THEME STYLING ARSENAL -->
+  <!-- SPREADSHEET BRAND INTEGRATED STYLING ENGINE -->
   <style>
     :root {
-    --bg-color: #050505;       /* Deep True Black background */
-    --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
-    --text-color: #ffffff;     /* Crisp White for readable text */
-    --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
-    --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
-    --danger-color: #ff3333;   /* Emergency Warning Red */
-    --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
-  }
+      --bg-color: #050505;       /* Deep True Black background */
+      --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
+      --text-color: #ffffff;     /* Crisp White for readable text */
+      --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
+      --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
+      --danger-color: #ff3333;   /* Emergency Warning Red */
+      --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
+    }
 
     body {
       background-color: var(--bg-color);
@@ -35,6 +35,7 @@
       width: 100%;
       max-width: 480px;
       padding: 20px 16px;
+      padding-bottom: 95px; /* Safely clears space for sticky bottom navigation dock */
       box-sizing: border-box;
     }
 
@@ -182,7 +183,7 @@
       display: inline-block;
     }
 
-    /* Class Booking Roster Elements */
+    /* Class Booking Layout Blocks */
     .class-item {
       display: flex;
       justify-content: space-between;
@@ -195,7 +196,9 @@
       border-bottom: none;
     }
 
-    .class-info text-align: left;
+    .class-info {
+      text-align: left;
+    }
 
     .class-info h3 {
       margin: 0 0 4px 0;
@@ -238,6 +241,58 @@
       cursor: pointer;
       margin-top: 10px;
       text-transform: uppercase;
+    }
+
+    /* SPA TAB VIEW DISPLAY HANDLERS */
+    .dashboard-tab {
+      display: none; 
+    }
+    .dashboard-tab.active-tab {
+      display: block; 
+    }
+
+    /* FIXED APP DOCK STYLING */
+    .bottom-nav-dock {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 68px;
+      background-color: #0c0c0c;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+      z-index: 9999;
+      box-sizing: border-box;
+    }
+
+    .nav-dock-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      height: 100%;
+      transition: color 0.2s ease;
+    }
+
+    .nav-dock-item .nav-icon {
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+
+    .nav-dock-item.active-nav {
+      color: var(--accent-color);
+      font-weight: 700;
     }
   </style>
 </head>
@@ -286,10 +341,10 @@
       </p>
     </div>
 
-    <!-- RE-STYLED NATIVE MEMBER DASHBOARD VIEW -->
+    <!-- MAIN MEMBER DASHBOARD PANEL (HIDDEN TILL AUTH SUCCESS) -->
     <div id="dashboard-view" style="display: none;">
       
-      <!-- Modern Status Pass Layout -->
+      <!-- Persisted Member Profile Card Header -->
       <div class="profile-pass">
         <div class="profile-name" id="display-name">Guest Member</div>
         <div class="profile-email" id="display-email">@username</div>
@@ -299,67 +354,15 @@
         </div>
       </div>
 
-      <!-- GOOGLE SHEET SPREADSHEET READOUT Progress Cards -->
-      <div class="card" style="text-align: left;">
-        <h2 style="font-size: 1rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">🏋️ Customized Workout Plan</h2>
-        <div id="workout-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.5; padding: 4px 0 0 4px;">
-          Syncing workout matrix rules...
+      <!-- VIEW PANELS HUB -->
+      
+      <!-- TAB 1: HOME (DYNAMIC SPREADSHEET READOUT METRICS) -->
+      <div id="tab-home" class="dashboard-tab">
+        <div class="card" style="text-align: left;">
+          <h2 style="font-size: 1rem; color: var(--accent-color);">Assigned Workout Plan</h2>
+          <p id="workout-display" style="font-size: 0.95rem; line-height: 1.4; color: #fff;">Running setup files...</p>
         </div>
-      </div>
 
-      <div class="card" style="text-align: left;">
-        <h2 style="font-size: 1rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">📊 Fitness Assessment</h2>
-        <div id="assessment-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.5; padding: 4px 0 0 4px;">
-          Syncing assessment metric rows...
-        </div>
-      </div>
+        <div class="card" style="text-align: left;">
+          <h2 style="font-size: 1rem; color: var(--accent-color);">Fitness Assessments & Progress</h2>
 
-      <!-- Class Booking Roster (Your exact original structure blocks) -->
-      <div class="card">
-        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px;">Available Classes This Week</h2>
-        <div id="schedule-container">
-          
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT-Built to Last Strength</h3>
-              <p>06:00 PM • Coach Curtis</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT-Built to Last Strength')">Book</button>
-          </div>
-
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT-Women's Wednesday</h3>
-              <p>06:30 PM • Coach Kiara</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT-Women's Wednesday')">Book</button>
-          </div>
-
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT Lean Body Shred</h3>
-              <p>06:00 PM • Coach Kiara</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT Lean Body Shred')">Book</button>
-          </div>
-
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT-Super Strength Saturday</h3>
-              <p>11:00 AM • Coach Kiara</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT-Super Strength Saturday')">Book</button>
-          </div>
-
-        </div>
-      </div>
-
-      <button class="logout-btn" onclick="clearProfile()">Switch Profile Account</button>
-    </div>
-
-  </div>
-
-  <!-- Cache-busting script version to force layout redraw -->
-  <script src="js/app.js?v=6"></script>
-</body>
-</html>
