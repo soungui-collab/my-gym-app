@@ -4,7 +4,371 @@
   <meta charset="UTF-8">
   <!-- MOBILE APPLICATION APP ICON PROFILE CONFIGURATION -->
   <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png"><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- MOBILE APPLICATION APP ICON PROFILE CONFIGURATION -->
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soungui Fitness Gym - Member Portal</title>
+  
+  <!-- ORIGINAL DARK THEME STYLING ARSENAL -->
+  <style>
+    :root {
+    --bg-color: #050505;       /* Deep True Black background */
+    --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
+    --text-color: #ffffff;     /* Crisp White for readable text */
+    --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
+    --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
+    --danger-color: #ff3333;   /* Emergency Warning Red */
+    --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
+  }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      padding: 20px 16px;
+      box-sizing: border-box;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 1.65rem;
+      margin: 0 0 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: var(--accent-color);
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #45f3ff33;
+      background-color: #0b0c10;
+      color: #ffffff;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--accent-color);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: background 0.2s;
+    }
+
+    .action-btn:disabled {
+      background-color: #444444;
+      color: #888888;
+      cursor: not-allowed;
+    }
+
+    /* Original Status Pass Layout */
+    .profile-pass {
+      background: linear-gradient(135deg, #1f2833 0%, #0b0c10 100%);
+      border: 1px solid #45f3ff22;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+      text-align: left;
+      position: relative;
+    }
+
+    .profile-name {
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .profile-email {
+      font-size: 0.85rem;
+      color: var(--accent-color);
+      margin-bottom: 14px;
+    }
+
+    .status-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #ffffff11;
+      padding-top: 12px;
+    }
+
+    .status-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      background-color: rgba(76, 175, 80, 0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      margin-right: 6px;
+      display: inline-block;
+    }
+
+    /* Class Booking Roster Elements */
+    .class-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #ffffff11;
+    }
+
+    .class-item:last-child {
+      border-bottom: none;
+    }
+
+    .class-info text-align: left;
+
+    .class-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
+      color: #ffffff;
+    }
+
+    .class-info p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .book-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .book-btn:disabled {
+      background-color: #444444;
+      color: #888888;
+      cursor: not-allowed;
+    }
+
+    .logout-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 10px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>Soungui Fitness Gym</h1>
+      <p>Member Access Portal</p>
+    </header>
+
+    <!-- DUAL-ACTION AUTHENTICATION PORTAL -->
+    <div class="card" id="auth-card">
+      <h2 id="auth-title" style="text-align: center;">Access Member Portal</h2>
+      <p id="auth-subtitle" style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px; text-align: center;">
+        Enter your credentials to access your profile, book classes, and view your routine.
+      </p>
+      
+      <!-- REGISTRATION ONLY FIELD -->
+      <div class="form-group" id="reg-name-group" style="display: none;">
+        <label for="user-name">Full Name</label>
+        <input type="text" id="user-name" placeholder="John Doe">
+      </div>
+
+      <div class="form-group">
+        <label for="user-username">Username</label>
+        <input type="text" id="user-username" placeholder="johndoe123">
+      </div>
+
+      <!-- REGISTRATION ONLY FIELD -->
+      <div class="form-group" id="reg-email-group" style="display: none;">
+        <label for="user-email">Email Address</label>
+        <input type="text" id="user-email" placeholder="john@example.com">
+      </div>
+
+      <div class="form-group">
+        <label for="user-password">Password</label>
+        <input type="password" id="user-password" placeholder="••••••••">
+      </div>
+
+      <button id="activate-profile-btn" class="action-btn" onclick="handleAuthAction()">Enter Portal</button>
+      
+      <p style="margin-top: 15px; font-size: 0.85rem; color: #ddd; text-align: center;">
+        <span id="toggle-text">Don't have an account?</span> 
+        <a href="#" id="toggle-auth-btn" onclick="toggleAuthMode(event)" style="color: var(--accent-color); text-decoration: none; font-weight: bold;">Create an Account</a>
+      </p>
+    </div>
+
+    <!-- RE-STYLED NATIVE MEMBER DASHBOARD VIEW -->
+    <div id="dashboard-view" style="display: none;">
+      
+      <!-- Modern Status Pass Layout -->
+      <div class="profile-pass">
+        <div class="profile-name" id="display-name">Guest Member</div>
+        <div class="profile-email" id="display-email">@username</div>
+        <div class="status-container">
+          <span class="status-label">Membership Status</span>
+          <span class="status-badge"><span class="status-dot"></span>Active</span>
+        </div>
+      </div>
+
+      <!-- GOOGLE SHEET SPREADSHEET READOUT Progress Cards -->
+      <div class="card" style="text-align: left;">
+        <h2 style="font-size: 1rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">🏋️ Customized Workout Plan</h2>
+        <div id="workout-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.5; padding: 4px 0 0 4px;">
+          Syncing workout matrix rules...
+        </div>
+      </div>
+
+      <div class="card" style="text-align: left;">
+        <h2 style="font-size: 1rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">📊 Fitness Assessment</h2>
+        <div id="assessment-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.5; padding: 4px 0 0 4px;">
+          Syncing assessment metric rows...
+        </div>
+      </div>
+
+      <!-- Class Booking Roster (Your exact original structure blocks) -->
+      <div class="card">
+        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px;">Available Classes This Week</h2>
+        <div id="schedule-container">
+          
+          <div class="class-item">
+            <div class="class-info">
+              <h3>HIIT-Built to Last Strength</h3>
+              <p>06:00 PM • Coach Curtis</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('HIIT-Built to Last Strength')">Book</button>
+          </div>
+
+          <div class="class-item">
+            <div class="class-info">
+              <h3>HIIT-Women's Wednesday</h3>
+              <p>06:30 PM • Coach Kiara</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('HIIT-Women's Wednesday')">Book</button>
+          </div>
+
+          <div class="class-item">
+            <div class="class-info">
+              <h3>HIIT Lean Body Shred</h3>
+              <p>06:00 PM • Coach Kiara</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('HIIT Lean Body Shred')">Book</button>
+          </div>
+
+          <div class="class-item">
+            <div class="class-info">
+              <h3>HIIT-Super Strength Saturday</h3>
+              <p>11:00 AM • Coach Kiara</p>
+            </div>
+            <button class="book-btn" onclick="handleBooking('HIIT-Super Strength Saturday')">Book</button>
+          </div>
+
+        </div>
+      </div>
+
+      <button class="logout-btn" onclick="clearProfile()">Switch Profile Account</button>
+    </div>
+
+  </div>
+
+  <!-- Cache-busting script version to force layout redraw -->
+  <script src="js/app.js?v=6"></script>
+</body>
+</html>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soungui Fitness Gym - Member Portal</title>
