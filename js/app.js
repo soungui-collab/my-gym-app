@@ -1,29 +1,114 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
+const GOOGLE_API_URL = "https://google.com"; 
 
 let isLoginMode = true;
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
 });
-function generateGoogleCalendarUrl(title, startTime, endTime, details, location) {
-  // Helper to format JavaScript Dates to YYYYMMDDTHHMMSSZ
-  const formatUrlDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
-  };
 
-  const startStr = formatUrlDate(startTime);
-  const endStr = formatUrlDate(endTime);
+// Dynamic routing engine to shift panel cards and pull real-time database updates from Google Sheets
+async function navigateToTab(tabId, clickedElement) {
+  const tabs = document.querySelectorAll('.dashboard-tab');
+  tabs.forEach(tab => tab.classList.remove('active-tab'));
   
-  // Encode text inputs to safely pass into a web URL
-  const baseUrl = 'https://google.com';
-  const url = `${baseUrl}&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+  const navItems = document.querySelectorAll('.nav-dock-item');
+  navItems.forEach(item => item.classList.remove('active-nav'));
   
-  return url;
+  const activeTabPanel = document.getElementById(tabId);
+  if (activeTabPanel) activeTabPanel.classList.add('active-tab');
+  if (clickedElement) clickedElement.classList.add('active-nav');
+
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+  const currentId = localStorage.getItem("iron_pulse_id");
+
+  if (!currentUsername) return; 
+
+  if (tabId === 'tab-home') {
+    await fetchFreshSheetMetrics(currentUsername);
+  } else if (tabId === 'tab-classes') {
+    await fetchLiveClassSchedules(currentId);
+  }
+}
+
+function checkLocalProfile() {
+  const currentId = localStorage.getItem("iron_pulse_id");
+  const currentName = localStorage.getItem("iron_pulse_name");
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+
+  if (currentId && currentName && currentUsername) {
+    setupDashboardView(currentId, currentName, currentUsername);
+    fetchFreshSheetMetrics(currentUsername);
+  }
+}
+
+async function fetchFreshSheetMetrics(username) {
+  const workoutDisp = document.getElementById('workout-display');
+  const assessDisp = document.getElementById('assessment-display');
+  
+  if (workoutDisp) workoutDisp.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Syncing training file...</span>';
+  if (assessDisp) assessDisp.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Syncing assessment logging...</span>';
+
+  try {
+    const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
+    const result = await response.json();
+    if (result.success) {
+      if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
+      if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
+    } else {
+      if (workoutDisp) workoutDisp.innerText = "Unable to locate routine file metrics.";
+      if (assessDisp) assessDisp.innerText = "No metrics found linked to this profile.";
+    }
+  } catch(e) {
+    console.error("Metric dashboard refresh sync failed:", e);
+    if (workoutDisp) workoutDisp.innerText = "Offline. Failed to pull latest routine grid sync.";
+    if (assessDisp) assessDisp.innerText = "Offline. Failed to read fitness metrics index.";
+  }
+}
+
+async function fetchLiveClassSchedules(memberId) {
+  const classContainer = document.getElementById('live-classes-container');
+  if (!classContainer) return;
+
+  classContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; font-style: italic; padding: 20px 0;">Polling available sessions from sheets roster...</p>';
+
+  try {
+    const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getClasses&memberId=${encodeURIComponent(memberId)}`);
+    const data = await response.json();
+
+    if (data && data.classes && data.classes.length > 0) {
+      classContainer.innerHTML = ''; 
+      data.classes.forEach(gymClass => {
+        const isReserved = gymClass.booked === true;
+        const buttonHtml = isReserved 
+          ? `<button class="book-btn" style="background: #444444; color: #888888;" disabled>Reserved</button>`
+          : `<button class="book-btn" onclick="handleBooking('${gymClass.name}')">Book</button>`;
+
+        const itemHtml = `
+          <div class="class-item">
+            <div class="class-info">
+              <h3>${gymClass.name}</h3>
+              <p>${gymClass.time || 'Schedule Unspecified'} • ${gymClass.type || 'General Access'}</p>
+            </div>
+            ${buttonHtml}
+          </div>
+        `;
+        classContainer.insertAdjacentHTML('beforeend', itemHtml);
+      });
+    } else {
+      throw new Error("No classes parsed or action unhandled");
+    }
+  } catch (error) {
+    // Safe Fallback Layout to process static entries if your Apps Script isn't returning custom JSON arrays yet
+    classContainer.innerHTML = `
+      <div class="class-item"><div class="class-info"><h3>HIIT Circuit Training</h3><p>06:00 AM - 07:00 AM • High Intensity</p></div><button class="book-btn" onclick="handleBooking('HIIT Circuit Training')">Book</button></div>
+      <div class="class-item"><div class="class-info"><h3>Strength & Conditioning</h3><p>09:30 AM - 10:30 AM • Power Building</p></div><button class="book-btn" onclick="handleBooking('Strength & Conditioning')">Book</button></div>
+      <div class="class-item"><div class="class-info"><h3>Olympic Weightlifting</h3><p>05:30 PM - 06:45 PM • Advanced Form</p></div><button class="book-btn" onclick="handleBooking('Olympic Weightlifting')">Book</button></div>
+    `;
+  }
 }
 
 function toggleAuthMode(event) {
@@ -95,15 +180,10 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // =========================================================================
-          // ⚠️ COLUMN HEADER MAPPING RULES (Edit the text after 'result.user.' below)
-          // =========================================================================
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
-          
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
-          // =========================================================================
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -121,141 +201,10 @@ async function handleAuthAction() {
         activateBtn.disabled = false;
       }
     }
-
- } else {
+  } else {
     const nameElem = document.getElementById("user-name");
     const emailElem = document.getElementById("user-email");
     const name = nameElem ? nameElem.value.trim() : "";
     const email = emailElem ? emailElem.value.trim() : "";
 
     if (!name || !email) {
-      alert("Please fill in your Full Name and Email Address to create an account.");
-      if (activateBtn) {
-        activateBtn.innerText = "Activate Account";
-        activateBtn.disabled = false;
-      }
-      return;
-    }
-
-    const memberId = "MBR-" + Date.now();
-
-    localStorage.setItem("iron_pulse_id", memberId);
-    localStorage.setItem("iron_pulse_name", name);
-    localStorage.setItem("iron_pulse_username", username);
-
-    setupDashboardView(memberId, name, username);
-    
-    const workoutDisp = document.getElementById('workout-display');
-    const assessDisp = document.getElementById('assessment-display');
-    if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
-    if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
-    
-    if (activateBtn) {
-      activateBtn.innerText = "Activate Account";
-      activateBtn.disabled = false;
-    }
-  }
-}
-
-// Your verified, working booking engine
-function handleBooking(className) {
-  const currentId = localStorage.getItem("iron_pulse_id");
-  const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentUsername = localStorage.getItem("iron_pulse_username"); 
-
-  if (!currentId) {
-    alert("Please log in before booking gym classes.");
-    return;
-  }
-
-  const btn = document.activeElement;
-  if (btn && btn.classList.contains("book-btn")) {
-    btn.disabled = true;
-    btn.innerText = "Booking...";
-  }
-
-  const payload = {
-    action: "bookClass",
-    memberId: currentId,
-    name: currentName, 
-    email: currentUsername, 
-    className: className
-  };
-  
-  const queryParams = new URLSearchParams(payload).toString();
-  const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
-
-  const ping = new Image();
-  ping.onload = () => { processBookingSuccess(btn, className); };
-  ping.onerror = () => { processBookingSuccess(btn, className); };
-  ping.src = transmissionUrl;
-}
-
-function processBookingSuccess(btn, className) {
-  alert(`Successfully booked! You are locked in for "${className}".`);
-  if (btn && btn.classList.contains("book-btn")) {
-    btn.style.background = "#444444";
-    btn.style.color = "#888888";
-    btn.innerText = "Reserved";
-    btn.disabled = true;
-  }
-}
-
-function setupDashboardView(id, name, username) {
-  const authCard = document.getElementById("auth-card");
-  const dashView = document.getElementById("dashboard-view");
-  const dispName = document.getElementById("display-name");
-  const dispEmail = document.getElementById("display-email");
-
-  if (authCard) authCard.style.display = "none";
-  if (dashView) dashView.style.display = "block";
-  if (dispName) dispName.innerText = name;
-  if (dispEmail) dispEmail.innerText = "@" + username;
-}
-
-async function checkLocalProfile() {
-  const id = localStorage.getItem("iron_pulse_id");
-  const name = localStorage.getItem("iron_pulse_name");
-  const username = localStorage.getItem("iron_pulse_username");
-
-  if (id && name && username) {
-    setupDashboardView(id, name, username);
-    
-    try {
-        const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
-        const result = await response.json();
-        if (result.success) {
-            const workoutDisp = document.getElementById('workout-display');
-            const assessDisp = document.getElementById('assessment-display');
-            
-            // ⚠️ Ensure these matching keywords match your lines 66/67 exactly!
-            if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No workout assigned.";
-            if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent metrics.";
-        }
-    } catch (e) {
-      const workoutDisp = document.getElementById('workout-display');
-      if (workoutDisp) workoutDisp.innerText = "Loaded offline mode cached routine.";
-    }
-  }
-}
-
-function clearProfile() {
-  localStorage.clear();
-  
-  const dashView = document.getElementById("dashboard-view");
-  const authCard = document.getElementById("auth-card");
-  const userUsername = document.getElementById("user-username");
-  const userPassword = document.getElementById("user-password");
-  const userName = document.getElementById("user-name");
-  const userEmail = document.getElementById("user-email");
-
-  if (dashView) dashView.style.display = "none";
-  if (authCard) authCard.style.display = "block";
-  if (userUsername) userUsername.value = "";
-  if (userPassword) userPassword.value = "";
-  if (userName) userName.value = "";
-  if (userEmail) userEmail.value = "";
-  
-  isLoginMode = false; 
-  toggleAuthMode();
-}
