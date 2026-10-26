@@ -12,14 +12,14 @@
   <!-- ORIGINAL DARK THEME STYLING ARSENAL -->
   <style>
     :root {
-    --bg-color: #050505;       /* Deep True Black background */
-    --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
-    --text-color: #ffffff;     /* Crisp White for readable text */
-    --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
-    --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
-    --danger-color: #ff3333;   /* Emergency Warning Red */
-    --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
-  }
+      --bg-color: #050505;       /* Deep True Black background */
+      --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
+      --text-color: #ffffff;     /* Crisp White for readable text */
+      --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
+      --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
+      --danger-color: #ff3333;   /* Emergency Warning Red */
+      --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
+    }
 
     body {
       background-color: var(--bg-color);
@@ -36,6 +36,12 @@
       max-width: 480px;
       padding: 20px 16px;
       box-sizing: border-box;
+      position: relative;
+    }
+
+    /* CHANGE 1: Dynamically adds safe bottom clearance spacing ONLY when logged in so the sticky bar never overlaps content */
+    body.logged-in .app-container {
+      padding-bottom: 90px;
     }
 
     header {
@@ -195,7 +201,9 @@
       border-bottom: none;
     }
 
-    .class-info text-align: left;
+    .class-info {
+      text-align: left;
+    }
 
     .class-info h3 {
       margin: 0 0 4px 0;
@@ -236,8 +244,58 @@
       font-weight: bold;
       font-size: 0.9rem;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 24px;
       text-transform: uppercase;
+    }
+
+    /* --- CHANGE 2: NEW BOTTOM TAB NAV STYLES --- */
+    .dashboard-pane {
+      display: none;
+    }
+    
+    .dashboard-pane.pane-active {
+      display: block;
+    }
+
+    .bottom-tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px; /* Center-locks perfectly inside your main workspace alignment */
+      height: 70px;
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 9999;
+    }
+
+    .tab-btn {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: color 0.2s ease, border-top 0.2s ease;
+      border-top: 3px solid transparent;
+    }
+
+    .tab-btn.tab-active {
+      color: var(--accent-color);
+      border-top: 3px solid var(--accent-color);
     }
   </style>
 </head>
@@ -299,67 +357,13 @@
         </div>
       </div>
 
-      <!-- GOOGLE SHEET SPREADSHEET READOUT Progress Cards -->
-      <div class="card" style="text-align: left;">
-        <h2 style="font-size: 1rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">🏋️ Customized Workout Plan</h2>
-        <div id="workout-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.5; padding: 4px 0 0 4px;">
-          Syncing workout matrix rules...
-        </div>
-      </div>
-
-      <div class="card" style="text-align: left;">
-        <h2 style="font-size: 1rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">📊 Fitness Assessment</h2>
-        <div id="assessment-display" style="color: #ffffff; font-size: 0.95rem; line-height: 1.5; padding: 4px 0 0 4px;">
-          Syncing assessment metric rows...
-        </div>
-      </div>
-
-      <!-- Class Booking Roster (Your exact original structure blocks) -->
-      <div class="card">
-        <h2 style="text-align: left; font-size: 1rem; margin-bottom: 14px;">Available Classes This Week</h2>
-        <div id="schedule-container">
-          
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT-Built to Last Strength</h3>
-              <p>06:00 PM • Coach Curtis</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT-Built to Last Strength')">Book</button>
-          </div>
-
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT-Women's Wednesday</h3>
-              <p>06:30 PM • Coach Kiara</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT-Women's Wednesday')">Book</button>
-          </div>
-
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT Lean Body Shred</h3>
-              <p>06:00 PM • Coach Kiara</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT Lean Body Shred')">Book</button>
-          </div>
-
-          <div class="class-item">
-            <div class="class-info">
-              <h3>HIIT-Super Strength Saturday</h3>
-              <p>11:00 AM • Coach Kiara</p>
-            </div>
-            <button class="book-btn" onclick="handleBooking('HIIT-Super Strength Saturday')">Book</button>
-          </div>
-
-        </div>
-      </div>
-
-      <button class="logout-btn" onclick="clearProfile()">Switch Profile Account</button>
-    </div>
-
-  </div>
-
-  <!-- Cache-busting script version to force layout redraw -->
-  <script src="js/app.js?v=6"></script>
-</body>
-</html>
+      <!-- CHANGE 3: DISCRETE TARGET PANE VIEW ENVELOPES -->
+      <!-- Sub-Pane A: Workouts View -->
+      <div id="pane-workouts" class="dashboard-pane pane-active">
+        <div class="card">
+          <h2>🏋️ Scheduled Workouts</h2>
+          <div id="workouts-roster">
+            <!-- Dynamic elements remain targeted safely here -->
+            <div class="class-item">
+              <div class="class-info">
+                <h3>Hypertrophy Push Day</h3>
