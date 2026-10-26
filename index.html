@@ -257,13 +257,14 @@
       display: block;
     }
 
+        /* Fixed Bottom Navigation Overlay scaled natively with maximum mobile sizing limit bounds */
     .bottom-tab-bar {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 480px; /* Center-locks perfectly inside your main workspace alignment */
+      max-width: 480px; 
       height: 70px;
       background-color: var(--card-bg);
       border-top: 1px solid var(--border-color);
@@ -272,6 +273,7 @@
       align-items: center;
       box-sizing: border-box;
       z-index: 9999;
+      pointer-events: none; /* Allows clicks to pass through empty space in the nav bar container */
     }
 
     .tab-btn {
@@ -291,11 +293,9 @@
       align-items: center;
       transition: color 0.2s ease, border-top 0.2s ease;
       border-top: 3px solid transparent;
+      pointer-events: auto; /* Makes sure the actual buttons still catch your clicks */
     }
 
-    .tab-btn.tab-active {
-      color: var(--accent-color);
-      border-top: 3px solid var(--accent-color);
     }
   </style>
 </head>
