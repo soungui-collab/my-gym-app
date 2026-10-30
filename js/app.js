@@ -107,8 +107,6 @@ async function handleAuthAction() {
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           // =========================================================================
           
-         
-          
         } else {
           alert("Incorrect password. Please try again.");
           passwordElem.value = "";
@@ -164,13 +162,38 @@ async function handleAuthAction() {
   }
 }
 
+// 🆕 FUNCTION: Open popup window element and load content dynamically
+async function openNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  const nutritionDisp = document.getElementById('nutrition-display');
+  
+  if (modal) {
+    modal.style.display = "flex";
+  }
+  
+  if (nutritionDisp) {
+    nutritionDisp.innerHTML = "<em>Syncing secure cloud data streams...</em>";
+  }
+  
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+  if (currentUsername) {
+    await fetchNutritionPlanDocument(currentUsername);
+  } else {
+    if (nutritionDisp) {
+      nutritionDisp.innerHTML = "<p style='color:var(--text-muted);'>Please log in to view nutrition data.</p>";
+    }
+  }
+}
+
+// 🆕 FUNCTION: Close popup window element
+function closeNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "none";
+}
+
 // 🆕 FUNCTION: Pulls nutrition files out of Google Drive and parses formatting
 async function fetchNutritionPlanDocument(username) {
   const nutritionDisp = document.getElementById('nutrition-display');
-  
-  if (nutritionDisp) {
-    nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
-  }
 
   try {
     const docResponse = await fetch(`${GOOGLE_DOCS_API_URL}?action=fetchDocContent&username=${encodeURIComponent(username)}`);
@@ -190,43 +213,10 @@ async function fetchNutritionPlanDocument(username) {
   } catch (error) {
     console.error("Critical failure during nutrition file parsing sync:", error);
     if (nutritionDisp) {
-      nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to safely load nutrition profile data.</p>";
+      nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to load nutrition profile data.</p>";
     }
   }
 }
-
-// Open popup window element and load content dynamically
-async function openNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  const nutritionDisp = document.getElementById('nutrition-display');
-  
-  if (modal) {
-    modal.style.display = "flex"; // Show the pop-up loader template immediately
-  }
-  
-  if (nutritionDisp) {
-    nutritionDisp.innerHTML = "<em>Syncing secure cloud data streams...</em>";
-  }
-  
-  // Pull the current session username out of browser cache storage
-  const currentUsername = localStorage.getItem("iron_pulse_username");
-  if (currentUsername) {
-    // ⚡ Fetch the text and images inside the opened modal screen
-    await fetchNutritionPlanDocument(currentUsername);
-  } else {
-    if (nutritionDisp) {
-      nutritionDisp.innerHTML = "<p style='color:var(--text-muted);'>Please log in to view nutrition data.</p>";
-    }
-  }
-}
-
-// Close popup window element
-function closeNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  if (modal) modal.style.display = "none";
-}
-
-
 
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
@@ -256,30 +246,8 @@ function handleBooking(className) {
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
   const ping = new Image();
-  // Fixed: Cleanly handles both paths so it won't crash the browser engine
   ping.onload = () => { processBookingSuccess(btn, className); };
   ping.onerror = () => { processBookingSuccess(btn, className); };
   ping.src = transmissionUrl;
-}
-
-function processBookingSuccess(btn, className) {
-  alert(`Successfully booked! You are locked in for "${className}".`);
-  if (btn && btn.classList.contains("book-btn")) {
-    btn.style.background = "#444444";
-    btn.style.color = "#888888";
-    btn.innerText = "Reserved";
-    btn.disabled = true;
-  }
-}
-
-function setupDashboardView(id, name, username) {
-  const authCard = document.getElementById("auth-card");
-  const dashView = document.getElementById("dashboard-view");
-  
-  if (authCard) authCard.style.display = "none";
-  if (dashView) dashView.style.display = "block";
-  
-  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
-  if (dispName) dispName.innerText = name;
 }
 
