@@ -107,8 +107,7 @@ async function handleAuthAction() {
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           // =========================================================================
           
-          // 🍏 DRIVE MODULE: Fetch the Formatted Nutrition Plan from your Standalone Script
-          await fetchNutritionPlanDocument(username);
+         
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -196,16 +195,27 @@ async function fetchNutritionPlanDocument(username) {
   }
 }
 
-// Open popup window element
-function openNutritionModal() {
+// Open popup window element and load content dynamically
+async function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
+  const nutritionDisp = document.getElementById('nutrition-display');
+  
   if (modal) {
-    modal.style.display = "flex";
-    
-    // Automatically triggers data load using cached session credentials 
-    const currentUsername = localStorage.getItem("iron_pulse_username");
-    if (currentUsername) {
-      fetchNutritionPlanDocument(currentUsername);
+    modal.style.display = "flex"; // Show the pop-up loader template immediately
+  }
+  
+  if (nutritionDisp) {
+    nutritionDisp.innerHTML = "<em>Syncing secure cloud data streams...</em>";
+  }
+  
+  // Pull the current session username out of browser cache storage
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+  if (currentUsername) {
+    // ⚡ Fetch the text and images inside the opened modal screen
+    await fetchNutritionPlanDocument(currentUsername);
+  } else {
+    if (nutritionDisp) {
+      nutritionDisp.innerHTML = "<p style='color:var(--text-muted);'>Please log in to view nutrition data.</p>";
     }
   }
 }
@@ -215,6 +225,7 @@ function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "none";
 }
+
 
 
 function handleBooking(className) {
