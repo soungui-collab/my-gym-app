@@ -224,6 +224,7 @@ function handleBooking(className) {
   const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
 
   const ping = new Image();
+  // Fixed: Cleanly handles both paths so it won't crash the browser engine
   ping.onload = () => { processBookingSuccess(btn, className); };
   ping.onerror = () => { processBookingSuccess(btn, className); };
   ping.src = transmissionUrl;
@@ -246,3 +247,7 @@ function setupDashboardView(id, name, username) {
   if (authCard) authCard.style.display = "none";
   if (dashView) dashView.style.display = "block";
   
+  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
+  if (dispName) dispName.innerText = name;
+}
+
