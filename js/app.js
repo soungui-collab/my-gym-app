@@ -225,5 +225,13 @@ function processBookingSuccess(btn, className) {
 function setupDashboardView(id, name, username) {
   const authCard = document.getElementById("auth-card");
   const dashView = document.getElementById("dashboard-view");
-  // Remainder of your layout setup logic follows cleanly below...
+  
+  // Cleanly swap your authentication card for the main panel dashboard container
+  if (authCard) authCard.style.display = "none";
+  if (dashView) dashView.style.display = "block";
+  
+  // Set up the user greeting container if you have one
+  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
+  if (dispName) dispName.innerText = name;
+
 }
