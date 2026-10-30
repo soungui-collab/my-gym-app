@@ -4,7 +4,7 @@ const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
 const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
 
-// 🆕 URL for your brand new standalone Google Docs script
+// URL for your standalone Google Docs script (Pulls Nutrition content)
 const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwJEc00R1kvOxcONbB_QDmTgmyl6-cMbvRXF4u8TDiTOp3V8QMEk2SInuKS8LP2gXE6/exec";
 
 let isLoginMode = true;
@@ -97,8 +97,18 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // 🆕 TRIGGER: Fetch Document content immediately following profile authentication
-          await fetchMemberDocument(username);
+          // =========================================================================
+          // 📊 SHEETS MODULE: POPULATE WORKOUT & ASSESSMENT FROM THE GOOGLE SHEET
+          // =========================================================================
+          const workoutDisp = document.getElementById('workout-display');
+          const assessDisp = document.getElementById('assessment-display');
+          
+          if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
+          if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
+          // =========================================================================
+          
+          // 🍏 DRIVE MODULE: Fetch the Formatted Nutrition Plan from your Standalone Script
+          await fetchNutritionPlanDocument(username);
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -142,8 +152,11 @@ async function handleAuthAction() {
     
     const workoutDisp = document.getElementById('workout-display');
     const assessDisp = document.getElementById('assessment-display');
+    const nutritionDisp = document.getElementById('nutrition-display');
+
     if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
     if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
+    if (nutritionDisp) nutritionDisp.innerHTML = "<p>Your custom nutrition document will appear here.</p>";
     
     if (activateBtn) {
       activateBtn.innerText = "Activate Account";
@@ -152,12 +165,12 @@ async function handleAuthAction() {
   }
 }
 
-// 🆕 FUNCTION: Look up the Google Doc via Drive API standalone script 
-async function fetchMemberDocument(username) {
-  const workoutDisp = document.getElementById('workout-display');
+// 🆕 FUNCTION: Pulls nutrition files out of Google Drive and parses formatting
+async function fetchNutritionPlanDocument(username) {
+  const nutritionDisp = document.getElementById('nutrition-display');
   
-  if (workoutDisp) {
-    workoutDisp.innerText = "Loading your custom training file out of Google Drive...";
+  if (nutritionDisp) {
+    nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
   }
 
   try {
@@ -165,17 +178,21 @@ async function fetchMemberDocument(username) {
     const docResult = await docResponse.json();
     
     if (docResult.success) {
-      if (workoutDisp) {
-        // Overwrite the static grid card with the full contents of your Google Doc file
-        workoutDisp.innerText = docResult.documentText;
+      if (nutritionDisp) {
+        // ⚡ Uses innerHTML to correctly output paragraph splits, lists, and headers
+        nutritionDisp.innerHTML = docResult.documentHtml;
       }
     } else {
-      console.warn("Document query notice:", docResult.error);
-      // Fallback display message inside the element box if a doc file isn't set up yet
-      if (workoutDisp) workoutDisp.innerText = "No file with your username found in Google Drive yet.";
+      console.warn("Drive lookup notice:", docResult.error);
+      if (nutritionDisp) {
+        nutritionDisp.innerHTML = "<p style='color:#888;'>No custom nutrition document file found in Google Drive yet.</p>";
+      }
     }
   } catch (error) {
-    console.error("Failed to safely fetch your customized Google Document:", error);
+    console.error("Critical failure during nutrition file parsing sync:", error);
+    if (nutritionDisp) {
+      nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to safely load nutrition profile data.</p>";
+    }
   }
 }
 
@@ -226,12 +243,6 @@ function setupDashboardView(id, name, username) {
   const authCard = document.getElementById("auth-card");
   const dashView = document.getElementById("dashboard-view");
   
-  // Cleanly swap your authentication card for the main panel dashboard container
   if (authCard) authCard.style.display = "none";
   if (dashView) dashView.style.display = "block";
   
-  // Set up the user greeting container if you have one
-  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
-  if (dispName) dispName.innerText = name;
-
-}
