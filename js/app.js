@@ -201,7 +201,7 @@ async function fetchNutritionPlanDocument(username) {
     
     if (docResult.success) {
       if (nutritionDisp) {
-        // ⚡ Uses innerHTML to correctly output paragraph splits, lists, and headers
+        // Uses innerHTML to correctly output paragraph splits, lists, and headers
         nutritionDisp.innerHTML = docResult.documentHtml;
       }
     } else {
