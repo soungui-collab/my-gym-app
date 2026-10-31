@@ -161,8 +161,8 @@ async function handleAuthAction() {
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           
-          // 🍏 DRIVE MODULE: Passed parameter successfully
-          await fetchNutritionPlanDocument(username);
+          // 🍏 DRIVE MODULE: Fired in the background so it doesn't freeze the dashboard
+fetchNutritionPlanDocument(username);
           
         } else {
           alert("Incorrect password. Please try again.");
