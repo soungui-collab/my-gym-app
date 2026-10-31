@@ -5,7 +5,7 @@ const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2
 const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
 
 // URL for your standalone Google Docs script (Pulls Nutrition content)
-const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbxX1dN9QnN0iJnrTYUF-SGU5KgHv2oDgk9b_PSABuURMQmNkKyp6cv8aJKf74IPxPtlpw/exec";
+const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbzt8vqV16rnM0ASTvlXsvZfiHMXS76W9Pk4zlqotwjDHzOlNdMmBF_fKaVW86hv9JaTbg/exec";
 
 let isLoginMode = true;
 
