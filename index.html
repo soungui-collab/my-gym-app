@@ -1,14 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soungui</title>
+
   <!-- ORIGINAL DARK THEME STYLING ARSENAL -->
   <style>
     :root {
-    --bg-color: #050505;       /* Deep True Black background */
-    --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
-    --text-color: #ffffff;     /* Crisp White for readable text */
-    --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
-    --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
-    --danger-color: #ff3333;   /* Emergency Warning Red */
-    --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
-  }
+      --bg-color: #050505;       /* Deep True Black background */
+      --card-bg: #121212;        /* Dark Charcoal Black for your text cards */
+      --text-color: #ffffff;     /* Crisp White for readable text */
+      --text-muted: #a0a0a0;     /* Muted Grey for description subtitles */
+      --accent-color: #e50914;   /* High-performance Crimson Red for your buttons & badges */
+      --danger-color: #ff3333;   /* Emergency Warning Red */
+      --border-color: #262626;   /* Subtle dark grey lines to separate layout blocks cleanly */
+    }
 
     body {
       background-color: var(--bg-color);
@@ -184,7 +194,9 @@
       border-bottom: none;
     }
 
-    .class-info text-align: left;
+    .class-info {
+      text-align: left;
+    }
 
     .class-info h3 {
       margin: 0 0 4px 0;
@@ -231,7 +243,7 @@
 
     /* 🆕 NEW NUTRITION PLAN DESIGN SYSTEM PRESETS */
     #nutrition-display h3 {
-      color: var(--accent-color); /* Matches your crimson red theme */
+      color: var(--accent-color);
       margin-top: 16px;
       margin-bottom: 6px;
       font-size: 1.05rem;
@@ -255,3 +267,99 @@
       color: var(--text-muted);
     }
   </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>Soungui</h1>
+      <p id="auth-subtitle">Member Portal Connection</p>
+    </header>
+
+    <!-- =========================================================================
+         A. AUTHENTICATION LANDING CARD (Sign In / Sign Up)
+         ========================================================================= -->
+    <div id="auth-card" class="card">
+      <h2 id="auth-title">Access Member Portal</h2>
+      
+      <div id="reg-name-group" class="form-group" style="display: none;">
+        <label>Full Name</label>
+        <input type="text" id="user-name" placeholder="John Doe">
+      </div>
+
+      <div id="reg-email-group" class="form-group" style="display: none;">
+        <label>Email Address</label>
+        <input type="email" id="user-email" placeholder="johndoe@example.com">
+      </div>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="user-username" placeholder="enter your username">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="user-password" placeholder="••••••••">
+      </div>
+
+      <button id="activate-profile-btn" class="action-btn" onclick="handleAuthAction()">Enter Portal</button>
+
+      <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+        <span id="toggle-text">Don't have an account?</span> 
+        <a href="#" id="toggle-auth-btn" onclick="toggleAuthMode(event)" style="color: var(--accent-color); font-weight: bold; text-decoration: none;">Create an Account</a>
+      </p>
+    </div>
+
+    <!-- =========================================================================
+         B. MEMBER LOGGED-IN DASHBOARD PANEL
+         ========================================================================= -->
+    <div id="dashboard-view" style="display: none;">
+      
+      <!-- Status Badge Pass Container -->
+      <div class="profile-pass">
+        <div id="user-display-name" class="profile-name">Member Profile</div>
+        <div class="profile-email">Active Member Pass</div>
+        <div class="status-container">
+          <span class="status-label">Membership Status</span>
+          <span class="status-badge"><span class="status-dot"></span>Verified</span>
+        </div>
+      </div>
+
+      <!-- Workout Plan Display Card -->
+      <div class="card">
+        <h2>Customized Workout Plan</h2>
+        <div id="workout-display" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-color);">
+          Loading your active workout files...
+        </div>
+      </div>
+
+      <!-- Fitness Assessment Display Card -->
+      <div class="card">
+        <h2>Fitness Assessments</h2>
+        <div id="assessment-display" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-muted);">
+          Syncing metric log data entries...
+        </div>
+      </div>
+
+      <!-- 🍏 Formatted Nutrition Plan Card UI Block -->
+      <div class="card">
+        <h2>Your Nutrition Plan</h2>
+        <div id="nutrition-display">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Your custom macronutrient targets and guidelines will populate here.</p>
+        </div>
+      </div>
+
+      <!-- Class Booking Module Block -->
+      <div class="card">
+        <h2>Schedule Gym Classes</h2>
+        <div class="class-item">
+          <div class="class-info">
+            <h3>Daily Functional Training</h3>
+            <p>08:00 AM — Morning Strength</p>
+          </div>
+          <button class="book-btn" onclick="handleBooking('Morning Strength (08:00 AM)')">Book</button>
+        </div>
+        <div class="class-item">
+          <div class="class-info">
+            <h3>High Intensity Conditioning</h3>
+            <p>05:30 PM — Evening Burn</p>
