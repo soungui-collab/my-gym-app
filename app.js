@@ -65,6 +65,25 @@ function toggleAuthMode(event) {
     if (toggleLink) toggleLink.innerText = "Log In Here";
   }
 }
+// Open popup window element
+function openNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) {
+    modal.style.display = "flex";
+    
+    // Automatically triggers data load using cached session credentials 
+    const currentUsername = localStorage.getItem("iron_pulse_username");
+    if (currentUsername) {
+      fetchNutritionPlanDocument(currentUsername);
+    }
+  }
+}
+
+// Close popup window element
+function closeNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "none";
+}
 
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
