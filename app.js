@@ -78,6 +78,7 @@ async function handleAuthAction() {
     activateBtn.innerText = "Processing...";
     activateBtn.disabled = true;
   }
+}
 
   if (isLoginMode) {
     try {
