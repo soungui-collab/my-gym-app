@@ -66,30 +66,43 @@ function toggleAuthMode(event) {
   }
 }
 // Open popup window element
+// Open popup window element and show the plan
 function openNutritionModal() {
-    // You don't strictly need a username argument if your Apps Script 
-    // is pointing directly to your specific plan's document ID.
-    fetchNutritionPlanDocument();
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) {
+    // 1. Reveal the modal popup overlay
+    modal.style.display = "flex"; 
+  }
+  
+  // 2. Pull the cached username from storage to grab their specific document
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+  fetchNutritionPlanDocument(currentUsername);
 }
 
-async function fetchNutritionPlanDocument() { 
+// Fixed to properly handle usernames and request from your Google Docs Script
+async function fetchNutritionPlanDocument(username) { 
     const nutritionDisp = document.getElementById('nutrition-display'); 
     
     if (nutritionDisp) { 
-        // 1. Show the syncing placeholder text
+        // Show the syncing placeholder text inside the modal display area
         nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
         
-        // 2. Replace this URL with your exact Google Apps Script URL from Step 1
-        const appsScriptUrl = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
+        // Construct the URL using your true Apps Script and attach the username if needed
+        const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
+        const fetchUrl = `${GOOGLE_DOCS_API_URL}${urlParam}`;
         
         try {
-            // 3. Request the document data
-            const response = await fetch(appsScriptUrl);
+            const response = await fetch(fetchUrl);
             const data = await response.json();
             
-            // 4. Inject the raw Google Doc text content into your display container
-            // (You can replace line-breaks with HTML breaks for cleaner readability)
-            nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
+            if (data && data.text) {
+                // Inject the raw text and turn document line breaks into HTML line breaks
+                nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
+            } else if (data && data.message) {
+                nutritionDisp.innerHTML = `<span style='color: orange;'>${data.message}</span>`;
+            } else {
+                nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan text container is empty.</span>";
+            }
             
         } catch (error) {
             console.error("Failed to load nutrition plan:", error);
@@ -97,6 +110,7 @@ async function fetchNutritionPlanDocument() {
         }
     }
 }
+
 
 
 // Close popup window element
