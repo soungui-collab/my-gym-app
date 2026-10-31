@@ -310,55 +310,65 @@
       </p>
     </div>
 
-    <!-- =========================================================================
+      <!-- =========================================================================
          B. MEMBER LOGGED-IN DASHBOARD PANEL
          ========================================================================= -->
     <div id="dashboard-view" style="display: none;">
       
       <!-- Status Badge Pass Container -->
       <div class="profile-pass">
-        <div id="user-display-name" class="profile-name">Member Profile</div>
-        <div class="profile-email">Active Member Pass</div>
+        <!-- Match this ID exactly with your JavaScript lookup -->
+        <div id="user-display-name" class="profile-name">Loading Profile...</div>
+        <div class="profile-email">Active Member</div>
         <div class="status-container">
-          <span class="status-label">Membership Status</span>
-          <span class="status-badge"><span class="status-dot"></span>Verified</span>
+          <span class="status-label">Portal Status</span>
+          <span class="status-badge"><span class="status-dot"></span>Connected</span>
         </div>
       </div>
 
-      <!-- Workout Plan Display Card -->
+      <!-- Workout Routine Card -->
       <div class="card">
-        <h2>Customized Workout Plan</h2>
-        <div id="workout-display" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-color);">
-          Loading your active workout files...
-        </div>
+        <h2>Today's Workout Plan</h2>
+        <p id="workout-display" style="font-size: 0.95rem; line-height: 1.5;">Syncing routine...</p>
       </div>
 
-      <!-- Fitness Assessment Display Card -->
+      <!-- Fitness Assessments Card -->
       <div class="card">
         <h2>Fitness Assessments</h2>
-        <div id="assessment-display" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-muted);">
-          Syncing metric log data entries...
-        </div>
+        <p id="assessment-display" style="font-size: 0.95rem; line-height: 1.5; color: var(--text-muted);">Syncing metrics...</p>
       </div>
 
-      <!-- 🍏 Formatted Nutrition Plan Card UI Block -->
+      <!-- Nutrition Card -->
       <div class="card">
-        <h2>Your Nutrition Plan</h2>
+        <h2>Custom Nutrition Document</h2>
         <div id="nutrition-display">
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Your custom nutrition document text and formatting will automatically populate here.</p>
+          <p>Your custom nutrition document will appear here.</p>
         </div>
       </div>
 
-      <!-- Class Booking Module Block -->
+      <!-- Class Booking Section -->
       <div class="card">
-        <h2>Schedule Gym Classes</h2>
+        <h2>Available Gym Classes</h2>
         <div class="class-item">
           <div class="class-info">
-            <h3>Daily Functional Training</h3>
-            <p>08:00 AM — Morning Strength</p>
+            <h3>Morning HIIT Blast</h3>
+            <p>07:00 AM — High Intensity</p>
           </div>
-          <button class="book-btn" onclick="handleBooking('Morning Strength (08:00 AM)')">Book</button>
+          <button class="book-btn" onclick="handleBooking('HIIT Blast')">Book</button>
         </div>
         <div class="class-item">
           <div class="class-info">
-            <h3>High Intensity Conditioning</h3>
+            <h3>Strength & Power</h3>
+            <p>05:30 PM — Weight Training</p>
+          </div>
+          <button class="book-btn" onclick="handleBooking('Strength & Power')">Book</button>
+        </div>
+      </div>
+
+      <button class="logout-btn" onclick="localStorage.clear(); window.location.reload();">Log Out</button>
+    </div>
+
+  </div> <!-- End app-container -->
+</body>
+</html>
+
