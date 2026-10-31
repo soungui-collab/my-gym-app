@@ -154,9 +154,9 @@ function closeNutritionModal() {
 // =========================================================================
 // 2. NETWORK ENDPOINTS CONFIGURATION
 // =========================================================================
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
-const GOOGLE_API_URL = "https://google.com"; 
-const GOOGLE_DOCS_API_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
+const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwJEc00R1kvOxcONbB_QDmTgmyl6-cMbvRXF4u8TDiTOp3V8QMEk2SInuKS8LP2gXE6/exec";
 
 let isLoginMode = true;
 
