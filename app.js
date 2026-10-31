@@ -80,7 +80,7 @@ async function fetchNutritionPlanDocument() {
         nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
         
         // 2. Replace this URL with your exact Google Apps Script URL from Step 1
-        const appsScriptUrl = "https://google.com";
+        const appsScriptUrl = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
         
         try {
             // 3. Request the document data
