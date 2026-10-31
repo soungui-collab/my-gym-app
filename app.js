@@ -69,15 +69,15 @@ function toggleAuthMode(event) {
 // Open popup window element and show the plan
 function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
-  if (modal) {
-    // 1. Reveal the modal popup overlay
-    modal.style.display = "flex"; 
-  }
+  if (modal) modal.style.display = "flex"; // Opens the modal popup
   
-  // 2. Pull the cached username from storage to grab their specific document
+  // 1. Grab the username from local storage
   const currentUsername = localStorage.getItem("iron_pulse_username");
+  
+  // 2. Pass it into the function so it has the parameter it needs
   fetchNutritionPlanDocument(currentUsername);
 }
+
 
 // Fixed to properly handle usernames and request from your Google Docs Script
 async function fetchNutritionPlanDocument(username) { 
