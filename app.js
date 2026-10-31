@@ -179,7 +179,6 @@ async function handleAuthAction() {
     }
 
   } else {
-    // FIXED: Closed out registration logic gracefully to fix crash
     const nameElem = document.getElementById("user-name");
     const emailElem = document.getElementById("user-email");
     const name = nameElem ? nameElem.value.trim() : "";
@@ -194,12 +193,21 @@ async function handleAuthAction() {
       return;
     }
 
+    // Generate unique membership reference
     const memberId = "MBR-" + Date.now();
     localStorage.setItem("iron_pulse_id", memberId);
     localStorage.setItem("iron_pulse_name", name);
     localStorage.setItem("iron_pulse_username", username);
 
     setupDashboardView(memberId, name, username);
+    
+    // Clear default placeholders out on registration setup
+    const workoutDisp = document.getElementById('workout-display');
+    const assessDisp = document.getElementById('assessment-display');
+    if (workoutDisp) workoutDisp.innerText = "No training routine assigned for today.";
+    if (assessDisp) assessDisp.innerText = "No recent fitness metrics logged.";
+
+    // Trigger quiet background load
     fetchNutritionPlanDocument(username);
 
     if (activateBtn) {
