@@ -412,6 +412,29 @@
     </div>
 
   </div>
+<!-- Dashboard Action Card with Trigger Button -->
+<div class="card">
+  <h2>Nutrition Guidelines</h2>
+  <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 14px;">View your custom macronutrient target breakdown and diet profile templates.</p>
+  <button class="action-btn" onclick="openNutritionModal()">View Nutrition Plan</button>
+</div>
+
+<!-- Hidden Nutrition Pop-up Modal Window -->
+<div id="nutrition-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
+  <div style="background:var(--card-bg); width:100%; max-width:440px; max-height:80vh; border-radius:12px; padding:20px; box-sizing:border-box; overflow-y:auto; border:1px solid var(--border-color); position:relative;">
+    
+    <!-- Header Block -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #ffffff11; padding-bottom:10px;">
+      <h2 style="margin:0; font-size:1.2rem; text-transform:uppercase;">Nutrition Strategy</h2>
+      <button onclick="closeNutritionModal()" style="background:transparent; border:none; color:var(--accent-color); font-size:1.5rem; font-weight:bold; cursor:pointer; padding:0 5px;">&times;</button>
+    </div>
+    
+    <!-- Injection Content Area for Documents & Images -->
+    <div id="nutrition-display">
+      <p style="color:var(--text-muted);">Syncing secure cloud data streams...</p>
+    </div>
+  </div>
+</div>
 
   <!-- Cache-busting script version to force layout redraw -->
   <script src="app.js?v=100"></script>
