@@ -1,6 +1,64 @@
-// =========================================================================
-// 1. ALL BUTTON TRIGGERS & CLICK HANDLERS (At the top so HTML can always find them)
-// =========================================================================
+// URL for Class Bookings Sheet (Your original connection)
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+
+// URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
+const GOOGLE_API_URL = "https://google.com"; 
+
+// URL for your standalone Google Docs script (Pulls Nutrition content)
+const GOOGLE_DOCS_API_URL = "https://google.com";
+
+let isLoginMode = true;
+
+document.addEventListener("DOMContentLoaded", () => {
+  checkLocalProfile();
+});
+
+function generateGoogleCalendarUrl(title, startTime, endTime, details, location) {
+  const formatUrlDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  };
+
+  const startStr = formatUrlDate(startTime);
+  const endStr = formatUrlDate(endTime);
+  
+  const baseUrl = 'https://google.com';
+  const url = `${baseUrl}&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+  
+  return url;
+}
+
+function toggleAuthMode(event) {
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
+  isLoginMode = !isLoginMode;
+  
+  const title = document.getElementById("auth-title");
+  const subtitle = document.getElementById("auth-subtitle");
+  const nameGroup = document.getElementById("reg-name-group");
+  const emailGroup = document.getElementById("reg-email-group");
+  const submitBtn = document.getElementById("activate-profile-btn");
+  const toggleLink = document.getElementById("toggle-auth-btn");
+  const toggleText = document.getElementById("toggle-text");
+
+  if (isLoginMode) {
+    if (title) title.innerText = "Access Member Portal";
+    if (subtitle) subtitle.innerText = "Enter your credentials to access your profile, book classes, and view your routine.";
+    if (nameGroup) nameGroup.style.display = "none";
+    if (emailGroup) emailGroup.style.display = "none";
+    if (submitBtn) submitBtn.innerText = "Enter Portal";
+    if (toggleText) toggleText.innerText = "Don't have an account?";
+    if (toggleLink) toggleLink.innerText = "Create an Account";
+  } else {
+    if (title) title.innerText = "Create Your Profile";
+    if (subtitle) subtitle.innerText = "Activate your profile instantly to begin scheduling daily gym classes and track your workouts.";
+    if (nameGroup) nameGroup.style.display = "block";
+    if (emailGroup) emailGroup.style.display = "block";
+    if (submitBtn) submitBtn.innerText = "Activate Account";
+    if (toggleText) toggleText.innerText = "Already have an account?";
+    if (toggleLink) toggleLink.innerText = "Log In Here";
+  }
+}
+
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
   const passwordElem = document.getElementById("user-password");
@@ -39,11 +97,18 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
+          // =========================================================================
+          // 📊 SHEETS MODULE: POPULATE WORKOUT & ASSESSMENT FROM THE GOOGLE SHEET
+          // =========================================================================
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
+          // =========================================================================
+          
+          // 🍏 DRIVE MODULE: Fetch the Formatted Nutrition Plan from your Standalone Script
+          await fetchNutritionPlanDocument(username);
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -100,110 +165,34 @@ async function handleAuthAction() {
   }
 }
 
-function toggleAuthMode(event) {
-  if (event && typeof event.preventDefault === "function") event.preventDefault();
-  isLoginMode = !isLoginMode;
-  
-  const title = document.getElementById("auth-title");
-  const subtitle = document.getElementById("auth-subtitle");
-  const nameGroup = document.getElementById("reg-name-group");
-  const emailGroup = document.getElementById("reg-email-group");
-  const submitBtn = document.getElementById("activate-profile-btn");
-  const toggleLink = document.getElementById("toggle-auth-btn");
-  const toggleText = document.getElementById("toggle-text");
-
-  if (isLoginMode) {
-    if (title) title.innerText = "Access Member Portal";
-    if (subtitle) subtitle.innerText = "Enter your credentials to access your profile, book classes, and view your routine.";
-    if (nameGroup) nameGroup.style.display = "none";
-    if (emailGroup) emailGroup.style.display = "none";
-    if (submitBtn) submitBtn.innerText = "Enter Portal";
-    if (toggleText) toggleText.innerText = "Don't have an account?";
-    if (toggleLink) toggleLink.innerText = "Create an Account";
-  } else {
-    if (title) title.innerText = "Create Your Profile";
-    if (subtitle) subtitle.innerText = "Activate your profile instantly to begin scheduling daily gym classes and track your workouts.";
-    if (nameGroup) nameGroup.style.display = "block";
-    if (emailGroup) emailGroup.style.display = "block";
-    if (submitBtn) submitBtn.innerText = "Activate Account";
-    if (toggleText) toggleText.innerText = "Already have an account?";
-    if (toggleLink) toggleLink.innerText = "Log In Here";
-  }
-}
-
-async function openNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  const nutritionDisp = document.getElementById('nutrition-display');
-  
-  if (modal) modal.style.display = "flex";
-  if (nutritionDisp) nutritionDisp.innerHTML = "<em>Syncing secure cloud data streams...</em>";
-  
-  const currentUsername = localStorage.getItem("iron_pulse_username");
-  if (currentUsername) {
-    await fetchNutritionPlanDocument(currentUsername);
-  } else {
-    if (nutritionDisp) nutritionDisp.innerHTML = "<p style='color:var(--text-muted);'>Please log in to view nutrition data.</p>";
-  }
-}
-
-function closeNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  if (modal) modal.style.display = "none";
-}
-
-// =========================================================================
-// 2. NETWORK ENDPOINTS CONFIGURATION
-// =========================================================================
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
-const GOOGLE_API_URL = "https://google.com"; 
-const GOOGLE_DOCS_API_URL = "https://google.com";
-
-let isLoginMode = true;
-
-document.addEventListener("DOMContentLoaded", () => {
-  checkLocalProfile();
-});
-
-// =========================================================================
-// 3. CORE APPS LAYOUT ENGINE & UTILITIES
-// =========================================================================
-function setupDashboardView(id, name, username) {
-  const authCard = document.getElementById("auth-card");
-  const dashView = document.getElementById("dashboard-view");
-  
-  if (authCard) authCard.style.display = "none";
-  if (dashView) dashView.style.display = "block";
-  
-  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
-  if (dispName) dispName.innerText = name;
-}
-
-function checkLocalProfile() {
-  const currentId = localStorage.getItem("iron_pulse_id");
-  const currentName = localStorage.getItem("iron_pulse_name");
-  const currentUsername = localStorage.getItem("iron_pulse_username");
-
-  if (currentId && currentName && currentUsername) {
-    setupDashboardView(currentId, currentName, currentUsername);
-  }
-}
-
+// 🆕 FUNCTION: Pulls nutrition files out of Google Drive and parses formatting
 async function fetchNutritionPlanDocument(username) {
   const nutritionDisp = document.getElementById('nutrition-display');
+  
+  if (nutritionDisp) {
+    nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
+  }
 
   try {
     const docResponse = await fetch(`${GOOGLE_DOCS_API_URL}?action=fetchDocContent&username=${encodeURIComponent(username)}`);
     const docResult = await docResponse.json();
     
     if (docResult.success) {
-      if (nutritionDisp) nutritionDisp.innerHTML = docResult.documentHtml;
+      if (nutritionDisp) {
+        // ⚡ Uses innerHTML to correctly output paragraph splits, lists, and headers
+        nutritionDisp.innerHTML = docResult.documentHtml;
+      }
     } else {
       console.warn("Drive lookup notice:", docResult.error);
-      if (nutritionDisp) nutritionDisp.innerHTML = "<p style='color:#888;'>No custom nutrition document file found in Google Drive yet.</p>";
+      if (nutritionDisp) {
+        nutritionDisp.innerHTML = "<p style='color:#888;'>No custom nutrition document file found in Google Drive yet.</p>";
+      }
     }
   } catch (error) {
     console.error("Critical failure during nutrition file parsing sync:", error);
-    if (nutritionDisp) nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to load nutrition profile data.</p>";
+    if (nutritionDisp) {
+      nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to load nutrition profile data.</p>";
+    }
   }
 }
 
@@ -241,3 +230,19 @@ function handleBooking(className) {
 }
 
 function processBookingSuccess(btn, className) {
+  alert(`Successfully booked! You are locked in for "${className}".`);
+  if (btn && btn.classList.contains("book-btn")) {
+    btn.style.background = "#444444";
+    btn.style.color = "#888888";
+    btn.innerText = "Reserved";
+    btn.disabled = true;
+  }
+}
+
+function setupDashboardView(id, name, username) {
+  const authCard = document.getElementById("auth-card");
+  const dashView = document.getElementById("dashboard-view");
+  
+  if (authCard) authCard.style.display = "none";
+  if (dashView) dashView.style.display = "block";
+  
