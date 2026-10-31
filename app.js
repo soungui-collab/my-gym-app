@@ -74,7 +74,7 @@ function openNutritionModal() {
     // Automatically triggers data load using cached session credentials 
     const currentUsername = localStorage.getItem("iron_pulse_username");
     if (currentUsername) {
-      fetchNutritionPlanDocument(currentUsername);
+      
     }
   }
 }
