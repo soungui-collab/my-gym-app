@@ -65,43 +65,43 @@ function toggleAuthMode(event) {
     if (toggleLink) toggleLink.innerText = "Log In Here";
   }
 }
-// Open popup window element
-// Open popup window element and show the plan
+
+// Open popup window element and trigger data fetch
 function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
-  if (modal) modal.style.display = "flex"; // Opens the modal popup
+  if (modal) {
+    modal.style.display = "flex"; // Opens the modal popup
+  }
   
-  // 1. Grab the username from local storage
+  // Grab username and pass it along to avoid parameter mismatch
   const currentUsername = localStorage.getItem("iron_pulse_username");
-  
-  // 2. Pass it into the function so it has the parameter it needs
   fetchNutritionPlanDocument(currentUsername);
 }
 
-
-// Fixed to properly handle usernames and request from your Google Docs Script
+// Fixed: Now accepts the username parameter and requests from the correct Docs URL
 async function fetchNutritionPlanDocument(username) { 
     const nutritionDisp = document.getElementById('nutrition-display'); 
     
     if (nutritionDisp) { 
-        // Show the syncing placeholder text inside the modal display area
+        // 1. Show the syncing placeholder text
         nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
         
-        // Construct the URL using your true Apps Script and attach the username if needed
+        // 2. Safe query parameter mapping
         const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
         const fetchUrl = `${GOOGLE_DOCS_API_URL}${urlParam}`;
         
         try {
+            // 3. Request document data from your Google Docs Script deployment
             const response = await fetch(fetchUrl);
             const data = await response.json();
             
+            // 4. Inject content or fallback handle messages gracefully
             if (data && data.text) {
-                // Inject the raw text and turn document line breaks into HTML line breaks
                 nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
             } else if (data && data.message) {
                 nutritionDisp.innerHTML = `<span style='color: orange;'>${data.message}</span>`;
             } else {
-                nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan text container is empty.</span>";
+                nutritionDisp.innerHTML = "<span style='color: orange;'>No nutrition plan layout returned.</span>";
             }
             
         } catch (error) {
@@ -110,8 +110,6 @@ async function fetchNutritionPlanDocument(username) {
         }
     }
 }
-
-
 
 // Close popup window element
 function closeNutritionModal() {
@@ -163,9 +161,8 @@ async function handleAuthAction() {
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           
-          // 🍏 DRIVE MODULE: Fetch the Formatted Nutrition Plan from your Standalone Script
+          // 🍏 DRIVE MODULE: Passed parameter successfully
           await fetchNutritionPlanDocument(username);
-          
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -209,97 +206,16 @@ async function handleAuthAction() {
     
     const workoutDisp = document.getElementById('workout-display');
     const assessDisp = document.getElementById('assessment-display');
-    const nutritionDisp = document.getElementById('nutrition-display');
-
-    if (workoutDisp) workoutDisp.innerText = "Welcome! Your customized workout plan will appear here soon.";
-    if (assessDisp) assessDisp.innerText = "No recent fitness assessments found.";
-    if (nutritionDisp) nutritionDisp.innerHTML = "<p>Your custom nutrition document will appear here.</p>";
+    
+    if (workoutDisp) workoutDisp.innerText = "No training routine assigned for today.";
+    if (assessDisp) assessDisp.innerText = "No recent fitness metrics logged.";
+    
+    // Automatically call nutrition setup on fresh registration
+    await fetchNutritionPlanDocument(username);
     
     if (activateBtn) {
-      activateBtn.innerText = "Activate Account";
+      activateBtn.innerText = "Enter Portal";
       activateBtn.disabled = false;
     }
   }
-}
-
-async function fetchNutritionPlanDocument(username) {
-  const nutritionDisp = document.getElementById('nutrition-display');
-  if (nutritionDisp) {
-    nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
-  }
-
-  try {
-    const docResponse = await fetch(`${GOOGLE_DOCS_API_URL}?action=fetchDocContent&username=${encodeURIComponent(username)}`);
-    const docResult = await docResponse.json();
-    
-    if (docResult.success) {
-      if (nutritionDisp) nutritionDisp.innerHTML = docResult.documentHtml;
-    } else {
-      console.warn("Drive lookup notice:", docResult.error);
-      if (nutritionDisp) nutritionDisp.innerHTML = "<p style='color:#888;'>No custom nutrition document file found in Google Drive yet.</p>";
-    }
-  } catch (error) {
-    console.error("Critical failure during nutrition file parsing sync:", error);
-    if (nutritionDisp) {
-      nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to load nutrition profile data.</p>";
-    }
-  }
-}
-
-function handleBooking(className) {
-  const currentId = localStorage.getItem("iron_pulse_id");
-  const currentName = localStorage.getItem("iron_pulse_name"); 
-  const currentUsername = localStorage.getItem("iron_pulse_username"); 
-
-  if (!currentId) {
-    alert("Please log in before booking gym classes.");
-    return;
-  }
-
-  const btn = document.activeElement;
-  if (btn && btn.classList.contains("book-btn")) {
-    btn.disabled = true;
-    btn.innerText = "Booking...";
-  }
-
-  const payload = {
-    action: "bookClass",
-    memberId: currentId,
-    name: currentName, 
-    email: currentUsername, 
-    className: className
-  };
-  
-  const queryParams = new URLSearchParams(payload).toString();
-  const transmissionUrl = GOOGLE_APPS_SCRIPT_URL + "?" + queryParams;
-
-  const ping = new Image();
-  ping.onload = () => { processBookingSuccess(btn, className); };
-  ping.onerror = () => { processBookingSuccess(btn, className); };
-  ping.src = transmissionUrl;
-}
-
-function processBookingSuccess(btn, className) {
-  alert(`Successfully booked! You are locked in for "${className}".`);
-  if (btn && btn.classList.contains("book-btn")) {
-    btn.style.background = "#444444";
-    btn.style.color = "#888888";
-    btn.innerText = "Reserved";
-    btn.disabled = true;
-  }
-}
-
-function generateGoogleCalendarUrl(title, startTime, endTime, details, location) {
-  const formatUrlDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
-  };
-
-  const startStr = formatUrlDate(startTime);
-  const endStr = formatUrlDate(endTime);
-  
-  const baseUrl = 'https://google.com';
-  const url = `${baseUrl}&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
-  
-  return url;
 }
