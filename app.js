@@ -20,9 +20,16 @@ function setupDashboardView(id, name, username) {
   if (authCard) authCard.style.display = "none";
   if (dashView) dashView.style.display = "block";
   
+  // 🗓️ BOOKING MODULE: Automatically reveal booking tools upon login
+  const bookingView = document.getElementById("booking-view") || document.getElementById("booking-section");
+  if (bookingView) {
+    bookingView.style.display = "block"; // or "flex" / "grid" depending on your layout style
+  }
+  
   const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
   if (dispName) dispName.innerText = name;
 }
+
 
 function checkLocalProfile() {
   const currentId = localStorage.getItem("iron_pulse_id");
