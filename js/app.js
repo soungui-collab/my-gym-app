@@ -1,42 +1,5 @@
 // =========================================================================
-// 1. CORE SYSTEM LAYOUT ENGINE & WORKFLOWS (Moved to Top for Safety)
-// =========================================================================
-function setupDashboardView(id, name, username) {
-  const authCard = document.getElementById("auth-card");
-  const dashView = document.getElementById("dashboard-view");
-  
-  if (authCard) authCard.style.display = "none";
-  if (dashView) dashView.style.display = "block";
-  
-  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
-  if (dispName) dispName.innerText = name;
-}
-
-function checkLocalProfile() {
-  const currentId = localStorage.getItem("iron_pulse_id");
-  const currentName = localStorage.getItem("iron_pulse_name");
-  const currentUsername = localStorage.getItem("iron_pulse_username");
-
-  if (currentId && currentName && currentUsername) {
-    setupDashboardView(currentId, currentName, currentUsername);
-  }
-}
-
-// =========================================================================
-// 2. NETWORK CONNECTION GRID ENDPOINTS
-// =========================================================================
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
-const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwJEc00R1kvOxcONbB_QDmTgmyl6-cMbvRXF4u8TDiTOp3V8QMEk2SInuKS8LP2gXE6/exec";
-
-let isLoginMode = true;
-
-document.addEventListener("DOMContentLoaded", () => {
-  checkLocalProfile();
-});
-
-// =========================================================================
-// 3. SECURE AUTHENTICATION MATRIX ACTIONS
+// 1. ALL BUTTON TRIGGERS & CLICK HANDLERS (At the top so HTML can always find them)
 // =========================================================================
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
@@ -137,9 +100,37 @@ async function handleAuthAction() {
   }
 }
 
-// =========================================================================
-// 4. DRIVE STORAGE & NUTRITION COMPILERS
-// =========================================================================
+function toggleAuthMode(event) {
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
+  isLoginMode = !isLoginMode;
+  
+  const title = document.getElementById("auth-title");
+  const subtitle = document.getElementById("auth-subtitle");
+  const nameGroup = document.getElementById("reg-name-group");
+  const emailGroup = document.getElementById("reg-email-group");
+  const submitBtn = document.getElementById("activate-profile-btn");
+  const toggleLink = document.getElementById("toggle-auth-btn");
+  const toggleText = document.getElementById("toggle-text");
+
+  if (isLoginMode) {
+    if (title) title.innerText = "Access Member Portal";
+    if (subtitle) subtitle.innerText = "Enter your credentials to access your profile, book classes, and view your routine.";
+    if (nameGroup) nameGroup.style.display = "none";
+    if (emailGroup) emailGroup.style.display = "none";
+    if (submitBtn) submitBtn.innerText = "Enter Portal";
+    if (toggleText) toggleText.innerText = "Don't have an account?";
+    if (toggleLink) toggleLink.innerText = "Create an Account";
+  } else {
+    if (title) title.innerText = "Create Your Profile";
+    if (subtitle) subtitle.innerText = "Activate your profile instantly to begin scheduling daily gym classes and track your workouts.";
+    if (nameGroup) nameGroup.style.display = "block";
+    if (emailGroup) emailGroup.style.display = "block";
+    if (submitBtn) submitBtn.innerText = "Activate Account";
+    if (toggleText) toggleText.innerText = "Already have an account?";
+    if (toggleLink) toggleLink.innerText = "Log In Here";
+  }
+}
+
 async function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   const nutritionDisp = document.getElementById('nutrition-display');
@@ -158,6 +149,43 @@ async function openNutritionModal() {
 function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "none";
+}
+
+// =========================================================================
+// 2. NETWORK ENDPOINTS CONFIGURATION
+// =========================================================================
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_API_URL = "https://google.com"; 
+const GOOGLE_DOCS_API_URL = "https://google.com";
+
+let isLoginMode = true;
+
+document.addEventListener("DOMContentLoaded", () => {
+  checkLocalProfile();
+});
+
+// =========================================================================
+// 3. CORE APPS LAYOUT ENGINE & UTILITIES
+// =========================================================================
+function setupDashboardView(id, name, username) {
+  const authCard = document.getElementById("auth-card");
+  const dashView = document.getElementById("dashboard-view");
+  
+  if (authCard) authCard.style.display = "none";
+  if (dashView) dashView.style.display = "block";
+  
+  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
+  if (dispName) dispName.innerText = name;
+}
+
+function checkLocalProfile() {
+  const currentId = localStorage.getItem("iron_pulse_id");
+  const currentName = localStorage.getItem("iron_pulse_name");
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+
+  if (currentId && currentName && currentUsername) {
+    setupDashboardView(currentId, currentName, currentUsername);
+  }
 }
 
 async function fetchNutritionPlanDocument(username) {
@@ -179,9 +207,6 @@ async function fetchNutritionPlanDocument(username) {
   }
 }
 
-// =========================================================================
-// 5. CLASS SCHEDULING & CALENDAR UTILITIES
-// =========================================================================
 function handleBooking(className) {
   const currentId = localStorage.getItem("iron_pulse_id");
   const currentName = localStorage.getItem("iron_pulse_name"); 
@@ -216,30 +241,3 @@ function handleBooking(className) {
 }
 
 function processBookingSuccess(btn, className) {
-  alert(`Successfully booked! You are locked in for "${className}".`);
-  if (btn && btn.classList.contains("book-btn")) {
-    btn.style.background = "#444444";
-    btn.style.color = "#888888";
-    btn.innerText = "Reserved";
-    btn.disabled = true;
-  }
-}
-
-function toggleAuthMode(event) {
-  if (event && typeof event.preventDefault === "function") event.preventDefault();
-  isLoginMode = !isLoginMode;
-  
-  const title = document.getElementById("auth-title");
-  const subtitle = document.getElementById("auth-subtitle");
-  const nameGroup = document.getElementById("reg-name-group");
-  const emailGroup = document.getElementById("reg-email-group");
-  const submitBtn = document.getElementById("activate-profile-btn");
-  const toggleLink = document.getElementById("toggle-auth-btn");
-  const toggleText = document.getElementById("toggle-text");
-
-  if (isLoginMode) {
-    if (title) title.innerText = "Access Member Portal";
-    if (subtitle) subtitle.innerText = "Enter your credentials to access your profile, book classes, and view your routine.";
-    if (nameGroup) nameGroup.style.display = "none";
-    if (emailGroup) emailGroup.style.display = "none";
-    if (submitBtn) submitBtn.innerText = "Enter Portal";
