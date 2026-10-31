@@ -108,6 +108,35 @@ async function fetchNutritionPlanDocument(username) {
     }
 }
 
+function loadNutritionPlan() {
+  const webAppUrl = 'https://google.com';
+  
+  // Show a loading state inside your popup if needed
+  const popupContainer = document.getElementById('popup-content-area');
+  popupContainer.innerHTML = 'Loading your custom plan...';
+
+  fetch(webAppUrl)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        console.error("Backend error:", data.error);
+        popupContainer.innerHTML = 'Error loading nutrition plan.';
+        return;
+      }
+
+      // Drop the pre-formatted HTML directly into your popup.
+      // Every image will automatically render right under its specific recipe!
+      popupContainer.innerHTML = data.html;
+
+      // Trigger your app's logic to open the modal/popup window
+      showPopupElement(); 
+    })
+    .catch(err => {
+      console.error("Network Fetch Error:", err);
+      popupContainer.innerHTML = 'Failed to connect to backend service.';
+    });
+}
+
 // Close popup window element
 function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
