@@ -5,7 +5,7 @@ const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 const GOOGLE_API_URL = "https://google.com"; 
 
 // URL for your standalone Google Docs script (Pulls Nutrition content)
-const GOOGLE_DOCS_API_URL = "https://google.com";
+const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbxX1dN9QnN0iJnrTYUF-SGU5KgHv2oDgk9b_PSABuURMQmNkKyp6cv8aJKf74IPxPtlpw/exec";
 
 let isLoginMode = true;
 
