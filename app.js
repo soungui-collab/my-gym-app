@@ -1,8 +1,8 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://google.com"; 
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
 
 // URL for your standalone Google Docs script (Pulls Nutrition content)
 const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbxX1dN9QnN0iJnrTYUF-SGU5KgHv2oDgk9b_PSABuURMQmNkKyp6cv8aJKf74IPxPtlpw/exec";
