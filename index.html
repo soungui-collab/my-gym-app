@@ -344,7 +344,7 @@
          ========================================================================= -->
     <div id="dashboard-view" style="display: none;">
       
-      <!-- Status Badge Pass Container -->
+            <!-- Status Badge Pass Container -->
       <div class="profile-pass">
         <div id="display-name" class="profile-name">Loading Profile...</div>
         <div class="profile-email">Active Member</div>
@@ -361,19 +361,6 @@
           Loading assigned training routine metrics...
         </p>
       </div>
-      
-      <div id="nutrition-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      
-      <button onclick="closeNutritionModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold;">&times;</button>
-      
-      <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Nutrition Guidelines</h2>
-      
-      <!-- 🍏 CRITICAL PART: Add this missing line inside your modal box -->
-      <div id="nutrition-display"></div>
-      
-    </div>
-</div>
 
       <!-- Fitness Assessment Statistics Card -->
       <div class="card">
@@ -386,3 +373,52 @@
       <!-- Nutrition Section Interface Card -->
       <div class="card"> 
         <h2>Nutrition Guidelines</h2> 
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 14px;">
+          View your custom macronutrient target breakdown and diet profile templates.
+        </p> 
+        <button class="action-btn" onclick="openNutritionModal()">View Nutrition Plan</button> 
+      </div>
+
+      <div id="booking-section" class="card">
+        <h2>Book Gym Classes</h2>
+        
+        <div class="class-item">
+          <div class="class-info">
+            <h3>Morning HIIT Strength</h3>
+            <p>07:00 AM • High Intensity</p>
+          </div>
+          <button class="book-btn">Book</button>
+        </div>
+
+        <div class="class-item">
+          <div class="class-info">
+            <h3>Powerlifting Clinic</h3>
+            <p>05:30 PM • Strength Focus</p>
+          </div>
+          <button class="book-btn">Book</button>
+        </div>
+      </div>
+
+      <button class="logout-btn" onclick="localStorage.clear(); window.location.reload();">Log Out Account</button>
+    </div> <!-- End Dashboard View -->
+
+  </div> <!-- End App Container -->
+
+  <!-- The Hidden Nutrition Popup Window Layer -->
+  <div id="nutrition-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      
+      <button onclick="closeNutritionModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold;">&times;</button>
+      
+      <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Nutrition Guidelines</h2>
+      
+      <!-- 🍏 DATA TARGET: Google Docs content will stream straight into here -->
+      <div id="nutrition-display"></div>
+      
+    </div>
+  </div>
+
+  <!-- 🔑 THE CRITICAL HOOKS THAT TELL THE BROWSER TO CLOSE SECURELY -->
+  <script src="script.js"></script>
+</body>
+</html>
