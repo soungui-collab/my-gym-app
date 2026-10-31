@@ -346,18 +346,32 @@
         </div>
       </div>
       <!-- Dashboard Action Card with Trigger Button -->
+<!-- The Card Component that holds your button -->
 <div class="card"> 
     <h2>Nutrition Guidelines</h2> 
     <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 14px;">
         View your custom macronutrient target breakdown and diet profile templates.
     </p> 
+    <!-- Triggers the script to unhide the modal and sync from Google Drive -->
     <button class="action-btn" onclick="openNutritionModal()">View Nutrition Plan</button> 
 </div>
 
-<!-- Hidden Nutrition Pop-up Modal Window -->
-<div id="nutrition-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
-  <div style="background:var(--card-bg); width:100%; max-width:440px; max-height:80vh; border-radius:12px; padding:20px; box-sizing:border-box; overflow-y:auto; border:1px solid var(--border-color); position:relative;">
-    
+<!-- The Hidden Modal Popup Overlay -->
+<div id="nutrition-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+    <div class="modal-content" style="background: white; padding: 25px; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative;">
+        
+        <!-- Close Button -->
+        <button onclick="closeNutritionModal()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.25rem; cursor: pointer;">&times;</button>
+        
+        <h3>Your Custom Nutrition Plan</h3>
+        <hr style="margin-bottom: 15px; border: 0; border-top: 1px solid #eee;">
+        
+        <!-- 🍏 DRIVE DATA TARGET: Your Google Doc content prints exactly here -->
+        <div id="nutrition-display"></div>
+        
+    </div>
+</div>
+
     <!-- Header Block -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #ffffff11; padding-bottom:10px;">
       <h2 style="margin:0; font-size:1.2rem; text-transform:uppercase;">Nutrition Strategy</h2>
