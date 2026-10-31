@@ -1,9 +1,4 @@
 /* Paste this at the bottom of your style.css file */
-#nutrition-display {
-    display: none; /* Keeps it hidden until clicked */
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+#dashboard-view {
+    display: none;
 }
