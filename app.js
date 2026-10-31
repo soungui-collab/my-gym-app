@@ -162,7 +162,7 @@ async function handleAuthAction() {
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           
           // 🍏 DRIVE MODULE: Fired in the background so it doesn't freeze the dashboard
-fetchNutritionPlanDocument(username);
+await fetchNutritionPlanDocument(username);
           
         } else {
           alert("Incorrect password. Please try again.");
@@ -211,7 +211,7 @@ fetchNutritionPlanDocument(username);
     if (assessDisp) assessDisp.innerText = "No recent fitness metrics logged.";
     
     // Automatically call nutrition setup on fresh registration in the background
-fetchNutritionPlanDocument(username);
+await fetchNutritionPlanDocument(username);
     
     if (activateBtn) {
       activateBtn.innerText = "Enter Portal";
