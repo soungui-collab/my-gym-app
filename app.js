@@ -210,8 +210,8 @@ fetchNutritionPlanDocument(username);
     if (workoutDisp) workoutDisp.innerText = "No training routine assigned for today.";
     if (assessDisp) assessDisp.innerText = "No recent fitness metrics logged.";
     
-    // Automatically call nutrition setup on fresh registration
-    await fetchNutritionPlanDocument(username);
+    // Automatically call nutrition setup on fresh registration in the background
+fetchNutritionPlanDocument(username);
     
     if (activateBtn) {
       activateBtn.innerText = "Enter Portal";
