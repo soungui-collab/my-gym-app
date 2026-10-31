@@ -67,17 +67,37 @@ function toggleAuthMode(event) {
 }
 // Open popup window element
 function openNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  if (modal) {
-    modal.style.display = "flex";
-    
-    // Automatically triggers data load using cached session credentials 
-    const currentUsername = localStorage.getItem("iron_pulse_username");
-    if (currentUsername) {
-      
-    }
-  }
+    // You don't strictly need a username argument if your Apps Script 
+    // is pointing directly to your specific plan's document ID.
+    fetchNutritionPlanDocument();
 }
+
+async function fetchNutritionPlanDocument() { 
+    const nutritionDisp = document.getElementById('nutrition-display'); 
+    
+    if (nutritionDisp) { 
+        // 1. Show the syncing placeholder text
+        nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
+        
+        // 2. Replace this URL with your exact Google Apps Script URL from Step 1
+        const appsScriptUrl = "https://google.com";
+        
+        try {
+            // 3. Request the document data
+            const response = await fetch(appsScriptUrl);
+            const data = await response.json();
+            
+            // 4. Inject the raw Google Doc text content into your display container
+            // (You can replace line-breaks with HTML breaks for cleaner readability)
+            nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
+            
+        } catch (error) {
+            console.error("Failed to load nutrition plan:", error);
+            nutritionDisp.innerHTML = "<span style='color: red;'>Error loading nutrition plan. Please try again.</span>";
+        }
+    }
+}
+
 
 // Close popup window element
 function closeNutritionModal() {
