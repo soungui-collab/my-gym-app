@@ -2,7 +2,7 @@
 const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://google.com"; 
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
 
 // URL for your standalone Google Docs script (Pulls Nutrition content)
 const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwmxQ16mxxZdCaywlO1sItDpc-_tyuAj4vgAdHY--_9hJmOE97AZjmewiYwJDde9HZA/exec";
