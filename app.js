@@ -110,7 +110,9 @@ async function handleAuthAction() {
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           
+          // 🍏 DRIVE MODULE: Fetch the Formatted Nutrition Plan from your Standalone Script
           await fetchNutritionPlanDocument(username);
+          
           
         } else {
           alert("Incorrect password. Please try again.");
