@@ -1,11 +1,11 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
+const GOOGLE_API_URL = "https://google.com"; 
 
 // URL for your standalone Google Docs script (Pulls Nutrition content)
-const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbzt8vqV16rnM0ASTvlXsvZfiHMXS76W9Pk4zlqotwjDHzOlNdMmBF_fKaVW86hv9JaTbg/exec";
+const GOOGLE_DOCS_API_URL = "https://google.com";
 
 let isLoginMode = true;
 
@@ -13,19 +13,26 @@ document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
 });
 
-function generateGoogleCalendarUrl(title, startTime, endTime, details, location) {
-  const formatUrlDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
-  };
+function setupDashboardView(id, name, username) {
+  const authCard = document.getElementById("auth-card");
+  const dashView = document.getElementById("dashboard-view");
+  
+  if (authCard) authCard.style.display = "none";
+  if (dashView) dashView.style.display = "block";
+  
+  const dispName = document.getElementById("display-name") || document.getElementById("user-display-name");
+  if (dispName) dispName.innerText = name;
+}
 
-  const startStr = formatUrlDate(startTime);
-  const endStr = formatUrlDate(endTime);
-  
-  const baseUrl = 'https://google.com';
-  const url = `${baseUrl}&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
-  
-  return url;
+function checkLocalProfile() {
+  const currentId = localStorage.getItem("iron_pulse_id");
+  const currentName = localStorage.getItem("iron_pulse_name");
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+
+  if (currentId && currentName && currentUsername) {
+    setupDashboardView(currentId, currentName, currentUsername);
+    fetchNutritionPlanDocument(currentUsername);
+  }
 }
 
 function toggleAuthMode(event) {
@@ -78,7 +85,6 @@ async function handleAuthAction() {
     activateBtn.innerText = "Processing...";
     activateBtn.disabled = true;
   }
-}
 
   if (isLoginMode) {
     try {
@@ -98,17 +104,12 @@ async function handleAuthAction() {
 
           setupDashboardView(memberId, displayName, username);
           
-          // =========================================================================
-          // 📊 SHEETS MODULE: POPULATE WORKOUT & ASSESSMENT FROM THE GOOGLE SHEET
-          // =========================================================================
           const workoutDisp = document.getElementById('workout-display');
           const assessDisp = document.getElementById('assessment-display');
           
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
-          // =========================================================================
           
-          // 🍏 DRIVE MODULE: Fetch the Formatted Nutrition Plan from your Standalone Script
           await fetchNutritionPlanDocument(username);
           
         } else {
@@ -166,10 +167,8 @@ async function handleAuthAction() {
   }
 }
 
-// 🆕 FUNCTION: Pulls nutrition files out of Google Drive and parses formatting
 async function fetchNutritionPlanDocument(username) {
   const nutritionDisp = document.getElementById('nutrition-display');
-  
   if (nutritionDisp) {
     nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
   }
@@ -179,15 +178,10 @@ async function fetchNutritionPlanDocument(username) {
     const docResult = await docResponse.json();
     
     if (docResult.success) {
-      if (nutritionDisp) {
-        // ⚡ Uses innerHTML to correctly output paragraph splits, lists, and headers
-        nutritionDisp.innerHTML = docResult.documentHtml;
-      }
+      if (nutritionDisp) nutritionDisp.innerHTML = docResult.documentHtml;
     } else {
       console.warn("Drive lookup notice:", docResult.error);
-      if (nutritionDisp) {
-        nutritionDisp.innerHTML = "<p style='color:#888;'>No custom nutrition document file found in Google Drive yet.</p>";
-      }
+      if (nutritionDisp) nutritionDisp.innerHTML = "<p style='color:#888;'>No custom nutrition document file found in Google Drive yet.</p>";
     }
   } catch (error) {
     console.error("Critical failure during nutrition file parsing sync:", error);
@@ -195,25 +189,6 @@ async function fetchNutritionPlanDocument(username) {
       nutritionDisp.innerHTML = "<p style='color:#ff4444;'>Failed to load nutrition profile data.</p>";
     }
   }
-}
-// Open popup window element
-function openNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  if (modal) {
-    modal.style.display = "flex";
-    
-    // Automatically triggers data load using cached session credentials 
-    const currentUsername = localStorage.getItem("iron_pulse_username");
-    if (currentUsername) {
-      fetchNutritionPlanDocument(currentUsername);
-    }
-  }
-}
-
-// Close popup window element
-function closeNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  if (modal) modal.style.display = "none";
 }
 
 function handleBooking(className) {
@@ -259,10 +234,17 @@ function processBookingSuccess(btn, className) {
   }
 }
 
-function setupDashboardView(id, name, username) {
-  const authCard = document.getElementById("auth-card");
-  const dashView = document.getElementById("dashboard-view");
+function generateGoogleCalendarUrl(title, startTime, endTime, details, location) {
+  const formatUrlDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  };
+
+  const startStr = formatUrlDate(startTime);
+  const endStr = formatUrlDate(endTime);
   
-  if (authCard) authCard.style.display = "none";
-  if (dashView) dashView.style.display = "block";
+  const baseUrl = 'https://google.com';
+  const url = `${baseUrl}&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
   
+  return url;
+}
