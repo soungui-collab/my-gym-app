@@ -71,7 +71,9 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const classItem = button.closest('.class-item');
     const className = classItem.querySelector('h3').textContent;
     const classTimeRaw = classItem.querySelector('p').textContent; 
-    const timeString = classTimeRaw.split('•')[0].trim(); // Fixed text extraction splits
+    
+    // Clean string split handling
+    const timeString = classTimeRaw.split('•')[0].trim(); 
 
     // Setup weekly day routing
     let classDay = "Monday"; 
@@ -80,15 +82,17 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     else if (className.toLowerCase().includes('built to last')) classDay = "Monday"; 
     else if (className.toLowerCase().includes('lean body shred')) classDay = "Tuesday"; 
 
-    // Find current date parameters
+    // Find target day calculations cleanly
     const today = new Date();
     const daysOfWeek = { 'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6 };
     const targetDay = daysOfWeek[classDay.toLowerCase()];
-    let daysToAdd = (targetDay - today.getDay() + 7) % 7;
+    const currentDay = today.getDay();
+    let daysToAdd = (targetDay - currentDay + 7) % 7;
     
-    const startIsoString = new Date(today.setDate(today.getDate() + daysToAdd));
+    const startIsoString = new Date();
+    startIsoString.setDate(today.getDate() + daysToAdd);
     
-    // Parse time string (e.g., "06:00 PM") into hours/minutes
+    // Parse time string (e.g., "06:00 PM") safely
     const timeMatches = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
     if (timeMatches) {
       let hours = parseInt(timeMatches[1], 10);
@@ -102,13 +106,13 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const endDate = new Date(startIsoString);
     endDate.setHours(endDate.getHours() + 1);
 
-    // Pulling available profiles out of localStorage
     const memberName = localStorage.getItem('userName') || 'Gym Member';
     const memberEmail = localStorage.getItem('userEmail') || 'member@example.com';
     const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
 
-    // Construct GET query parameters string safely mapping your logic variables
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec';
+    // Set your deployment URL here
+    const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+    
     const params = new URLSearchParams({
       action: 'bookClass',
       name: memberName,
@@ -119,20 +123,24 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       endTime: endDate.toISOString()
     });
 
-    // Create a hidden image element to make the background GET request instantly
-    const pingTrigger = new Image();
-    
-    // As soon as the URL hits, trigger the visual validation update layout
-    pingTrigger.src = `${webAppUrl}?${params.toString()}`;
-
-    // Force update the UI state immediately since the background request is dispatched
-    setTimeout(() => {
+    // Dispatches via fetch. mode: 'no-cors' sends data safely even if the return payload is hidden
+    fetch(`${webAppUrl}?${params.toString()}`, {
+      method: 'GET',
+      mode: 'no-cors'
+    })
+    .then(() => {
       button.textContent = "Booked! ✓";
       button.style.backgroundColor = "#28a745";
       button.style.color = "white";
-    }, 800); // 800ms visual buffer to simulate submission response cleanly
+    })
+    .catch((error) => {
+      console.error('Booking system error:', error);
+      button.textContent = originalText;
+      button.disabled = false;
+    });
   }
 });
+
 
 
 
