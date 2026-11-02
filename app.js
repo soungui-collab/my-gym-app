@@ -1,11 +1,6 @@
-// URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
-
-// URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
-
-// URL for your standalone Google Docs script (Pulls Nutrition content)
-const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
+const GOOGLE_API_URL = "https://google.com"; 
+const GOOGLE_DOCS_API_URL = "https://google.com";
 
 let isLoginMode = true;
 
@@ -80,7 +75,7 @@ async function fetchNutritionPlanDocument(username) {
   
   const modal = document.getElementById("nutrition-modal");
   if (modal && modal.style.display === "flex" && !nutritionDisp.innerHTML) {
-    nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
+    nutritionDisp.innerHTML = "<div style='text-align:center; padding:20px; font-style:italic; color:#666;'>Syncing customized nutrition plan file from Google Drive...</div>";
   }
   
   const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
@@ -90,38 +85,72 @@ async function fetchNutritionPlanDocument(username) {
     const response = await fetch(fetchUrl);
     const data = await response.json();
     
-    if (data && data.text) {
-      // 1. Render core layout text
-      nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
+    if (data && data.sections) {
+      nutritionDisp.innerHTML = "";
+
+      const contentWrapper = document.createElement('div');
+      contentWrapper.style.display = 'flex';
+      contentWrapper.style.flexDirection = 'column';
+      contentWrapper.style.gap = '10px';
       
-      // 2. Append images neatly below text if present
-      if (data.images && data.images.length > 0) {
-        const imageContainer = document.createElement('div');
-        imageContainer.style.marginTop = '20px';
-        imageContainer.style.display = 'flex';
-        imageContainer.style.flexDirection = 'column';
-        imageContainer.style.gap = '15px';
-        imageContainer.style.alignItems = 'center';
-        
-        data.images.forEach(imgData => {
+      data.sections.forEach(section => {
+        if (section.type === "text") {
+          if (section.content.trim() === "") {
+            const space = document.createElement('div');
+            space.style.height = '1em';
+            contentWrapper.appendChild(space);
+          } else {
+            const p = document.createElement('p');
+            p.style.margin = '0';
+            p.style.lineHeight = '1.6';
+            p.style.fontSize = '15px';
+            p.style.color = '#222';
+            p.innerText = section.content;
+            contentWrapper.appendChild(p);
+          }
+        } else if (section.type === "image") {
+          const imgData = section.content;
+          
+          const itemWrapper = document.createElement('div');
+          itemWrapper.style.width = '100%';
+          itemWrapper.style.maxWidth = '520px';
+          itemWrapper.style.margin = '15px auto';
+          itemWrapper.style.textAlign = 'center';
+          itemWrapper.style.padding = '12px';
+          itemWrapper.style.backgroundColor = '#ffffff';
+          itemWrapper.style.border = '1px solid #e0e0e0';
+          itemWrapper.style.borderRadius = '8px';
+          itemWrapper.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+          
           const imgTag = document.createElement('img');
           imgTag.src = imgData.dataUri;
           imgTag.alt = imgData.altText || "Nutrition Plan Image";
           imgTag.title = imgData.title || "";
-          imgTag.style.maxWidth = '100%';
+          imgTag.style.width = '100%';
           imgTag.style.height = 'auto';
-          imgTag.style.borderRadius = '8px';
-          imgTag.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+          imgTag.style.borderRadius = '6px';
+          itemWrapper.appendChild(imgTag);
+
+          if (imgData.altText || imgData.title) {
+            const caption = document.createElement('p');
+            caption.style.margin = '10px 0 0 0';
+            caption.style.fontSize = '13px';
+            caption.style.color = '#555555';
+            caption.style.fontStyle = 'italic';
+            caption.style.lineHeight = '1.4';
+            caption.innerText = imgData.altText || imgData.title;
+            itemWrapper.appendChild(caption);
+          }
           
-          imageContainer.appendChild(imgTag);
-        });
-        
-        nutritionDisp.appendChild(imageContainer);
-      }
+          contentWrapper.appendChild(itemWrapper);
+        }
+      });
+      
+      nutritionDisp.appendChild(contentWrapper);
     } else if (data && data.message) {
       nutritionDisp.innerHTML = `<span style='color: orange;'>${data.message}</span>`;
     } else {
-      nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan text container is empty.</span>";
+      nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan data structure is empty.</span>";
     }
     
   } catch (error) {
