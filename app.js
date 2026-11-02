@@ -75,7 +75,7 @@ async function fetchNutritionPlanDocument(username) {
   
   const modal = document.getElementById("nutrition-modal");
   if (modal && modal.style.display === "flex" && !nutritionDisp.innerHTML) {
-    nutritionDisp.innerHTML = "<div style='text-align:center; padding:20px; font-style:italic; color:#666;'>Syncing customized nutrition plan file from Google Drive...</div>";
+    nutritionDisp.innerHTML = "<div style='text-align:center; padding:20px; font-style:italic; color:#bbb;'>Syncing customized nutrition plan file from Google Drive...</div>";
   }
   
   const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
@@ -104,7 +104,7 @@ async function fetchNutritionPlanDocument(username) {
             p.style.margin = '0';
             p.style.lineHeight = '1.6';
             p.style.fontSize = '15px';
-            p.style.color = '#222';
+            p.style.color = '#ffffff'; // High contrast white text for dark backgrounds
             p.innerText = section.content;
             contentWrapper.appendChild(p);
           }
@@ -117,10 +117,10 @@ async function fetchNutritionPlanDocument(username) {
           itemWrapper.style.margin = '15px auto';
           itemWrapper.style.textAlign = 'center';
           itemWrapper.style.padding = '12px';
-          itemWrapper.style.backgroundColor = '#ffffff';
-          itemWrapper.style.border = '1px solid #e0e0e0';
+          itemWrapper.style.backgroundColor = '#1e1e1e'; // Soft dark background card to match dark theme
+          itemWrapper.style.border = '1px solid #333333';
           itemWrapper.style.borderRadius = '8px';
-          itemWrapper.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+          itemWrapper.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
           
           const imgTag = document.createElement('img');
           imgTag.src = imgData.dataUri;
@@ -135,7 +135,7 @@ async function fetchNutritionPlanDocument(username) {
             const caption = document.createElement('p');
             caption.style.margin = '10px 0 0 0';
             caption.style.fontSize = '13px';
-            caption.style.color = '#555555';
+            caption.style.color = '#cccccc'; // Light silver text for captions
             caption.style.fontStyle = 'italic';
             caption.style.lineHeight = '1.4';
             caption.innerText = imgData.altText || imgData.title;
