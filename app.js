@@ -60,6 +60,101 @@ function toggleAuthMode(event) {
     if (toggleLink) toggleLink.innerText = "Log In Here";
   }
 }
+// Helper function to find the next upcoming date for a specific day of the week
+function getNextOccuranceOfDay(dayName, timeString) {
+  const daysOfWeek = { 'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6 };
+  const targetDay = daysOfWeek[dayName.toLowerCase()];
+  if (targetDay === undefined) return new Date();
+
+  const today = new Date();
+  const resultDate = new Date(today);
+  let daysToAdd = (targetDay - currentDay + 7) % 7;
+  const currentDay = today.getDay();
+  
+  if (daysToAdd === 0) {
+    const [hoursStr, minutesStr] = timeString.match(/\d+/g);
+    const isPM = timeString.toLowerCase().includes('pm');
+    let hours = parseInt(hoursStr, 10);
+    if (isPM && hours !== 12) hours += 12;
+    if (!isPM && hours === 12) hours = 0;
+    const minutes = parseInt(minutesStr, 10);
+    const classTimeToday = new Date(today);
+    classTimeToday.setHours(hours, minutes, 0, 0);
+    if (today > classTimeToday) daysToAdd = 7;
+  }
+  
+  resultDate.setDate(today.getDate() + daysToAdd);
+  const timeMatches = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (timeMatches) {
+    let hours = parseInt(timeMatches[1], 10);
+    const minutes = parseInt(timeMatches[2], 10);
+    const ampm = timeMatches[3].toUpperCase();
+    if (ampm === 'PM' && hours !== 12) hours += 12;
+    if (ampm === 'AM' && hours === 12) hours = 0;
+    resultDate.setHours(hours, minutes, 0, 0);
+  }
+  return resultDate.toISOString();
+}
+
+// Main event handler mapping into your doGet architecture
+document.getElementById('booking-section').addEventListener('click', function(event) {
+  if (event.target && event.target.classList.contains('book-btn')) {
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = "Booking...";
+    button.disabled = true;
+
+    const classItem = button.closest('.class-item');
+    const className = classItem.querySelector('h3').textContent;
+    const classTimeRaw = classItem.querySelector('p').textContent; 
+    const timeString = classTimeRaw.split('•')[0].trim(); 
+
+    // Setup weekly day routing
+    let classDay = "Monday"; 
+    if (className.toLowerCase().includes('wednesday')) classDay = "Wednesday";
+    else if (className.toLowerCase().includes('saturday')) classDay = "Saturday";
+    else if (className.toLowerCase().includes('built to last')) classDay = "Monday"; 
+    else if (className.toLowerCase().includes('lean body shred')) classDay = "Tuesday"; 
+
+    const startIsoString = getNextOccuranceOfDay(classDay, timeString);
+    const endDate = new Date(startIsoString);
+    endDate.setHours(endDate.getHours() + 1);
+
+    // Pulling available user profiles out of localStorage
+    const memberName = localStorage.getItem('userName') || 'Gym Member';
+    const memberEmail = localStorage.getItem('userEmail') || 'member@example.com';
+    const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
+
+    // Construct GET query parameters string safely mapping your logic variables
+    const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+    const params = new URLSearchParams({
+      action: 'bookClass',
+      name: memberName,
+      email: memberEmail,
+      memberId: memberId,
+      className: className,
+      startTime: startIsoString,
+      endTime: endDate.toISOString()
+    });
+
+    fetch(`${webAppUrl}?${params.toString()}`, {
+      method: 'GET',
+      mode: 'no-cors'
+    })
+    .then(() => {
+      button.textContent = "Booked! ✓";
+      button.style.backgroundColor = "#28a745";
+      button.style.color = "white";
+    })
+    .catch((error) => {
+      console.error('Booking system error:', error);
+      alert('Something went wrong. Please try again.');
+      button.textContent = originalText;
+      button.disabled = false;
+    });
+  }
+});
+
 
 function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
