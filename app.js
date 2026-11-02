@@ -111,7 +111,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
 
     // Set your deployment URL here
-    const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec';
     
     const params = new URLSearchParams({
       action: 'bookClass',
