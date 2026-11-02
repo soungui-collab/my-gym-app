@@ -433,6 +433,58 @@
       
     </div>
   </div>
+  <script> document.getElementById('booking-section').addEventListener('click', function(event) {
+  // Check if the clicked element is actually a "Book" button
+  if (event.target && event.target.classList.contains('book-btn')) {
+    const button = event.target;
+    
+    // 1. Visually change the button state so users know it's processing
+    const originalText = button.textContent;
+    button.textContent = "Booking...";
+    button.disabled = true;
+
+    // 2. Extract class details dynamically from the HTML structure above the button
+    const classItem = button.closest('.class-item');
+    const className = classItem.querySelector('h3').textContent;
+    const classTimeRaw = classItem.querySelector('p').textContent; // e.g., "06:00 PM • High Intensity"
+
+    // 3. Prepare the data payload to send to Google Sheets & Calendar
+    // Note: You can also pull the logged-in user's email/name from localStorage if available!
+    const bookingData = {
+      className: className,
+      timeInfo: classTimeRaw,
+      userEmail: localStorage.getItem('userEmail') || 'Logged-In User', 
+      timestamp: new Date().toISOString()
+    };
+
+    // 4. Send the payload to your Google Apps Script Web App URL
+    const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+    fetch(webAppUrl, {
+      method: 'POST',
+      mode: 'no-cors', // Crucial to prevent CORS block issues with Google Web Apps
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookingData)
+    })
+    .then(() => {
+      // 5. Update button to a success state
+      button.textContent = "Booked! ✓";
+      button.style.backgroundColor = "#28a745"; // Changes button to green
+      button.style.color = "#white";
+    })
+    .catch((error) => {
+      console.error('Booking failed:', error);
+      alert('Something went wrong. Please try again.');
+      
+      // Reset button back to original state on failure
+      button.textContent = originalText;
+      button.disabled = false;
+    });
+  }
+});
+<script>
 
   <!-- 🔑 THE CRITICAL HOOKS THAT TELL THE BROWSER TO CLOSE SECURELY -->
   <script src="app.js"></script>
