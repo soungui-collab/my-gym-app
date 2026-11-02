@@ -88,7 +88,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
 
       // !!! DOUBLE CHECK THIS URL IS EXACTLY YOUR NEW DEPLOYMENT URL !!!
-      const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+      const webAppUrl = 'https://script.google.com/macros/s/AKfycby8Yf0BgbnXKdTY0OcWfew-x6IP9ddEyMI8i5_2_XCsRUH0qaTAsT2MWQ_t6g6aRsa-/exec';
       
       const params = new URLSearchParams({
         action: 'bookClass',
