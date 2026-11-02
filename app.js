@@ -1,11 +1,11 @@
 // URL for Class Bookings Sheet (Your original connection)
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
 
 // URL for Fitness Assessments & Workouts Sheet (Your dashboard connection)
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
+const GOOGLE_API_URL = "https://google.com"; 
 
 // URL for your standalone Google Docs script (Pulls Nutrition content)
-const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
+const GOOGLE_DOCS_API_URL = "https://google.com";
 
 let isLoginMode = true;
 
@@ -31,7 +31,6 @@ function checkLocalProfile() {
 
   if (currentId && currentName && currentUsername) {
     setupDashboardView(currentId, currentName, currentUsername);
-    // Background fetch without forcing placeholder text on screen
     fetchNutritionPlanDocument(currentUsername);
   }
 }
@@ -67,7 +66,6 @@ function toggleAuthMode(event) {
   }
 }
 
-// Open popup window element and show the plan
 function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "flex"; 
@@ -76,68 +74,62 @@ function openNutritionModal() {
   fetchNutritionPlanDocument(currentUsername);
 }
 
-// Fixed to properly handle usernames and request from your Google Docs Script
 async function fetchNutritionPlanDocument(username) { 
-    const nutritionDisp = document.getElementById('nutrition-display'); 
-    if (!nutritionDisp) return;
-    
-    // Only show the placeholder text if the modal window itself is actively open
-    const modal = document.getElementById("nutrition-modal");
-    if (modal && modal.style.display === "flex" && !nutritionDisp.innerHTML) {
-        nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
-    }
-    
-    const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
-    const fetchUrl = `${GOOGLE_DOCS_API_URL}${urlParam}`;
-    
-    try {
-        const response = await fetch(fetchUrl);
-        const data = await response.json();
-        
-        if (data && data.text) {
-            nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
-        } else if (data && data.message) {
-            nutritionDisp.innerHTML = `<span style='color: orange;'>${data.message}</span>`;
-        } else {
-            nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan text container is empty.</span>";
-        }
-        
-    } catch (error) {
-        console.error("Failed to load nutrition plan:", error);
-        nutritionDisp.innerHTML = "<span style='color: red;'>Error loading nutrition plan. Please try again.</span>";
-    }
-}
-
-function loadNutritionPlan() {
-  const webAppUrl = 'https://google.com';
+  const nutritionDisp = document.getElementById('nutrition-display'); 
+  if (!nutritionDisp) return;
   
-  // Show a loading state inside your popup if needed
-  const popupContainer = document.getElementById('popup-content-area');
-  popupContainer.innerHTML = 'Loading your custom plan...';
-
-  fetch(webAppUrl)
-    .then(response => response.json())
-    .then(data => {
-      if (data.error) {
-        console.error("Backend error:", data.error);
-        popupContainer.innerHTML = 'Error loading nutrition plan.';
-        return;
+  const modal = document.getElementById("nutrition-modal");
+  if (modal && modal.style.display === "flex" && !nutritionDisp.innerHTML) {
+    nutritionDisp.innerHTML = "<em>Syncing customized nutrition plan file from Google Drive...</em>";
+  }
+  
+  const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
+  const fetchUrl = `${GOOGLE_DOCS_API_URL}${urlParam}`;
+  
+  try {
+    const response = await fetch(fetchUrl);
+    const data = await response.json();
+    
+    if (data && data.text) {
+      // 1. Render core layout text
+      nutritionDisp.innerHTML = data.text.replace(/\n/g, "<br>");
+      
+      // 2. Append images neatly below text if present
+      if (data.images && data.images.length > 0) {
+        const imageContainer = document.createElement('div');
+        imageContainer.style.marginTop = '20px';
+        imageContainer.style.display = 'flex';
+        imageContainer.style.flexDirection = 'column';
+        imageContainer.style.gap = '15px';
+        imageContainer.style.alignItems = 'center';
+        
+        data.images.forEach(imgData => {
+          const imgTag = document.createElement('img');
+          imgTag.src = imgData.dataUri;
+          imgTag.alt = imgData.altText || "Nutrition Plan Image";
+          imgTag.title = imgData.title || "";
+          imgTag.style.maxWidth = '100%';
+          imgTag.style.height = 'auto';
+          imgTag.style.borderRadius = '8px';
+          imgTag.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+          
+          imageContainer.appendChild(imgTag);
+        });
+        
+        nutritionDisp.appendChild(imageContainer);
       }
-
-      // Drop the pre-formatted HTML directly into your popup.
-      // Every image will automatically render right under its specific recipe!
-      popupContainer.innerHTML = data.html;
-
-      // Trigger your app's logic to open the modal/popup window
-      showPopupElement(); 
-    })
-    .catch(err => {
-      console.error("Network Fetch Error:", err);
-      popupContainer.innerHTML = 'Failed to connect to backend service.';
-    });
+    } else if (data && data.message) {
+      nutritionDisp.innerHTML = `<span style='color: orange;'>${data.message}</span>`;
+    } else {
+      nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan text container is empty.</span>";
+    }
+    
+  } catch (error) {
+    console.error("Failed to load nutrition plan:", error);
+    nutritionDisp.innerHTML = "<span style='color: red;'>Error loading nutrition plan. Please try again.</span>";
+  }
 }
 
-// Close popup window element
 function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "none";
@@ -187,61 +179,30 @@ async function handleAuthAction() {
           if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
           if (assessDisp) assessDisp.innerText = result.user.Assessment || result.user.Assessments || "No recent fitness metrics logged.";
           
-          // Silent background sync
           fetchNutritionPlanDocument(username);
           
         } else {
           alert("Incorrect password. Please try again.");
           passwordElem.value = "";
+          if (activateBtn) {
+            activateBtn.innerText = "Enter Portal";
+            activateBtn.disabled = false;
+          }
         }
       } else {
-        alert("Username not found. Check spelling or click 'Create an Account'.");
+        alert(result.message || "Profile lookup failed.");
+        if (activateBtn) {
+          activateBtn.innerText = "Enter Portal";
+          activateBtn.disabled = false;
+        }
       }
-    } catch (error) {
-      console.error("handshake error:", error);
-      alert("Could not connect to authentication grid.");
-    } finally {
+    } catch (e) {
+      console.error(e);
+      alert("Authentication error.");
       if (activateBtn) {
         activateBtn.innerText = "Enter Portal";
         activateBtn.disabled = false;
       }
-    }
-
-  } else {
-    const nameElem = document.getElementById("user-name");
-    const emailElem = document.getElementById("user-email");
-    const name = nameElem ? nameElem.value.trim() : "";
-    const email = emailElem ? emailElem.value.trim() : "";
-
-    if (!name || !email) {
-      alert("Please fill in your Full Name and Email Address to create an account.");
-      if (activateBtn) {
-        activateBtn.innerText = "Activate Account";
-        activateBtn.disabled = false;
-      }
-      return;
-    }
-
-    // Generate unique membership reference
-    const memberId = "MBR-" + Date.now();
-    localStorage.setItem("iron_pulse_id", memberId);
-    localStorage.setItem("iron_pulse_name", name);
-    localStorage.setItem("iron_pulse_username", username);
-
-    setupDashboardView(memberId, name, username);
-    
-    // Clear default placeholders out on registration setup
-    const workoutDisp = document.getElementById('workout-display');
-    const assessDisp = document.getElementById('assessment-display');
-    if (workoutDisp) workoutDisp.innerText = "No training routine assigned for today.";
-    if (assessDisp) assessDisp.innerText = "No recent fitness metrics logged.";
-
-    // Trigger quiet background load
-    fetchNutritionPlanDocument(username);
-
-    if (activateBtn) {
-      activateBtn.innerText = "Enter Portal";
-      activateBtn.disabled = false;
     }
   }
 }
