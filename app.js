@@ -126,7 +126,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
 
     // Construct GET query parameters string safely mapping your logic variables
-    const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbzV1FQZ2zWcLBTquasr4rX8S4JtEbzIO0RbO3bKiJngpuskD431bMdNTBAnkicQRAx4/exec';
     const params = new URLSearchParams({
       action: 'bookClass',
       name: memberName,
