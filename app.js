@@ -72,8 +72,9 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const className = classItem.querySelector('h3').textContent;
     const classTimeRaw = classItem.querySelector('p').textContent; 
     
-    // Clean string split handling
-    const timeString = classTimeRaw.split('•')[0].trim(); 
+    // FIX: Grab index [0] from the split array before running .trim()
+    const timeParts = classTimeRaw.split('•');
+    const timeString = timeParts[0].trim(); 
 
     // Setup weekly day routing
     let classDay = "Monday"; 
@@ -82,7 +83,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     else if (className.toLowerCase().includes('built to last')) classDay = "Monday"; 
     else if (className.toLowerCase().includes('lean body shred')) classDay = "Tuesday"; 
 
-    // Find target day calculations cleanly
+    // Target day calculation
     const today = new Date();
     const daysOfWeek = { 'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6 };
     const targetDay = daysOfWeek[classDay.toLowerCase()];
@@ -92,7 +93,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const startIsoString = new Date();
     startIsoString.setDate(today.getDate() + daysToAdd);
     
-    // Parse time string (e.g., "06:00 PM") safely
+    // Parse time string safely
     const timeMatches = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
     if (timeMatches) {
       let hours = parseInt(timeMatches[1], 10);
@@ -110,8 +111,8 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     const memberEmail = localStorage.getItem('userEmail') || 'member@example.com';
     const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
 
-    // Set your deployment URL here
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycby8Yf0BgbnXKdTY0OcWfew-x6IP9ddEyMI8i5_2_XCsRUH0qaTAsT2MWQ_t6g6aRsa-/exec';
+    // IMPORTANT: Swap this out with your exact Google Web App Deployment ID URL
+    const webAppUrl = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
     
     const params = new URLSearchParams({
       action: 'bookClass',
@@ -123,23 +124,28 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       endTime: endDate.toISOString()
     });
 
-    // Dispatches via fetch. mode: 'no-cors' sends data safely even if the return payload is hidden
-    fetch(`${webAppUrl}?${params.toString()}`, {
+    const finalUrl = `${webAppUrl}?${params.toString()}`;
+    console.log("Sending booking payload to Google URL:", finalUrl);
+
+    // Dispatches query data
+    fetch(finalUrl, {
       method: 'GET',
       mode: 'no-cors'
     })
     .then(() => {
+      console.log("Network transmission completed successfully.");
       button.textContent = "Booked! ✓";
       button.style.backgroundColor = "#28a745";
       button.style.color = "white";
     })
     .catch((error) => {
-      console.error('Booking system error:', error);
+      console.error('Network dispatch failure:', error);
       button.textContent = originalText;
       button.disabled = false;
     });
   }
 });
+
 
 
 
