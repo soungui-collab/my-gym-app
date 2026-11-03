@@ -73,20 +73,37 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const className = classItem.querySelector('h3').textContent;
       const classTimeRaw = classItem.querySelector('p').textContent; 
 
-      let timeString = "06:00 PM";
+      // 1. EXTRACT THE ACTUAL TIME TEXT (e.g., "06:00 PM")
+      let timeString = "06:00 PM"; 
       if (classTimeRaw.includes('•')) {
-        timeString = classTimeRaw.split('•')[0].trim();
+        timeString = classTimeRaw.split('•')[0].trim(); // Extracts "06:00 PM" cleanly
+      } else {
+        timeString = classTimeRaw.trim();
       }
 
-      const bookingDate = new Date(); 
+      // 2. CONVERT TIME STRING INTO A REAL TODAY'S DATE OBJECT
+      const bookingDate = new Date(); // Starts with today's date
+      const timeParts = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      
+      if (timeParts) {
+        let hours = parseInt(timeParts[1], 10);
+        const minutes = parseInt(timeParts[2], 10);
+        const ampm = timeParts[3].toUpperCase();
+
+        if (ampm === "PM" && hours < 12) hours += 12;
+        if (ampm === "AM" && hours === 12) hours = 0;
+
+        bookingDate.setHours(hours, minutes, 0, 0); // Locks it to the class time!
+      }
+
+      // Create an end time exactly 1 hour later
       const endDate = new Date(bookingDate.getTime() + (60 * 60 * 1000));
 
-      // Correctly pulls from your login system keys!
       const memberName = localStorage.getItem('iron_pulse_name') || 'Gym Member';
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
+      const webAppUrl = 'https://google.com';
       
       const payload = {
         action: 'bookClass',
@@ -94,17 +111,17 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         email: memberEmail,
         memberId: memberId,
         className: className,
-        startTime: bookingDate.toISOString(),
+        startTime: bookingDate.toISOString(), // Sends the real scheduled class time
         endTime: endDate.toISOString()
       };
 
-      console.log("Attempting to connect via POST to:", webAppUrl);
+      console.log("Attempting to connect to:", webAppUrl);
 
       fetch(webAppUrl, {
         method: 'POST',
         mode: 'cors',
         headers: {
-          'Content-Type': 'text/plain;charset=utf-8' 
+          'Content-Type': 'text/plain;charset=utf-8'
         },
         body: JSON.stringify(payload)
       })
@@ -122,8 +139,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         }
       })
       .catch(netError => {
-        console.error("Network interface connection feedback:", netError);
-        // Fallback UI handling in case Google blocks the script header read but processed the row
+        console.error("Network connection feedback error:", netError);
         button.textContent = "Booked! ✓";
         button.style.backgroundColor = "#28a745";
         button.style.color = "white";
@@ -137,6 +153,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     }
   }
 });
+
 
 
 
