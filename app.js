@@ -104,7 +104,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      // ⚠️ MAKE SURE THIS IS YOUR ACTUAL ACCURATE GOOGLE SCRIPT DEPLOYMENT URL!
+      // ⚠️ UPDATE THIS LINK WITH YOUR LIVE GOOGLE DEPLOYMENT LINK IF CHANGED
       const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
