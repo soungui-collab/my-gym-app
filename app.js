@@ -86,7 +86,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      const webAppUrl = 'https://script.google.com/macros/s/AKfycby8Yf0BgbnXKdTY0OcWfew-x6IP9ddEyMI8i5_2_XCsRUH0qaTAsT2MWQ_t6g6aRsa-/exec';
+      const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
         action: 'bookClass',
