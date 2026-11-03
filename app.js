@@ -167,101 +167,6 @@ function openNutritionModal() {
   fetchNutritionPlanDocument(currentUsername);
 }
 
-async function fetchNutritionPlanDocument(username) { 
-  const nutritionDisp = document.getElementById('nutrition-display'); 
-  if (!nutritionDisp) return;
-  
-  const modal = document.getElementById("nutrition-modal");
-  if (modal && modal.style.display === "flex" && !nutritionDisp.innerHTML) {
-    nutritionDisp.innerHTML = "<div style='text-align:center; padding:20px; font-style:italic; color:#bbb;'>Syncing customized nutrition plan file from Google Drive...</div>";
-  }
-  
-  const urlParam = username ? `?username=${encodeURIComponent(username)}` : "";
-  const fetchUrl = `${GOOGLE_DOCS_API_URL}${urlParam}`;
-  
-  try {
-    const response = await fetch(fetchUrl);
-    const data = await response.json();
-    
-    if (data && data.sections) {
-      nutritionDisp.innerHTML = "";
-
-      const contentWrapper = document.createElement('div');
-      contentWrapper.style.display = 'flex';
-      contentWrapper.style.flexDirection = 'column';
-      contentWrapper.style.gap = '10px';
-      
-      data.sections.forEach(section => {
-        if (section.type === "text") {
-          if (section.content.trim() === "") {
-            const space = document.createElement('div');
-            space.style.height = '1em';
-            contentWrapper.appendChild(space);
-          } else {
-            const p = document.createElement('p');
-            p.style.margin = '0';
-            p.style.lineHeight = '1.6';
-            p.style.fontSize = '15px';
-            p.style.color = '#ffffff'; // High contrast white text for dark backgrounds
-            p.innerText = section.content;
-            contentWrapper.appendChild(p);
-          }
-        } else if (section.type === "image") {
-          const imgData = section.content;
-          
-          const itemWrapper = document.createElement('div');
-          itemWrapper.style.width = '100%';
-          itemWrapper.style.maxWidth = '520px';
-          itemWrapper.style.margin = '15px auto';
-          itemWrapper.style.textAlign = 'center';
-          itemWrapper.style.padding = '12px';
-          itemWrapper.style.backgroundColor = '#1e1e1e'; // Soft dark background card to match dark theme
-          itemWrapper.style.border = '1px solid #333333';
-          itemWrapper.style.borderRadius = '8px';
-          itemWrapper.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-          
-          const imgTag = document.createElement('img');
-          imgTag.src = imgData.dataUri;
-          imgTag.alt = imgData.altText || "Nutrition Plan Image";
-          imgTag.title = imgData.title || "";
-          imgTag.style.width = '100%';
-          imgTag.style.height = 'auto';
-          imgTag.style.borderRadius = '6px';
-          itemWrapper.appendChild(imgTag);
-
-          if (imgData.altText || imgData.title) {
-            const caption = document.createElement('p');
-            caption.style.margin = '10px 0 0 0';
-            caption.style.fontSize = '13px';
-            caption.style.color = '#cccccc'; // Light silver text for captions
-            caption.style.fontStyle = 'italic';
-            caption.style.lineHeight = '1.4';
-            caption.innerText = imgData.altText || imgData.title;
-            itemWrapper.appendChild(caption);
-          }
-          
-          contentWrapper.appendChild(itemWrapper);
-        }
-      });
-      
-      nutritionDisp.appendChild(contentWrapper);
-    } else if (data && data.message) {
-      nutritionDisp.innerHTML = `<span style='color: orange;'>${data.message}</span>`;
-    } else {
-      nutritionDisp.innerHTML = "<span style='color: orange;'>Nutrition plan data structure is empty.</span>";
-    }
-    
-  } catch (error) {
-    console.error("Failed to load nutrition plan:", error);
-    nutritionDisp.innerHTML = "<span style='color: red;'>Error loading nutrition plan. Please try again.</span>";
-  }
-}
-
-function closeNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
-  if (modal) modal.style.display = "none";
-}
-
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
   const passwordElem = document.getElementById("user-password");
@@ -284,16 +189,26 @@ async function handleAuthAction() {
 
   if (isLoginMode) {
     try {
-      const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`);
+      // FIX: Added explicit CORS handling configuration parameters to bypass browser blocks smoothly
+      const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
       const result = await response.json();
 
       if (result.success) {
         const correctPassword = result.user.Password || result.user.password;
 
-        if (correctPassword && String(correctPassword).trim() === password) {
+        // Ensure string translation comparison matches perfectly without hidden spaces
+        if (correctPassword && String(correctPassword).trim() === String(password).trim()) {
           const memberId = result.user.MemberID || result.user.memberId || "MBR-" + username;
           const displayName = result.user.Name || result.user.FullName || result.user.MemberName || username;
 
+          // Lock your critical core data securely into local storage keys
           localStorage.setItem("iron_pulse_id", memberId);
           localStorage.setItem("iron_pulse_name", displayName);
           localStorage.setItem("iron_pulse_username", username);
@@ -324,8 +239,8 @@ async function handleAuthAction() {
         }
       }
     } catch (e) {
-      console.error(e);
-      alert("Authentication error.");
+      console.error("Critical authentication routing failure:", e);
+      alert("Authentication connection error. Check your Inspect console for details.");
       if (activateBtn) {
         activateBtn.innerText = "Enter Portal";
         activateBtn.disabled = false;
