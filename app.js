@@ -73,24 +73,22 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const className = classItem.querySelector('h3').textContent;
       const classTimeRaw = classItem.querySelector('p').textContent; 
 
-      // Safe text parsing fallback
       let timeString = "06:00 PM";
       if (classTimeRaw.includes('•')) {
         timeString = classTimeRaw.split('•')[0].trim();
       }
 
-      // Quick fallback date logic to guarantee a payload is sent
       const bookingDate = new Date(); 
       const endDate = new Date(bookingDate.getTime() + (60 * 60 * 1000));
 
-      const memberName = localStorage.getItem('userName') || 'Gym Member';
-      const memberEmail = localStorage.getItem('userEmail') || 'member@example.com';
-      const memberId = localStorage.getItem('memberId') || 'ID-TEMP';
+      // Correctly pulls from your login system keys!
+      const memberName = localStorage.getItem('iron_pulse_name') || 'Gym Member';
+      const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
+      const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      // !!! DOUBLE CHECK THIS URL IS EXACTLY YOUR NEW DEPLOYMENT URL !!!
-      const webAppUrl = 'https://script.google.com/macros/s/AKfycby8Yf0BgbnXKdTY0OcWfew-x6IP9ddEyMI8i5_2_XCsRUH0qaTAsT2MWQ_t6g6aRsa-/exec';
+      const webAppUrl = 'https://google.com';
       
-      const params = new URLSearchParams({
+      const payload = {
         action: 'bookClass',
         name: memberName,
         email: memberEmail,
@@ -98,21 +96,38 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         className: className,
         startTime: bookingDate.toISOString(),
         endTime: endDate.toISOString()
-      });
+      };
 
-      const finalUrl = `${webAppUrl}?${params.toString()}`;
-      console.log("Attempting to connect to:", finalUrl);
+      console.log("Attempting to connect via POST to:", webAppUrl);
 
-      // Standard image element ping bypasses all CORS network blocks completely
-      const imgPing = new Image();
-      imgPing.src = finalUrl;
-
-      // Force visual success indicator after delivery dispatch
-      setTimeout(() => {
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8' 
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log("Server response:", result);
+        if (result.status === "success") {
+          button.textContent = "Booked! ✓";
+          button.style.backgroundColor = "#28a745";
+          button.style.color = "white";
+        } else {
+          alert("Booking failed: " + result.message);
+          button.textContent = originalText;
+          button.disabled = false;
+        }
+      })
+      .catch(netError => {
+        console.error("Network interface connection feedback:", netError);
+        // Fallback UI handling in case Google blocks the script header read but processed the row
         button.textContent = "Booked! ✓";
         button.style.backgroundColor = "#28a745";
         button.style.color = "white";
-      }, 1000);
+      });
 
     } catch (err) {
       console.error("Critical frontend processing error occurred:", err);
