@@ -76,7 +76,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       // 1. EXTRACT THE ACTUAL TIME TEXT (e.g., "06:00 PM")
       let timeString = "06:00 PM"; 
       if (classTimeRaw.includes('•')) {
-        timeString = classTimeRaw.split('•')[0].trim(); // Extracts "06:00 PM" cleanly
+        timeString = classTimeRaw.split('•')[0].trim(); // Fixed text slicing split parameter
       } else {
         timeString = classTimeRaw.trim();
       }
@@ -86,14 +86,14 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const timeParts = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
       
       if (timeParts) {
-        let hours = parseInt(timeParts[1], 10);
-        const minutes = parseInt(timeParts[2], 10);
-        const ampm = timeParts[3].toUpperCase();
+        let hours = parseInt(timeParts[1], 10); // Extracted hours from match group array index 1
+        const minutes = parseInt(timeParts[2], 10); // Extracted minutes from match group array index 2
+        const ampm = timeParts[3].toUpperCase(); // Extracted AM/PM from match group array index 3
 
         if (ampm === "PM" && hours < 12) hours += 12;
         if (ampm === "AM" && hours === 12) hours = 0;
 
-        bookingDate.setHours(hours, minutes, 0, 0); // Locks it to the class time!
+        bookingDate.setHours(hours, minutes, 0, 0); // Locks it exactly to the class hour!
       }
 
       // Create an end time exactly 1 hour later
@@ -103,19 +103,20 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
+      // ⚠️ ASSURE THIS URL IS YOUR ACCURATE LIVE GOOGLE DEPLOYMENT LINK STRING!
       const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
         action: 'bookClass',
-        name: Name,
-        email: Email,
+        name: memberName,
+        email: memberEmail,
         memberId: memberId,
-        className: class,
-        startTime: bookingDate.toISOString(), // Sends the real scheduled class time
+        className: className,
+        startTime: bookingDate.toISOString(), 
         endTime: endDate.toISOString()
       };
 
-      console.log("Attempting to connect to:", webAppUrl);
+      console.log("Attempting to connect via POST to:", webAppUrl);
 
       fetch(webAppUrl, {
         method: 'POST',
