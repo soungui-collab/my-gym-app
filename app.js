@@ -76,24 +76,25 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       // 1. EXTRACT THE ACTUAL TIME TEXT (e.g., "06:00 PM")
       let timeString = "06:00 PM"; 
       if (classTimeRaw.includes('•')) {
-        timeString = classTimeRaw.split('•')[0].trim(); // Fixed text slicing split parameter
+        // FIXED: Grabs the first item from the array index [0] before trimming
+        timeString = classTimeRaw.split('•')[0].trim(); 
       } else {
         timeString = classTimeRaw.trim();
       }
 
       // 2. CONVERT TIME STRING INTO A REAL TODAY'S DATE OBJECT
-      const bookingDate = new Date(); // Starts with today's date
+      const bookingDate = new Date(); // Starts with today's base date
       const timeParts = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
       
       if (timeParts) {
-        let hours = parseInt(timeParts[1], 10); // Extracted hours from match group array index 1
-        const minutes = parseInt(timeParts[2], 10); // Extracted minutes from match group array index 2
-        const ampm = timeParts[3].toUpperCase(); // Extracted AM/PM from match group array index 3
+        let hours = parseInt(timeParts[1], 10);
+        const minutes = parseInt(timeParts[2], 10);
+        const ampm = timeParts[3].toUpperCase();
 
         if (ampm === "PM" && hours < 12) hours += 12;
         if (ampm === "AM" && hours === 12) hours = 0;
 
-        bookingDate.setHours(hours, minutes, 0, 0); // Locks it exactly to the class hour!
+        bookingDate.setHours(hours, minutes, 0, 0); // Locks it exactly to the class hour slot!
       }
 
       // Create an end time exactly 1 hour later
@@ -103,7 +104,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      // ⚠️ ASSURE THIS URL IS YOUR ACCURATE LIVE GOOGLE DEPLOYMENT LINK STRING!
+      // ⚠️ MAKE SURE THIS IS YOUR ACTUAL ACCURATE GOOGLE SCRIPT DEPLOYMENT URL!
       const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
