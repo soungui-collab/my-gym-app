@@ -112,7 +112,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
       // ⚠️ PUT YOUR ACTUAL ACCURATE GOOGLE SCRIPT DEPLOYMENT URL HERE
-      const webAppUrl = 'https://google.com';
+      const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
         action: 'bookClass',
