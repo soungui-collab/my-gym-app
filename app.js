@@ -174,7 +174,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
 
 
 function openNutritionModal() {
-  const modal = document.getElementById("nutrition-modal");
+  const modal = document.getElementById("fit01");
   if (modal) modal.style.display = "flex"; 
   
   const currentUsername = localStorage.getItem("iron_pulse_username");
