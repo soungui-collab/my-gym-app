@@ -438,5 +438,72 @@
   <!-- 🔑 THE CRITICAL HOOKS THAT TELL THE BROWSER TO CLOSE SECURELY -->
   <script src="app.js"></script>
 
+  <script>
+  // 1. ⚠️ REPLACE WITH YOUR ACTUAL APPS SCRIPT WEB APP URL (Must end in /exec)
+  const APPS_SCRIPT_NUTRITION_URL = "https://google.com";
+
+  // 2. Wrap your modal open logic to fetch data seamlessly
+  async function openNutritionModal() {
+    const modal = document.getElementById("nutrition-modal");
+    const display = document.getElementById("nutrition-display");
+    
+    // Show the modal container layer immediately
+    if (modal) modal.style.display = "flex";
+    
+    // Provide visual loading feedback inside the data target
+    if (display) {
+      display.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px 0;">Loading personalized nutrition plan details...</p>';
+    }
+
+    try {
+      // Fetch structural text strings and Base64 images from your Google Drive bridge
+      const response = await fetch(APPS_SCRIPT_NUTRITION_URL);
+      const data = await response.json();
+      
+      if (data.status !== "success") {
+          display.innerHTML = `<p style="color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 6px;"><strong>Error:</strong> ${data.message}</p>`;
+          return;
+      }
+      
+      // Clear out the loading feedback text placeholder
+      display.innerHTML = "";
+      
+      // 3. Loop through document components sequentially
+      data.elements.forEach(element => {
+          if (element.type === "text") {
+              const p = document.createElement("p");
+              p.textContent = element.content;
+              p.style.marginBottom = "14px";
+              p.style.fontSize = "1rem";
+              p.style.lineHeight = "1.5";
+              display.appendChild(p);
+          } 
+          else if (element.type === "image") {
+              const img = document.createElement("img");
+              // Unpacks the raw binary string bytes back into an image frame
+              img.src = `data:${element.mimeType};base64,${element.data}`;
+              img.style.maxWidth = "100%";
+              img.style.height = "auto";
+              img.style.display = "block";
+              img.style.margin = "18px auto";
+              img.style.borderRadius = "6px";
+              img.alt = "Nutrition Plan Diagram";
+              display.appendChild(img);
+          }
+      });
+      
+    } catch (error) {
+        console.error("Network interface pipeline failure:", error);
+        display.innerHTML = '<p style="color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 6px;">Unable to connect to nutrition system server database.</p>';
+    }
+  }
+
+  // 4. Modal close function handler execution
+  function closeNutritionModal() {
+    const modal = document.getElementById("nutrition-modal");
+    if (modal) modal.style.display = "none";
+  }
+</script>
+
 </body>
 </html>
