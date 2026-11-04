@@ -81,7 +81,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       } else if (className.toLowerCase().includes("saturday")) {
         targetDayNum = 6; // Saturday
       } else {
-        targetDayNum = 1; // Monday (HIIT Built to Last Strength)
+        targetDayNum = 1; // Tuesday (HIIT Built to Last Strength)
       }
 
       // 2. MATHEMATICALLY CALCULATE THE TRUE UPCOMING DATE
