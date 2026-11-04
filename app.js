@@ -72,17 +72,21 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const classItem = button.closest('.class-item');
       const className = classItem.querySelector('h3').textContent.trim();
 
-      // 1. MAP YOUR CLASSES TO THEIR SPECIFIC DAYS OF THE WEEK
-      let targetDayNum = 1; // Default to Monday
+            // 1. MAP YOUR CLASSES TO THEIR TRUE DAYS OF THE WEEK (0 = Sunday, 1 = Monday, 2 = Tuesday...)
+      let targetDayNum = 2; // Change default to 2 if your base class is Tuesday
+      
       if (className.toLowerCase().includes("wednesday")) {
-        targetDayNum = 3; // Wednesday
+        targetDayNum = 3; // Wednesday (HIIT Women's Wednesday)
       } else if (className.toLowerCase().includes("shred")) {
         targetDayNum = 4; // Thursday (HIIT Lean Body Shred)
       } else if (className.toLowerCase().includes("saturday")) {
-        targetDayNum = 6; // Saturday
+        targetDayNum = 6; // Saturday (Super Strength Saturday)
+      } else if (className.toLowerCase().includes("built to last") || className.toLowerCase().includes("strength")) {
+        targetDayNum = 2; // Tuesday (HIIT Built to Last Strength)
       } else {
-        targetDayNum = 1; // Tuesday (HIIT Built to Last Strength)
+        targetDayNum = 2; // Safe fallback to Tuesday if no keywords match
       }
+
 
       // 2. MATHEMATICALLY CALCULATE THE TRUE UPCOMING DATE
       const bookingDate = new Date(); // Start at right now
