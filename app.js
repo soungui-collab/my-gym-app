@@ -70,31 +70,38 @@ document.getElementById('booking-section').addEventListener('click', function(ev
 
     try {
       const classItem = button.closest('.class-item');
-      const className = classItem.querySelector('h3').textContent;
-      const classTimeRaw = classItem.querySelector('p').textContent; 
+      const className = classItem.querySelector('h3').textContent.trim();
 
-      // 1. EXTRACT THE ACTUAL TIME TEXT (e.g., "06:00 PM")
-      let timeString = "06:00 PM"; 
-      if (classTimeRaw.includes('•')) {
-        // FIXED: Grabs the first item from the array index [0] before trimming
-        timeString = classTimeRaw.split('•')[0].trim(); 
+      // 1. MAP YOUR CLASSES TO THEIR SPECIFIC DAYS OF THE WEEK
+      let targetDayNum = 1; // Default to Monday
+      if (className.toLowerCase().includes("wednesday")) {
+        targetDayNum = 3; // Wednesday
+      } else if (className.toLowerCase().includes("shred")) {
+        targetDayNum = 4; // Thursday (HIIT Lean Body Shred)
+      } else if (className.toLowerCase().includes("saturday")) {
+        targetDayNum = 6; // Saturday
       } else {
-        timeString = classTimeRaw.trim();
+        targetDayNum = 1; // Monday (HIIT Built to Last Strength)
       }
 
-      // 2. CONVERT TIME STRING INTO A REAL TODAY'S DATE OBJECT
-      const bookingDate = new Date(); // Starts with today's base date
-      const timeParts = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
-      
-      if (timeParts) {
-        let hours = parseInt(timeParts[1], 10);
-        const minutes = parseInt(timeParts[2], 10);
-        const ampm = timeParts[3].toUpperCase();
+      // 2. MATHEMATICALLY CALCULATE THE TRUE UPCOMING DATE
+      const bookingDate = new Date(); // Start at right now
+      const currentDayNum = bookingDate.getDay();
 
-        if (ampm === "PM" && hours < 12) hours += 12;
-        if (ampm === "AM" && hours === 12) hours = 0;
+      let daysUntilClass = targetDayNum - currentDayNum;
+      if (daysUntilClass <= 0) {
+        daysUntilClass += 7; // If the day has passed or is today, schedule for next week's session
+      }
 
-        bookingDate.setHours(hours, minutes, 0, 0); // Locks it exactly to the class hour slot!
+      bookingDate.setDate(bookingDate.getDate() + daysUntilClass);
+
+      // 3. SET THE EXACT HOURS FOR THE SESSIONS
+      if (targetDayNum === 6) {
+        bookingDate.setHours(11, 0, 0, 0); // Saturday at 11:00 AM
+      } else if (className.toLowerCase().includes("wednesday")) {
+        bookingDate.setHours(18, 30, 0, 0); // Wednesday at 6:30 PM
+      } else {
+        bookingDate.setHours(18, 0, 0, 0); // Monday & Thursday at 6:00 PM
       }
 
       // Create an end time exactly 1 hour later
@@ -104,8 +111,8 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      // ⚠️ UPDATE THIS LINK WITH YOUR LIVE GOOGLE DEPLOYMENT LINK IF CHANGED
-      const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
+      // ⚠️ PUT YOUR ACTUAL ACCURATE GOOGLE SCRIPT DEPLOYMENT URL HERE
+      const webAppUrl = 'https://google.com';
       
       const payload = {
         action: 'bookClass',
@@ -141,7 +148,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         }
       })
       .catch(netError => {
-        console.error("Network connection feedback error:", netError);
+        console.error("Network connection error:", netError);
         button.textContent = "Booked! ✓";
         button.style.backgroundColor = "#28a745";
         button.style.color = "white";
@@ -155,6 +162,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
     }
   }
 });
+
 
 
 
