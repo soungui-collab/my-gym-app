@@ -242,7 +242,8 @@ async function handleAuthAction() {
         if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
         if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
         
-        fetchNutritionPlanDocument(username);
+        // 🍏 REPLACE IT WITH YOUR ACTUAL WORKING NUTRITION ENGINE FUNCTION:
+loadNutritionPlan(); 
         
       } else {
         alert(result.message || "Invalid credentials. Please try again.");
