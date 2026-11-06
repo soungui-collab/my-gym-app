@@ -320,3 +320,111 @@ async function handleAuthAction() {
     }
   }
 }
+/**
+ * 1. FETCH PERSONALIZED NUTRITION DOCUMENT
+ */
+async function loadNutritionPlan() {
+  const username = localStorage.getItem("iron_pulse_username");
+  const displayContainer = document.getElementById("nutrition-display") || document.getElementById("nutrition-content");
+  
+  if (!displayContainer) return;
+  displayContainer.innerHTML = "<p class='loading-text'>Streaming your personalized nutrition blueprint...</p>";
+
+  try {
+    // Passes the logged-in username directly to fetch only THEIR document ID
+    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=nutrition`);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      renderDocumentElements(displayContainer, result.elements);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>Info: ${result.message}</p>`;
+    }
+  } catch (err) {
+    console.error("Nutrition stream engine failure:", err);
+    displayContainer.innerHTML = "<p class='error-text'>Failed to stream nutrition plan document data.</p>";
+  }
+}
+
+/**
+ * 2. FETCH PERSONALIZED WORKOUT DOCUMENT
+ */
+async function loadWorkoutPlan() {
+  const username = localStorage.getItem("iron_pulse_username");
+  const displayContainer = document.getElementById("workout-display");
+  
+  if (!displayContainer) return;
+  displayContainer.innerHTML = "<p class='loading-text'>Configuring today's custom training splits...</p>";
+
+  try {
+    // Passes the logged-in username directly to fetch only THEIR workout doc
+    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=workout`);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      renderDocumentElements(displayContainer, result.elements);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>${result.message}</p>`;
+    }
+  } catch (err) {
+    console.error("Workout stream engine failure:", err);
+    displayContainer.innerHTML = "<p class='error-text'>Failed to connect to custom training matrix server.</p>";
+  }
+}
+
+/**
+ * 3. FETCH PERSONALIZED ASSESSMENT DOCUMENT
+ */
+async function loadAssessmentPlan() {
+  const username = localStorage.getItem("iron_pulse_username");
+  const displayContainer = document.getElementById("assessment-display");
+  
+  if (!displayContainer) return;
+  displayContainer.innerHTML = "<p class='loading-text'>Retrieving recent biometric milestone metrics...</p>";
+
+  try {
+    // Passes the logged-in username directly to fetch only THEIR assessment doc
+    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      renderDocumentElements(displayContainer, result.elements);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>${result.message}</p>`;
+    }
+  } catch (err) {
+    console.error("Assessment stream engine failure:", err);
+    displayContainer.innerHTML = "<p class='error-text'>Failed to render biometric history logs.</p>";
+  }
+}
+
+/**
+ * REUSABLE CORE GRAPHICS ENGINE: Takes Google Doc structural pieces (text/images) 
+ * and builds them perfectly on your web screen.
+ */
+function renderDocumentElements(container, elements) {
+  container.innerHTML = ""; // Clear existing loading placeholders safely
+  
+  if (!elements || elements.length === 0) {
+    container.innerHTML = "<p class='empty-text'>Document is currently empty. Contact your coach!</p>";
+    return;
+  }
+
+  elements.forEach(el => {
+    if (el.type === "text") {
+      const p = document.createElement("p");
+      p.className = "doc-paragraph";
+      p.innerText = el.content;
+      container.appendChild(p);
+    } else if (el.type === "image") {
+      const img = document.createElement("img");
+      img.className = "doc-inline-image";
+      img.src = `data:${el.mimeType};base64,${el.data}`;
+      img.style.maxWidth = "100%";
+      img.style.borderRadius = "8px";
+      img.style.margin = "12px 0";
+      img.style.display = "block";
+      container.appendChild(img);
+    }
+  });
+}
