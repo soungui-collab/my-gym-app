@@ -26,7 +26,8 @@ function checkLocalProfile() {
 
   if (currentId && currentName && currentUsername) {
     setupDashboardView(currentId, currentName, currentUsername);
-    fetchNutritionPlanDocument(currentUsername);
+    // 🍏 To your modern automated function call (or delete it if you want it to trigger by button click only):
+loadNutritionPlan();
   }
 }
 
