@@ -230,10 +230,7 @@ async function handleAuthAction() {
   // 2. Initialize the dashboard layout interface view
   setupDashboardView(memberId, displayName, username);
   
-  // 3. 🍏 TRIPLE AUTOMATED GOOGLE DOC STREAM PIPELINES ACTIVATED (STEP 6)
-  loadWorkoutPlan();     // Instantly streams their personalized workout Google Doc
-  loadAssessmentPlan();  // Instantly streams their personalized assessment Google Doc
-  loadNutritionPlan();   // Instantly streams their personalized nutrition Google Doc
+  
   
 } else {
   alert(result.message || "Invalid credentials. Please try again.");
@@ -408,4 +405,73 @@ function renderDocumentElements(container, elements) {
       container.appendChild(img);
     }
   });
+}
+// =========================================================================
+// 🍏 INTERACTIVE MODAL INTERFACE CONTROLLERS (STEP 3)
+// =========================================================================
+
+/**
+ * A. WORKOUT ROUTINE PIPELINES
+ */
+function openWorkoutModal() {
+  const modal = document.getElementById("workout-modal");
+  const displayContainer = document.getElementById("workout-modal-display");
+  
+  if (!modal || !displayContainer) return;
+  
+  // Show the popup window frame overlay smoothly
+  modal.style.display = "flex";
+  displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Streaming your custom training splits out of Google Drive...</p>";
+  
+  // Directly reuse your existing core fetch engine but pass the modal container container explicitly
+  loadDocumentStreamIntoElement("workout", displayContainer);
+}
+
+function closeWorkoutModal() {
+  const modal = document.getElementById("workout-modal");
+  if (modal) modal.style.display = "none";
+}
+
+/**
+ * B. FITNESS ASSESSMENT PIPELINES
+ */
+function openAssessmentModal() {
+  const modal = document.getElementById("assessment-modal");
+  const displayContainer = document.getElementById("assessment-modal-display");
+  
+  if (!modal || !displayContainer) return;
+  
+  // Show the popup window frame overlay smoothly
+  modal.style.display = "flex";
+  displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Retrieving your biometric milestone data from Google Drive...</p>";
+  
+  // Directly reuse your existing core fetch engine but pass the modal container container explicitly
+  loadDocumentStreamIntoElement("assessment", displayContainer);
+}
+
+function closeAssessmentModal() {
+  const modal = document.getElementById("assessment-modal");
+  if (modal) modal.style.display = "none";
+}
+
+/**
+ * UNIFIED DOCUMENT UTILITY ENGINE: Reuses your working API routes to fetch 
+ * on-demand parameters cleanly when a button click event fires!
+ */
+async function loadDocumentStreamIntoElement(docType, displayContainer) {
+  const username = localStorage.getItem("iron_pulse_username");
+  
+  try {
+    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      renderDocumentElements(displayContainer, result.elements);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message}</p>`;
+    }
+  } catch (err) {
+    console.error(`Streaming infrastructure connection issue for ${docType}:`, err);
+    displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>`;
+  }
 }
