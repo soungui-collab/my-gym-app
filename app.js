@@ -476,3 +476,24 @@ async function loadDocumentStreamIntoElement(docType, displayContainer) {
     displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>`;
   }
 }
+/**
+ * C. NUTRITION BLUEPRINT POP-UP MODAL CONTROLLERS
+ */
+function openNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  const displayContainer = document.getElementById("nutrition-modal-display");
+  
+  if (!modal || !displayContainer) return;
+  
+  // Slide open the overlay frame
+  modal.style.display = "flex";
+  displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Streaming your unique nutrition blueprint out of Google Drive...</p>";
+  
+  // Directly fires your utility streaming engine using your clean backend routing key
+  loadDocumentStreamIntoElement("nutrition", displayContainer);
+}
+
+function closeNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "none";
+}
