@@ -219,47 +219,30 @@ async function handleAuthAction() {
       const result = await response.json();
 
       if (result.success) {
-        const displayName = result.user.ClientName || username;
-        const memberId = "MBR-" + username;
+  const displayName = result.user.ClientName || username;
+  const memberId = "MBR-" + username;
 
-        // 1. Secure profile keys in local storage
-        localStorage.setItem("iron_pulse_id", memberId);
-        localStorage.setItem("iron_pulse_name", displayName);
-        localStorage.setItem("iron_pulse_username", username);
+  // 1. Secure profile keys in local storage
+  localStorage.setItem("iron_pulse_id", memberId);
+  localStorage.setItem("iron_pulse_name", displayName);
+  localStorage.setItem("iron_pulse_username", username);
 
-        // 2. Initialize the dashboard layout interface view
-        setupDashboardView(memberId, displayName, username);
-        
-        // 3. Immediately assign fitness text strings to clear the "Loading..." state
-        const workoutDisp = document.getElementById('workout-display');
-        const assessDisp = document.getElementById('assessment-display');
-        
-        if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
-        if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
-        
-        // 4. Safely initialize your nutrition plan layout with fallback checks
-        try {
-          if (typeof loadNutritionPlan === "function") {
-            loadNutritionPlan();
-          } else if (typeof fetchNutritionPlanDocument === "function") {
-            fetchNutritionPlanDocument(username);
-          } else if (typeof loadNutritionPlanDocument === "function") {
-            loadNutritionPlanDocument();
-          } else {
-            console.warn("Nutrition loader function could not be located in app.js.");
-          }
-        } catch (nutritionErr) {
-          console.error("Secondary failure loading nutrition documents:", nutritionErr);
-        }
-        
-      } else {
-        alert(result.message || "Invalid credentials. Please try again.");
-        passwordElem.value = "";
-        if (activateBtn) {
-          activateBtn.innerText = defaultBtnText;
-          activateBtn.disabled = false;
-        }
-      }
+  // 2. Initialize the dashboard layout interface view
+  setupDashboardView(memberId, displayName, username);
+  
+  // 3. 🍏 TRIPLE AUTOMATED GOOGLE DOC STREAM PIPELINES ACTIVATED (STEP 6)
+  loadWorkoutPlan();     // Instantly streams their personalized workout Google Doc
+  loadAssessmentPlan();  // Instantly streams their personalized assessment Google Doc
+  loadNutritionPlan();   // Instantly streams their personalized nutrition Google Doc
+  
+} else {
+  alert(result.message || "Invalid credentials. Please try again.");
+  passwordElem.value = "";
+  if (activateBtn) {
+    activateBtn.innerText = defaultBtnText;
+    activateBtn.disabled = false;
+  }
+}
     } catch (e) {
       console.error("Critical authentication routing failure:", e);
       alert("Authentication connection error. Check your Inspect console for details.");
@@ -320,6 +303,7 @@ async function handleAuthAction() {
     }
   }
 }
+
 /**
  * 1. FETCH PERSONALIZED NUTRITION DOCUMENT
  */
@@ -331,7 +315,6 @@ async function loadNutritionPlan() {
   displayContainer.innerHTML = "<p class='loading-text'>Streaming your personalized nutrition blueprint...</p>";
 
   try {
-    // Passes the logged-in username directly to fetch only THEIR document ID
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=nutrition`);
     const result = await response.json();
 
@@ -357,7 +340,6 @@ async function loadWorkoutPlan() {
   displayContainer.innerHTML = "<p class='loading-text'>Configuring today's custom training splits...</p>";
 
   try {
-    // Passes the logged-in username directly to fetch only THEIR workout doc
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=workout`);
     const result = await response.json();
 
@@ -383,7 +365,6 @@ async function loadAssessmentPlan() {
   displayContainer.innerHTML = "<p class='loading-text'>Retrieving recent biometric milestone metrics...</p>";
 
   try {
-    // Passes the logged-in username directly to fetch only THEIR assessment doc
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
     const result = await response.json();
 
@@ -403,7 +384,7 @@ async function loadAssessmentPlan() {
  * and builds them perfectly on your web screen.
  */
 function renderDocumentElements(container, elements) {
-  container.innerHTML = ""; // Clear existing loading placeholders safely
+  container.innerHTML = ""; 
   
   if (!elements || elements.length === 0) {
     container.innerHTML = "<p class='empty-text'>Document is currently empty. Contact your coach!</p>";
