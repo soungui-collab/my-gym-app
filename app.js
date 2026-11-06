@@ -198,8 +198,6 @@ async function handleAuthAction() {
     return;
   }
 
-  // Determine standard baseline state text based on mode context
-  // Note: Adjusting variable name logic to match your frontend file's state track (e.g., !isLoginMode means SignUpMode)
   const defaultBtnText = isLoginMode ? "Enter Portal" : "Register Account";
 
   if (activateBtn) {
@@ -212,24 +210,18 @@ async function handleAuthAction() {
   // ==========================================
   if (isLoginMode) {
     try {
-      // Pass both username AND password to Apps Script so it can securely compare hashes server-side
-      const response = await fetch(`${GOOGLE_API_URL}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Accept': 'application/json'
-        }
+      const loginUrl = `${GOOGLE_API_URL}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+
+      const response = await fetch(loginUrl, {
+        method: 'GET'
       });
       
       const result = await response.json();
 
       if (result.success) {
-        // Mapping elements directly back from your Client_Data columns: Username, Password, Client Name, Date, Assessment, Workout, Client Email
-        // Apps Script strips spaces/underscores from column headers to yield clean JSON object property keys:
         const displayName = result.user.ClientName || username;
-        const memberId = "MBR-" + username; // Unified generation metric
+        const memberId = "MBR-" + username;
 
-        // Lock your critical core data securely into local storage keys
         localStorage.setItem("iron_pulse_id", memberId);
         localStorage.setItem("iron_pulse_name", displayName);
         localStorage.setItem("iron_pulse_username", username);
@@ -242,8 +234,7 @@ async function handleAuthAction() {
         if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
         if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
         
-        // 🍏 REPLACE IT WITH YOUR ACTUAL WORKING NUTRITION ENGINE FUNCTION:
-loadNutritionPlan(); 
+        loadNutritionPlan(); 
         
       } else {
         alert(result.message || "Invalid credentials. Please try again.");
@@ -254,6 +245,66 @@ loadNutritionPlan();
         }
       }
     } catch (e) {
+      console.error("Critical authentication routing failure:", e);
+      alert("Authentication connection error. Check your Inspect console for details.");
+      if (activateBtn) {
+        activateBtn.innerText = defaultBtnText;
+        activateBtn.disabled = false;
+      }
+    }
+  } 
+  // ==========================================
+  // PIPELINE B: SIGN UP / REGISTRATION MODE
+  // ==========================================
+  else {
+    const name = nameElem ? nameElem.value.trim() : "";
+    const email = emailElem ? emailElem.value.trim() : "";
+
+    if (!name || !email) {
+      alert("Please provide your name and email to register.");
+      if (activateBtn) {
+        activateBtn.innerText = defaultBtnText;
+        activateBtn.disabled = false;
+      }
+      return;
+    }
+
+    try {
+      const regUrl = `${GOOGLE_API_URL}?action=registerUser&Username=${encodeURIComponent(username)}&Password=${encodeURIComponent(password)}&Name=${encodeURIComponent(name)}&Email=${encodeURIComponent(email)}`;
+      
+      const response = await fetch(regUrl, {
+        method: 'GET'
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Account created securely! You can now log in.");
+        
+        if (nameElem) nameElem.value = "";
+        if (emailElem) emailElem.value = "";
+        passwordElem.value = "";
+        
+        const toggleBtn = document.getElementById("toggle-auth-btn");
+        if (toggleBtn) {
+          toggleBtn.click(); 
+        }
+      } else {
+        alert("Registration Error: " + (result.error || "Failed to finalize registration."));
+      }
+
+    } catch (e) {
+      console.error("Critical registration pipeline failure:", e);
+      alert("Registration system connection error.");
+    } finally {
+      if (activateBtn) {
+        activateBtn.innerText = isLoginMode ? "Enter Portal" : "Register Account";
+        activateBtn.disabled = false;
+      }
+    }
+  }
+}
+ catch (e) {
       console.error("Critical authentication routing failure:", e);
       alert("Authentication connection error. Check your Inspect console for details.");
       if (activateBtn) {
