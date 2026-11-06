@@ -222,19 +222,35 @@ async function handleAuthAction() {
         const displayName = result.user.ClientName || username;
         const memberId = "MBR-" + username;
 
+        // 1. Secure profile keys in local storage
         localStorage.setItem("iron_pulse_id", memberId);
         localStorage.setItem("iron_pulse_name", displayName);
         localStorage.setItem("iron_pulse_username", username);
 
+        // 2. Initialize the dashboard layout interface view
         setupDashboardView(memberId, displayName, username);
         
+        // 3. Immediately assign fitness text strings to clear the "Loading..." state
         const workoutDisp = document.getElementById('workout-display');
         const assessDisp = document.getElementById('assessment-display');
         
         if (workoutDisp) workoutDisp.innerText = result.user.Workout || "No training routine assigned for today.";
         if (assessDisp) assessDisp.innerText = result.user.Assessment || "No recent fitness metrics logged.";
         
-        loadNutritionPlan(); 
+        // 4. Safely initialize your nutrition plan layout with fallback checks
+        try {
+          if (typeof loadNutritionPlan === "function") {
+            loadNutritionPlan();
+          } else if (typeof fetchNutritionPlanDocument === "function") {
+            fetchNutritionPlanDocument(username);
+          } else if (typeof loadNutritionPlanDocument === "function") {
+            loadNutritionPlanDocument();
+          } else {
+            console.warn("Nutrition loader function could not be located in app.js.");
+          }
+        } catch (nutritionErr) {
+          console.error("Secondary failure loading nutrition documents:", nutritionErr);
+        }
         
       } else {
         alert(result.message || "Invalid credentials. Please try again.");
