@@ -1,13 +1,9 @@
-// =========================================================================
-// GLOBAL APP CONFIGURATION & STATE TRACKING
-// =========================================================================
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec";
 const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
 const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
 
 let isLoginMode = true;
 
-// Initialize layout on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   checkLocalProfile();
 });
@@ -30,6 +26,8 @@ function checkLocalProfile() {
 
   if (currentId && currentName && currentUsername) {
     setupDashboardView(currentId, currentName, currentUsername);
+    // 🍏 To your modern automated function call (or delete it if you want it to trigger by button click only):
+loadNutritionPlan();
   }
 }
 
@@ -63,10 +61,7 @@ function toggleAuthMode(event) {
     if (toggleLink) toggleLink.innerText = "Log In Here";
   }
 }
-
-// =========================================================================
-// CLASS BOOKING ENGINE SUBSYSTEM
-// =========================================================================
+// Main event handler mapping into your doGet architecture
 document.getElementById('booking-section').addEventListener('click', function(event) {
   if (event.target && event.target.classList.contains('book-btn')) {
     const button = event.target;
@@ -78,7 +73,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const classItem = button.closest('.class-item');
       const className = classItem.querySelector('h3').textContent.trim();
 
-      // 1. MAP YOUR CLASSES TO THEIR TRUE DAYS OF THE WEEK (0 = Sunday, 1 = Monday, 2 = Tuesday...)
+            // 1. MAP YOUR CLASSES TO THEIR TRUE DAYS OF THE WEEK (0 = Sunday, 1 = Monday, 2 = Tuesday...)
       let targetDayNum = 2; // Change default to 2 if your base class is Tuesday
       
       if (className.toLowerCase().includes("wednesday")) {
@@ -92,6 +87,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       } else {
         targetDayNum = 2; // Safe fallback to Tuesday if no keywords match
       }
+
 
       // 2. MATHEMATICALLY CALCULATE THE TRUE UPCOMING DATE
       const bookingDate = new Date(); // Start at right now
@@ -120,7 +116,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      // ⚠️ ACCURATE BOOKING SCRIPT URL METRIC TARGET
+      // ⚠️ PUT YOUR ACTUAL ACCURATE GOOGLE SCRIPT DEPLOYMENT URL HERE
       const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
@@ -172,9 +168,20 @@ document.getElementById('booking-section').addEventListener('click', function(ev
   }
 });
 
-// =========================================================================
-// AUTOMATED USER AUTHENTICATION GATE PIPELINE
-// =========================================================================
+
+
+
+
+
+
+function openNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "flex"; 
+  
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+  fetchNutritionPlanDocument(currentUsername);
+}
+
 // =========================================================================
 // 3. SECURE AUTHENTICATION ENGINE (SIGN IN / SIGN UP)
 // =========================================================================
@@ -417,7 +424,8 @@ function renderDocumentElements(container, elements) {
   });
 }
 
-console.error(Streaming infrastructure connection issue for ${docType}:, err);
-displayContainer.innerHTML = <p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>;
-}
+
+function closeNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "none";
 }
