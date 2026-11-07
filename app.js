@@ -1,9 +1,9 @@
 // =========================================================================
 // GLOBAL APP CONFIGURATION & STATE TRACKING
 // =========================================================================
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
-const GOOGLE_API_URL = "https://google.com"; 
-const GOOGLE_DOCS_API_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec";
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
+const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
 
 let isLoginMode = true;
 
