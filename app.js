@@ -302,7 +302,7 @@ async function handleAuthAction() {
 }
 
 // =========================================================================
-// 4. INTERACTIVE MODAL INTERFACE CONTROLLERS (ON-DEMAND STREAMING)
+// 🍏 INTERACTIVE POP-UP MODAL STREAM CONTROLLERS
 // =========================================================================
 
 /**
@@ -312,7 +312,10 @@ function openWorkoutModal() {
   const modal = document.getElementById("workout-modal");
   const displayContainer = document.getElementById("workout-modal-display");
   
-  if (!modal || !displayContainer) return;
+  if (!modal || !displayContainer) {
+    console.error("Layout Error: Could not locate workout modal container elements in HTML.");
+    return;
+  }
   
   modal.style.display = "flex";
   displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Streaming your custom training splits out of Google Drive...</p>";
@@ -332,7 +335,10 @@ function openAssessmentModal() {
   const modal = document.getElementById("assessment-modal");
   const displayContainer = document.getElementById("assessment-modal-display");
   
-  if (!modal || !displayContainer) return;
+  if (!modal || !displayContainer) {
+    console.error("Layout Error: Could not locate assessment modal container elements in HTML.");
+    return;
+  }
   
   modal.style.display = "flex";
   displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Retrieving your biometric milestone data from Google Drive...</p>";
@@ -352,7 +358,10 @@ function openNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   const displayContainer = document.getElementById("nutrition-modal-display");
   
-  if (!modal || !displayContainer) return;
+  if (!modal || !displayContainer) {
+    console.error("Layout Error: Could not locate nutrition modal container elements in HTML.");
+    return;
+  }
   
   modal.style.display = "flex";
   displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Streaming your unique nutrition blueprint out of Google Drive...</p>";
@@ -365,7 +374,7 @@ function closeNutritionModal() {
   if (modal) modal.style.display = "none";
 }
 
-// Global exposure for HTML inline onclick attributes
+// Global exposure for HTML inline onclick attributes to find them safely
 window.openWorkoutModal = openWorkoutModal;
 window.closeWorkoutModal = closeWorkoutModal;
 window.openAssessmentModal = openAssessmentModal;
@@ -374,34 +383,50 @@ window.openNutritionModal = openNutritionModal;
 window.closeNutritionModal = closeNutritionModal;
 
 /**
- * UNIFIED DOCUMENT UTILITY ENGINE: Fetches on-demand configurations from your Web App URL
+ * UNIFIED DIAGNOSTIC DOCUMENT UTILITY ENGINE
  */
 async function loadDocumentStreamIntoElement(docType, displayContainer) {
   const username = localStorage.getItem("iron_pulse_username");
   
+  if (!username) {
+    displayContainer.innerHTML = "<p class='error-text' style='color: #ff4757;'>Profile Error: Logged-in username token not found in browser memory. Please log out and back in.</p>";
+    return;
+  }
+  
   try {
-    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`);
+    const targetUrl = `${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`;
+    
+    const response = await fetch(targetUrl, {
+      method: 'GET',
+      mode: 'cors'
+    });
+    
+    if (!response.ok) {
+      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Server HTTP Rejection: ${response.status} ${response.statusText}</p>`;
+      return;
+    }
+    
     const result = await response.json();
 
     if (result.status === "success") {
       renderDocumentElements(displayContainer, result.elements);
     } else {
-      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message}</p>`;
+      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Backend Warning: ${result.message || "Unknown database mapping error."}</p>`;
     }
   } catch (err) {
     console.error(`Streaming infrastructure connection issue for ${docType}:`, err);
-    displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>`;
+    displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Connection Error: Failed to parse server response. Check browser developer console for network details.</p>`;
   }
 }
 
 /**
- * REUSABLE CORE RENDER ENGINE: Takes elements (text/images) and builds them inside modals
+ * REUSABLE CORE RENDER ENGINE
  */
 function renderDocumentElements(container, elements) {
   container.innerHTML = ""; 
   
-  if (!elements || elements.length === 0) {
-    container.innerHTML = "<p class='empty-text'>Document is currently empty. Contact your coach!</p>";
+  if (!elements || !Array.isArray(elements) || elements.length === 0) {
+    container.innerHTML = "<p class='empty-text'>Plan document is currently empty or unreadable. Contact your coach!</p>";
     return;
   }
 
@@ -423,6 +448,7 @@ function renderDocumentElements(container, elements) {
     }
   });
 }
+
 
 
 function closeNutritionModal() {
