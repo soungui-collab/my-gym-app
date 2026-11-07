@@ -301,59 +301,7 @@ async function handleAuthAction() {
     }
   }
 }
-/**
- * 1. FETCH PERSONALIZED NUTRITION DOCUMENT
- */
-async function loadNutritionPlan() {
-  const username = localStorage.getItem("iron_pulse_username");
-  const displayContainer = document.getElementById("nutrition-display") || document.getElementById("nutrition-content");
-  
-  if (!displayContainer) return;
-  displayContainer.innerHTML = "<p class='loading-text'>Streaming your personalized nutrition blueprint...</p>";
 
-  try {
-    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=nutrition`);
-    const result = await response.json();
-
-    if (result.status === "success") {
-      renderDocumentElements(displayContainer, result.elements);
-    } else {
-      displayContainer.innerHTML = `<p class='error-text'>Info: ${result.message}</p>`;
-    }
-  } catch (err) {
-    console.error("Nutrition stream engine failure:", err);
-    displayContainer.innerHTML = "<p class='error-text'>Failed to stream nutrition plan document data.</p>";
-  }
-}
-
-/**
- * 2. FETCH PERSONALIZED WORKOUT DOCUMENT
- */
-async function loadWorkoutPlan() {
-  const username = localStorage.getItem("iron_pulse_username");
-  const displayContainer = document.getElementById("workout-display");
-  
-  if (!displayContainer) return;
-  displayContainer.innerHTML = "<p class='loading-text'>Configuring today's custom training splits...</p>";
-
-  try {
-    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=workout`);
-    const result = await response.json();
-
-    if (result.status === "success") {
-      renderDocumentElements(displayContainer, result.elements);
-    } else {
-      displayContainer.innerHTML = `<p class='error-text'>${result.message}</p>`;
-    }
-  } catch (err) {
-    console.error("Workout stream engine failure:", err);
-    displayContainer.innerHTML = "<p class='error-text'>Failed to connect to custom training matrix server.</p>";
-  }
-}
-
-/**
- * 3. FETCH PERSONALIZED ASSESSMENT DOCUMENT
- */
 async function loadAssessmentPlan() {
   const username = localStorage.getItem("iron_pulse_username");
   const displayContainer = document.getElementById("assessment-display");
