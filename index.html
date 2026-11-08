@@ -424,20 +424,43 @@
 
   </div> <!-- End App Container -->
 
-  <!-- The Hidden Nutrition Popup Window Layer -->
-  <div id="nutrition-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      
-      <button onclick="closeNutritionModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold;">&times;</button>
-      
-      <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Nutrition Guidelines</h2>
-      
-      <!-- 🍏 DATA TARGET: Google Docs content will stream straight into here -->
-      <div id="nutrition-display"></div>
-      
+      <!-- =========================================================================
+         🍏 UNIFIED POP-UP STREAMING MODAL WINDOW LAYOUTS
+         ========================================================================= -->
+
+    <!-- 1. WORKOUT ROUTINE STREAM MODAL LAYER -->
+    <div id="workout-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-box">
+        <button onclick="closeWorkoutModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold;">&times;</button>
+        <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Your Training Matrix</h2>
+        
+        <!-- DATA TARGET: Google Docs content will stream straight into here -->
+        <div id="workout-modal-display"></div>
+      </div>
     </div>
-  </div>
-  
+
+    <!-- 2. FITNESS ASSESSMENT STREAM MODAL LAYER -->
+    <div id="assessment-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-box">
+        <button onclick="closeAssessmentModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold;">&times;</button>
+        <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Biometric Assessment History</h2>
+        
+        <!-- DATA TARGET: Google Docs content will stream straight into here -->
+        <div id="assessment-modal-display"></div>
+      </div>
+    </div>
+
+    <!-- 3. NUTRITION BLUEPRINT STREAM MODAL LAYER -->
+    <div id="nutrition-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-box">
+        <button onclick="closeNutritionModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold;">&times;</button>
+        <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Nutrition Guidelines</h2>
+        
+        <!-- DATA TARGET: Google Docs content will stream straight into here -->
+        <div id="nutrition-modal-display"></div>
+      </div>
+    </div>
+
   <!-- 🔑 THE CRITICAL HOOKS THAT TELL THE BROWSER TO CLOSE SECURELY -->
   <script src="app.js"></script>
 
