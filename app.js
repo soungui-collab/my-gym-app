@@ -198,7 +198,7 @@ function bookIndividualSession() {
     const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
     const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
     
-    const webAppUrl = 'https://google.com';
+    GOOGLE_API_URL; = 'https://google.com';
     
     const payload = {
       action: 'bookSession', 
