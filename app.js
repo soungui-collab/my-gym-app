@@ -1,9 +1,6 @@
-// =========================================================================
-// 1. GLOBAL APP CONFIGURATION & STATE TRACKING
-// =========================================================================
-const GOOGLE_APPS_SCRIPT_URL = "https://google.com";
-const GOOGLE_API_URL = "https://google.com"; 
-const GOOGLE_DOCS_API_URL = "https://google.com";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec";
+const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzCqCk9fmNXAwLgpHYPSbixHky2vJuabT4H1-WhjWzuHLW2cXMsiOvKE_RchAHp-bEA/exec"; 
+const GOOGLE_DOCS_API_URL = "https://script.google.com/macros/s/AKfycbwMiFc9utMC56DxxgSvJfT8usYSL4kAT0XgURxbVwr0YoWKhEadmuXpcBy-uKMi-l_N/exec";
 
 let isLoginMode = true;
 
@@ -29,6 +26,8 @@ function checkLocalProfile() {
 
   if (currentId && currentName && currentUsername) {
     setupDashboardView(currentId, currentName, currentUsername);
+    // 🍏 To your modern automated function call (or delete it if you want it to trigger by button click only):
+loadNutritionPlan();
   }
 }
 
@@ -62,10 +61,7 @@ function toggleAuthMode(event) {
     if (toggleLink) toggleLink.innerText = "Log In Here";
   }
 }
-
-// =========================================================================
-// 2. CLASS BOOKING ENGINE SUBSYSTEM
-// =========================================================================
+// Main event handler mapping into your doGet architecture
 document.getElementById('booking-section').addEventListener('click', function(event) {
   if (event.target && event.target.classList.contains('book-btn')) {
     const button = event.target;
@@ -77,7 +73,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const classItem = button.closest('.class-item');
       const className = classItem.querySelector('h3').textContent.trim();
 
-      // 1. MAP YOUR CLASSES TO THEIR TRUE DAYS OF THE WEEK (0 = Sunday, 1 = Monday, 2 = Tuesday...)
+            // 1. MAP YOUR CLASSES TO THEIR TRUE DAYS OF THE WEEK (0 = Sunday, 1 = Monday, 2 = Tuesday...)
       let targetDayNum = 2; // Change default to 2 if your base class is Tuesday
       
       if (className.toLowerCase().includes("wednesday")) {
@@ -91,6 +87,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       } else {
         targetDayNum = 2; // Safe fallback to Tuesday if no keywords match
       }
+
 
       // 2. MATHEMATICALLY CALCULATE THE TRUE UPCOMING DATE
       const bookingDate = new Date(); // Start at right now
@@ -119,7 +116,8 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
       const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
 
-      const webAppUrl = GOOGLE_APPS_SCRIPT_URL;
+      // ⚠️ PUT YOUR ACTUAL ACCURATE GOOGLE SCRIPT DEPLOYMENT URL HERE
+      const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
       
       const payload = {
         action: 'bookClass',
@@ -170,9 +168,20 @@ document.getElementById('booking-section').addEventListener('click', function(ev
   }
 });
 
-// =========================================================================
-// 3. SECURE AUTHENTICATION ENGINE (SIGN IN / SIGN UP)
-// =========================================================================
+
+
+
+
+
+
+function openNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "flex"; 
+  
+  const currentUsername = localStorage.getItem("iron_pulse_username");
+  fetchNutritionPlanDocument(currentUsername);
+}
+
 async function handleAuthAction() {
   const usernameElem = document.getElementById("user-username");
   const passwordElem = document.getElementById("user-password");
@@ -211,23 +220,27 @@ async function handleAuthAction() {
       const result = await response.json();
 
       if (result.success) {
-        const displayName = result.user.ClientName || username;
-        const memberId = "MBR-" + username;
+  const displayName = result.user.ClientName || username;
+  const memberId = "MBR-" + username;
 
-        localStorage.setItem("iron_pulse_id", memberId);
-        localStorage.setItem("iron_pulse_name", displayName);
-        localStorage.setItem("iron_pulse_username", username);
+  // 1. Secure profile keys in local storage
+  localStorage.setItem("iron_pulse_id", memberId);
+  localStorage.setItem("iron_pulse_name", displayName);
+  localStorage.setItem("iron_pulse_username", username);
 
-        setupDashboardView(memberId, displayName, username);
-        
-      } else {
-        alert(result.message || "Invalid credentials. Please try again.");
-        passwordElem.value = "";
-        if (activateBtn) {
-          activateBtn.innerText = defaultBtnText;
-          activateBtn.disabled = false;
-        }
-      }
+  // 2. Initialize the dashboard layout interface view
+  setupDashboardView(memberId, displayName, username);
+  
+  
+  
+} else {
+  alert(result.message || "Invalid credentials. Please try again.");
+  passwordElem.value = "";
+  if (activateBtn) {
+    activateBtn.innerText = defaultBtnText;
+    activateBtn.disabled = false;
+  }
+}
     } catch (e) {
       console.error("Critical authentication routing failure:", e);
       alert("Authentication connection error. Check your Inspect console for details.");
@@ -254,216 +267,181 @@ async function handleAuthAction() {
     }
 
     try {
-const regUrl = ${GOOGLE_API_URL}?action=registerUser&Username=${encodeURIComponent(username)}&Password=${encodeURIComponent(password)}&Name=${encodeURIComponent(name)}&Email=${encodeURIComponent(email)};
-const response = await fetch(regUrl, {
-method: 'GET'
-});
-const result = await response.json();
-if (result.success) {
-alert("Account created securely! You can now log in.");
-if (nameElem) nameElem.value = "";
-if (emailElem) emailElem.value = "";
-passwordElem.value = "";
-const toggleBtn = document.getElementById("toggle-auth-btn");
-if (toggleBtn) {
-toggleBtn.click();
+      const regUrl = `${GOOGLE_API_URL}?action=registerUser&Username=${encodeURIComponent(username)}&Password=${encodeURIComponent(password)}&Name=${encodeURIComponent(name)}&Email=${encodeURIComponent(email)}`;
+      
+      const response = await fetch(regUrl, {
+        method: 'GET'
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Account created securely! You can now log in.");
+        
+        if (nameElem) nameElem.value = "";
+        if (emailElem) emailElem.value = "";
+        passwordElem.value = "";
+        
+        const toggleBtn = document.getElementById("toggle-auth-btn");
+        if (toggleBtn) {
+          toggleBtn.click(); 
+        }
+      } else {
+        alert("Registration Error: " + (result.error || "Failed to finalize registration."));
+      }
+
+    } catch (e) {
+      console.error("Critical registration pipeline failure:", e);
+      alert("Registration system connection error.");
+    } finally {
+      if (activateBtn) {
+        activateBtn.innerText = isLoginMode ? "Enter Portal" : "Register Account";
+        activateBtn.disabled = false;
+      }
+    }
+  }
 }
-} else {
-alert("Registration Error: " + (result.error || "Failed to finalize registration."));
+
+async function loadAssessmentPlan() {
+  const username = localStorage.getItem("iron_pulse_username");
+  const displayContainer = document.getElementById("assessment-display");
+  
+  if (!displayContainer) return;
+  displayContainer.innerHTML = "<p class='loading-text'>Retrieving recent biometric milestone metrics...</p>";
+
+  try {
+    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      renderDocumentElements(displayContainer, result.elements);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>${result.message}</p>`;
+    }
+  } catch (err) {
+    console.error("Assessment stream engine failure:", err);
+    displayContainer.innerHTML = "<p class='error-text'>Failed to render biometric history logs.</p>";
+  }
 }
-} catch (e) {
-console.error("Critical registration pipeline failure:", e);
-alert("Registration system connection error.");
-} finally {
-if (activateBtn) {
-activateBtn.innerText = isLoginMode ? "Enter Portal" : "Register Account";
-activateBtn.disabled = false;
-}
-}
-}
-}
-// =========================================================================
-// 4. INTERACTIVE Pop-Up MODAL STREAM CONTROLLERS
-// =========================================================================
-function openWorkoutModal() {
-const modal = document.getElementById("workout-modal");
-const displayContainer = document.getElementById("workout-modal-display");
-if (!modal || !displayContainer) {
-console.error("Layout Error: Could not locate workout modal container elements in HTML.");
-return;
-}
-modal.style.display = "flex";
-displayContainer.innerHTML = "Streaming your custom training splits out of Google Drive...";
-loadDocumentStreamIntoElement("workout", displayContainer);
-}
-function closeWorkoutModal() {
-const modal = document.getElementById("workout-modal");
-if (modal) modal.style.display = "none";
-}
-function openAssessmentModal() {
-const modal = document.getElementById("assessment-modal");
-const displayContainer = document.getElementById("assessment-modal-display");
-if (!modal || !displayContainer) {
-console.error("Layout Error: Could not locate assessment modal container elements in HTML.");
-return;
-}
-modal.style.display = "flex";
-displayContainer.innerHTML = "Retrieving your biometric milestone data from Google Drive...";
-loadDocumentStreamIntoElement("assessment", displayContainer);
-}
-function closeAssessmentModal() {
-const modal = document.getElementById("assessment-modal");
-if (modal) modal.style.display = "none";
-}
-function openNutritionModal() {
-const modal = document.getElementById("nutrition-modal");
-const displayContainer = document.getElementById("nutrition-modal-display");
-if (!modal || !displayContainer) {
-console.error("Layout Error: Could not locate nutrition modal container elements in HTML.");
-return;
-}
-modal.style.display = "flex";
-displayContainer.innerHTML = "Streaming your unique nutrition blueprint out of Google Drive...";
-loadDocumentStreamIntoElement("nutrition", displayContainer);
-}
-function closeNutritionModal() {
-const modal = document.getElementById("nutrition-modal");
-if (modal) modal.style.display = "none";
-}
-// Global exposure for HTML inline onclick attributes to find them safely
-window.openWorkoutModal = openWorkoutModal;
-window.closeWorkoutModal = closeWorkoutModal;
-window.openAssessmentModal = openAssessmentModal;
-window.closeAssessmentModal = closeAssessmentModal;
-window.openNutritionModal = openNutritionModal;
-window.closeNutritionModal = closeNutritionModal;
-// =========================================================================
-// 5. INDIVIDUAL GYM SESSION CALENDAR BOOKING PIPELINE
-// =========================================================================
-function bookIndividualSession() {
-const dateInput = document.getElementById('session-date');
-const timeSelect = document.getElementById('session-time');
-const bookBtn = document.getElementById('book-session-btn');
-if (!dateInput || !timeSelect || !bookBtn) return;
-const chosenDate = dateInput.value;
-const chosenTime = timeSelect.value;
-if (!chosenDate || !chosenTime) {
-alert("Please select both a date and a time slot before booking.");
-return;
-}
-const originalText = bookBtn.textContent;
-bookBtn.textContent = "Booking...";
-bookBtn.disabled = true;
-try {
-const startDateTime = new Date(${chosenDate}T${chosenTime}:00);
-const endDateTime = new Date(startDateTime.getTime() + (60 * 60 * 1000));
-const memberName = localStorage.getItem('iron_pulse_name') || 'Gym Member';
-const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
-const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
-const webAppUrl = GOOGLE_APPS_SCRIPT_URL;
-const payload = {
-action: 'bookSession',
-name: memberName,
-email: memberEmail,
-memberId: memberId,
-className: Gym Session (${memberId}),
-startTime: startDateTime.toISOString(),
-endTime: endDateTime.toISOString()
-};
-fetch(webAppUrl, {
-method: 'POST',
-mode: 'cors',
-headers: {
-'Content-Type': 'text/plain;charset=utf-8'
-},
-body: JSON.stringify(payload)
-})
-.then(response => response.json())
-.then(result => {
-if (result.status === "success") {
-handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-} else {
-alert("Booking failed: " + result.message);
-bookBtn.textContent = originalText;
-bookBtn.disabled = false;
-}
-})
-.catch(netError => {
-console.warn("Handled Google redirect exception. Syncing display state...", netError);
-handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-});
-} catch (err) {
-console.error("Critical frontend processing error occurred:", err);
-alert("Application script failed: " + err.message);
-bookBtn.textContent = originalText;
-bookBtn.disabled = false;
-}
-}
-function handleBookingSuccess(button, originalText, dateInput, timeSelect) {
-button.textContent = "Booked! ✓";
-button.style.backgroundColor = "#28a745";
-button.style.color = "white";
-setTimeout(() => {
-button.textContent = originalText;
-button.style.backgroundColor = "";
-button.style.color = "";
-button.disabled = false;
-if (dateInput) dateInput.value = "";
-if (timeSelect) timeSelect.value = "";
-}, 4000);
-}
-window.bookIndividualSession = bookIndividualSession;
-// =========================================================================
-// 6. UNIFIED DOCUMENT STREAMING & CORE RENDERING ENGINES
-// =========================================================================
-async function loadDocumentStreamIntoElement(docType, displayContainer) {
-const username = localStorage.getItem("iron_pulse_username");
-if (!username) {
-displayContainer.innerHTML = "Profile Error: Logged-in username token not found in browser memory. Please log out and back in.";
-return;
-}
-try {
-const targetUrl = ${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType};
-const response = await fetch(targetUrl, {
-method: 'GET',
-mode: 'cors'
-});
-if (!response.ok) {
-displayContainer.innerHTML = <p class='error-text' style='color: #ff4757;'>Server HTTP Rejection: ${response.status} ${response.statusText}</p>;
-return;
-}
-const result = await response.json();
-if (result.status === "success") {
-renderDocumentElements(displayContainer, result.elements);
-} else {
-displayContainer.innerHTML = <p class='error-text' style='color: #ff4757;'>Backend Warning: ${result.message || "Unknown database mapping error."}</p>;
-}
-} catch (err) {
-console.error(Streaming infrastructure connection issue for ${docType}:, err);
-displayContainer.innerHTML = <p class='error-text' style='color: #ff4757;'>Connection Error: Failed to parse server response. Check browser developer console for network details.</p>;
-}
-}
+
+
+/**
+ * REUSABLE CORE GRAPHICS ENGINE: Takes Google Doc structural pieces (text/images) 
+ * and builds them perfectly on your web screen.
+ */
 function renderDocumentElements(container, elements) {
-container.innerHTML = "";
-if (!elements || !Array.isArray(elements) || elements.length === 0) {
-container.innerHTML = "Plan document is currently empty or unreadable. Contact your coach!";
-return;
+  container.innerHTML = ""; 
+  
+  if (!elements || elements.length === 0) {
+    container.innerHTML = "<p class='empty-text'>Document is currently empty. Contact your coach!</p>";
+    return;
+  }
+
+  elements.forEach(el => {
+    if (el.type === "text") {
+      const p = document.createElement("p");
+      p.className = "doc-paragraph";
+      p.innerText = el.content;
+      container.appendChild(p);
+    } else if (el.type === "image") {
+      const img = document.createElement("img");
+      img.className = "doc-inline-image";
+      img.src = `data:${el.mimeType};base64,${el.data}`;
+      img.style.maxWidth = "100%";
+      img.style.borderRadius = "8px";
+      img.style.margin = "12px 0";
+      img.style.display = "block";
+      container.appendChild(img);
+    }
+  });
 }
-elements.forEach(el => {
-if (el.type === "text") {
-const p = document.createElement("p");
-p.className = "doc-paragraph";
-p.innerText = el.content;
-container.appendChild(p);
-} else if (el.type === "image") {
-const img = document.createElement("img");
-img.className = "doc-inline-image";
-img.src = data:${el.mimeType};base64,${el.data};
-img.style.maxWidth = "100%";
-img.style.borderRadius = "8px";
-img.style.margin = "12px 0";
-img.style.display = "block";
-container.appendChild(img);
+// =========================================================================
+// 🍏 INTERACTIVE MODAL INTERFACE CONTROLLERS (STEP 3)
+// =========================================================================
+
+/**
+ * A. WORKOUT ROUTINE PIPELINES
+ */
+function openWorkoutModal() {
+  const modal = document.getElementById("workout-modal");
+  const displayContainer = document.getElementById("workout-modal-display");
+  
+  if (!modal || !displayContainer) return;
+  
+  // Show the popup window frame overlay smoothly
+  modal.style.display = "flex";
+  displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Streaming your custom training splits out of Google Drive...</p>";
+  
+  // Directly reuse your existing core fetch engine but pass the modal container container explicitly
+  loadDocumentStreamIntoElement("workout", displayContainer);
 }
-});
+
+function closeWorkoutModal() {
+  const modal = document.getElementById("workout-modal");
+  if (modal) modal.style.display = "none";
+}
+
+/**
+ * B. FITNESS ASSESSMENT PIPELINES
+ */
+function openAssessmentModal() {
+  const modal = document.getElementById("assessment-modal");
+  const displayContainer = document.getElementById("assessment-modal-display");
+  
+  if (!modal || !displayContainer) return;
+  
+  // Show the popup window frame overlay smoothly
+  modal.style.display = "flex";
+  displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Retrieving your biometric milestone data from Google Drive...</p>";
+  
+  // Directly reuse your existing core fetch engine but pass the modal container container explicitly
+  loadDocumentStreamIntoElement("assessment", displayContainer);
+}
+
+function closeAssessmentModal() {
+  const modal = document.getElementById("assessment-modal");
+  if (modal) modal.style.display = "none";
+}
+
+/**
+ * UNIFIED DOCUMENT UTILITY ENGINE: Reuses your working API routes to fetch 
+ * on-demand parameters cleanly when a button click event fires!
+ */
+async function loadDocumentStreamIntoElement(docType, displayContainer) {
+  const username = localStorage.getItem("iron_pulse_username");
+  
+  try {
+    const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      renderDocumentElements(displayContainer, result.elements);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message}</p>`;
+    }
+  } catch (err) {
+    console.error(`Streaming infrastructure connection issue for ${docType}:`, err);
+    displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>`;
+  }
+}
+/**
+ * C. NUTRITION BLUEPRINT POP-UP MODAL CONTROLLERS
+ */
+function openNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  const displayContainer = document.getElementById("nutrition-modal-display");
+  
+  if (!modal || !displayContainer) return;
+  
+  // Slide open the overlay frame
+  modal.style.display = "flex";
+  displayContainer.innerHTML = "<p class='loading-text' style='color: var(--accent-color);'>Streaming your unique nutrition blueprint out of Google Drive...</p>";
+  
+  // Directly fires your utility streaming engine using your clean backend routing key
+  loadDocumentStreamIntoElement("nutrition", displayContainer);
+}
+
+function closeNutritionModal() {
+  const modal = document.getElementById("nutrition-modal");
+  if (modal) modal.style.display = "none";
 }
