@@ -198,8 +198,7 @@ function bookIndividualSession() {
     const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
     const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
     
-    const webAppUrl = GOOGLE_API_URL; // 🍏 Points the scheduling engine to your Chatbot script!
- = 'https://google.com';
+    const webAppUrl = 'https://google.com';
     
     const payload = {
       action: 'bookSession', 
