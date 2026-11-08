@@ -510,7 +510,6 @@ function doPost(e) {
 }
 
 
-}
 
 // Expose block cleanly to window layer context
 window.bookIndividualSession = bookIndividualSession;
