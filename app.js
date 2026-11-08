@@ -455,109 +455,60 @@ function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "none";
 }
-// =========================================================================
-// 6. INDIVIDUAL GYM SESSION CALENDAR BOOKING PIPELINE (FIXED REDIRECT)
-// =========================================================================
-function bookIndividualSession() {
-  const dateInput = document.getElementById('session-date');
-  const timeSelect = document.getElementById('session-time');
-  const bookBtn = document.getElementById('book-session-btn');
-  
-  if (!dateInput || !timeSelect || !bookBtn) return;
-  
-  const chosenDate = dateInput.value; // Format: YYYY-MM-DD
-  const chosenTime = timeSelect.value; // Format: HH:MM
-  
-  if (!chosenDate || !chosenTime) {
-    alert("Please select both a date and a time slot before booking.");
-    return;
+    // ... This is the end of your existing fetchElementsFromGoogleDocId function ...
+    return { status: "success", title: doc.getName(), elements: documentContent };
+  } catch (err) {
+    return { status: "error", message: "Document streaming access error: " + err.toString() + " (Attempted ID: " + docId + ")" };
   }
-  
-  const originalText = bookBtn.textContent;
-  bookBtn.textContent = "Booking...";
-  bookBtn.disabled = true;
-  
+} // 🍏 This is the closing brace of your old function
+
+// =========================================================================
+// 🍏 INTEGRATED MASTER CALENDAR ROUTER (POST ENGINE)
+// =========================================================================
+function doPost(e) {
   try {
-    // Compile input parameters into a true local Date element matrix
-    const startDateTime = new Date(`${chosenDate}T${chosenTime}:00`);
+    var data = JSON.parse(e.postData.contents);
     
-    // Create an end timestamp precisely 1 hour later
-    const endDateTime = new Date(startDateTime.getTime() + (60 * 60 * 1000));
+    // ROUTING UPDATE: Accepts 'bookClass' OR 'bookSession' smoothly into your calendar block
+    if (data.action === "bookClass" || data.action === "bookSession") {
+      
+      var calendar = CalendarApp.getDefaultCalendar();
+      
+      // Captures the title strings (e.g., your custom individual session title compiled in JS)
+      var eventTitle = data.className; 
+      var start = new Date(data.startTime);
+      var end = new Date(data.endTime);
+      
+      var description = "Member Name: " + data.name + "\n" +
+                        "Email: " + data.email + "\n" +
+                        "Member ID: " + data.memberId + "\n" +
+                        "Booking Type: " + (data.action === "bookSession" ? "Individual Gym Slot" : "Group Fitness Class");
+      
+      // Creates the event natively into your Google Calendar
+      var event = calendar.createEvent(eventTitle, start, end, {
+        description: description
+      });
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        message: "Calendar slot allocated successfully",
+        eventId: event.getId()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
     
-    const memberName = localStorage.getItem('iron_pulse_name') || 'Gym Member';
-    const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
-    const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
-    
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbxwFu09velerANm9ZuV8vjBFzOhEVuJ1SgqavBEBIMe2ELHLFVZWbRiOTclXzPmD56e/exec';
-    
-    const payload = {
-      action: 'bookSession', 
-      name: memberName,
-      email: memberEmail,
-      memberId: memberId,
-      className: `Gym Session (${memberId})`, 
-      startTime: startDateTime.toISOString(),
-      endTime: endDateTime.toISOString()
-    };
-    
-    console.log("Attempting to connect via POST to:", webAppUrl);
-    
-    // Fires standard fetch matching your working bookClass mechanism
-    fetch(webAppUrl, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(response => response.json())
-    .then(result => {
-      console.log("Server response:", result);
-      if (result.status === "success") {
-        handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-      } else {
-        alert("Booking failed: " + result.message);
-        bookBtn.textContent = originalText;
-        bookBtn.disabled = false;
-      }
-    })
-    .catch(netError => {
-      // 🍏 SAFELY BEYOND GOOGLE REDIRECT BLOCKS:
-      // Google completes the event perfectly but blocks the cross-domain redirect response.
-      // We log it and safely treat it as a success just like your group classes do!
-      console.warn("Handled Google redirect exception. Syncing display state...", netError);
-      handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-    });
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: "Invalid action routing query parameter received."
+    })).setMimeType(ContentService.MimeType.JSON);
     
   } catch (err) {
-    console.error("Critical frontend processing error occurred:", err);
-    alert("Application script failed: " + err.message);
-    bookBtn.textContent = originalText;
-    bookBtn.disabled = false;
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-/**
- * Helper to smoothly handle UI transitions after a successful booking
- */
-function handleBookingSuccess(button, originalText, dateInput, timeSelect) {
-  button.textContent = "Booked! ✓";
-  button.style.backgroundColor = "#28a745";
-  button.style.color = "white";
-  
-  setTimeout(() => {
-    button.textContent = originalText;
-    button.style.backgroundColor = "";
-    button.style.color = "";
-    button.disabled = false;
-    if (dateInput) dateInput.value = "";
-    if (timeSelect) timeSelect.value = "";
-  }, 4000);
-}
-
-// Expose blocks cleanly to window layer context
-window.bookIndividualSession = bookIndividualSession;
 
 }
 
