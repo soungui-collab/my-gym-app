@@ -534,3 +534,141 @@ function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "none";
 }
+// =========================================================================
+// 7. SESSION HISTORY LOG SUBSYSTEM
+// =========================================================================
+function appendToHistoryLog(sessionName, isoStartTime, typeLabel) {
+  const displayContainer = document.getElementById("history-log-display");
+  if (!displayContainer) return;
+
+  // Clear default placeholder text if it's the first log
+  const placeholder = displayContainer.querySelector(".empty-text");
+  if (placeholder) container.innerHTML = "";
+
+  const eventDate = new Date(isoStartTime);
+  const formattedDate = eventDate.toLocaleDateString('en-CA', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+  const formattedTime = eventDate.toLocaleTimeString('en-CA', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+
+  const logItem = document.createElement("div");
+  logItem.className = "class-item";
+  logItem.style.background = "rgba(255,255,255,0.02)";
+  logItem.style.padding = "10px";
+  logItem.style.borderRadius = "6px";
+  logItem.style.marginBottom = "4px";
+  logItem.style.borderLeft = typeLabel === "Individual" ? "3px solid var(--accent-color)" : "3px solid #28a745";
+
+  logItem.innerHTML = `
+    <div class="class-info">
+      <h3 style="font-size: 0.9rem; margin: 0;">${sessionName}</h3>
+      <p style="font-size: 0.75rem; margin: 2px 0 0 0; color: var(--text-muted);">${formattedDate} • ${formattedTime} • Verified Slot</p>
+    </div>
+    <span style="font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: #fff; background: ${typeLabel === 'Individual' ? 'var(--accent-color)' : '#28a745'};">${typeLabel}</span>
+  `;
+
+  // Always insert latest scheduling logs at the top
+  if (displayContainer.firstChild && displayContainer.firstChild.className === "empty-text") {
+    displayContainer.innerHTML = "";
+  }
+  displayContainer.insertBefore(logItem, displayContainer.firstChild);
+}
+
+// Hook into Group Booking inside section 2 (Modify your bookClass fetch success to run this):
+// appendToHistoryLog(className, bookingDate.toISOString(), "Group");
+
+// Hook into Individual Booking inside section 5 (Modify your bookIndividualSession fetch success to run this):
+// appendToHistoryLog(`Gym Session (${memberId})`, startDateTime.toISOString(), "Individual");
+
+
+// =========================================================================
+// 8. LOCAL COGNITIVE NUTRITION TRACKER LOGIC
+// =========================================================================
+function getTrackerDateKey() {
+  const today = new Date();
+  return `iron_pulse_cals_${localStorage.getItem("iron_pulse_username") || "anon"}_${today.toISOString().split('T')[0]}`;
+}
+
+function loadNutritionTracker() {
+  const listContainer = document.getElementById("meal-log-list");
+  const totalDisplay = document.getElementById("total-calories");
+  if (!listContainer || !totalDisplay) return;
+
+  const dateKey = getTrackerDateKey();
+  const savedData = JSON.parse(localStorage.getItem(dateKey)) || [];
+  
+  listContainer.innerHTML = "";
+  let totalCals = 0;
+
+  savedData.forEach((item, index) => {
+    totalCals += item.calories;
+    const itemRow = document.createElement("div");
+    itemRow.style.display = "flex";
+    itemRow.style.justify = "space-between";
+    itemRow.style.fontSize = "0.85rem";
+    itemRow.style.padding = "6px 0";
+    itemRow.style.borderBottom = "1px solid #ffffff05";
+
+    itemRow.innerHTML = `
+      <span style="color: var(--text-muted);"><strong style="color: var(--accent-color); font-size: 0.75rem;">[${item.type}]</strong> ${item.description}</span>
+      <span style="font-weight: bold;">${item.calories} kcal</span>
+    `;
+    listContainer.appendChild(itemRow);
+  });
+
+  totalDisplay.textContent = totalCals;
+}
+
+function addMealLog() {
+  const typeSelect = document.getElementById("meal-type");
+  const descInput = document.getElementById("meal-desc");
+  const calsInput = document.getElementById("meal-cals");
+
+  if (!descInput || !calsInput || !descInput.value.trim() || !calsInput.value) {
+    alert("Please provide food description parameters and accurate caloric metrics.");
+    return;
+  }
+
+  const dateKey = getTrackerDateKey();
+  const currentLogs = JSON.parse(localStorage.getItem(dateKey)) || [];
+
+  const newLog = {
+    type: typeSelect.value,
+    description: descInput.value.trim(),
+    calories: parseInt(calsInput.value, 10)
+  };
+
+  currentLogs.push(newLog);
+  localStorage.setItem(dateKey, JSON.stringify(currentLogs));
+
+  // Reset inputs safely
+  descInput.value = "";
+  calsInput.value = "";
+
+  // Reload views instantly
+  loadNutritionTracker();
+}
+
+function resetNutritionTracker() {
+  if (confirm("Are you sure you want to clear your caloric splits for today?")) {
+    localStorage.removeItem(getTrackerDateKey());
+    loadNutritionTracker();
+  }
+}
+
+// Ensure data loads gracefully right on authorization sync initialization
+const originalSetupDashboardView = window.setupDashboardView;
+window.setupDashboardView = function(id, name, username) {
+  if (typeof originalSetupDashboardView === "function") {
+    originalSetupDashboardView(id, name, username);
+  }
+  loadNutritionTracker();
+};
+
+window.addMealLog = addMealLog;
+window.resetNutritionTracker = resetNutritionTracker;
