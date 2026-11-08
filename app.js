@@ -455,3 +455,90 @@ function closeNutritionModal() {
   const modal = document.getElementById("nutrition-modal");
   if (modal) modal.style.display = "none";
 }
+// =========================================================================
+// 6. INDIVIDUAL GYM SESSION CALENDAR BOOKING PIPELINE
+// =========================================================================
+async function bookIndividualSession() {
+  const dateInput = document.getElementById('session-date');
+  const timeSelect = document.getElementById('session-time');
+  const bookBtn = document.getElementById('book-session-btn');
+  
+  if (!dateInput || !timeSelect || !bookBtn) return;
+  
+  const chosenDate = dateInput.value; // Format: YYYY-MM-DD
+  const chosenTime = timeSelect.value; // Format: HH:MM
+  
+  if (!chosenDate || !chosenTime) {
+    alert("Please select both a date and a time slot before booking.");
+    return;
+  }
+  
+  const originalText = bookBtn.textContent;
+  bookBtn.textContent = "Processing reservation...";
+  bookBtn.disabled = true;
+  
+  try {
+    // Compile input parameters into a true local Date element matrix
+    const startDateTime = new Date(`${chosenDate}T${chosenTime}:00`);
+    
+    // Create an end timestamp precisely 1 hour later
+    const endDateTime = new Date(startDateTime.getTime() + (60 * 60 * 1000));
+    
+    const memberName = localStorage.getItem('iron_pulse_name') || 'Gym Member';
+    const memberEmail = localStorage.getItem('iron_pulse_username') || 'member@example.com';
+    const memberId = localStorage.getItem('iron_pulse_id') || 'ID-TEMP';
+    
+    // Explicit targeting mirror to matching group class payload arrays
+    const webAppUrl = 'https://google.com';
+    
+    const payload = {
+      action: 'bookSession', // Distinct hook key for Apps Script routing
+      name: memberName,
+      email: memberEmail,
+      memberId: memberId,
+      className: `Gym Session (${memberId})`, // Populates as event title in calendar
+      startTime: startDateTime.toISOString(),
+      endTime: endDateTime.toISOString()
+    };
+    
+    const response = await fetch(webAppUrl, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      bookBtn.textContent = "Reserved Slot! ✓";
+      bookBtn.style.backgroundColor = "#28a745";
+      bookBtn.style.color = "white";
+      
+      // Auto-reset state placeholders after brief success delay
+      setTimeout(() => {
+        bookBtn.textContent = originalText;
+        bookBtn.style.backgroundColor = "";
+        bookBtn.disabled = false;
+        dateInput.value = "";
+        timeSelect.value = "";
+      }, 3000);
+      
+    } else {
+      alert("Session Booking Failed: " + result.message);
+      bookBtn.textContent = originalText;
+      bookBtn.disabled = false;
+    }
+    
+  } catch (err) {
+    console.error("Individual session processing failure:", err);
+    alert("Connection failure trying to build calendar event allocation block.");
+    bookBtn.textContent = originalText;
+    bookBtn.disabled = false;
+  }
+}
+
+// Expose block cleanly to window layer context
+window.bookIndividualSession = bookIndividualSession;
