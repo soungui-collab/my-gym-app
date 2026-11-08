@@ -393,6 +393,60 @@
       <button id="book-session-btn" class="action-btn" onclick="bookIndividualSession()" style="margin-top: 8px;">Book Gym Slot</button>
     </div>
 
+    <!-- =========================================================================
+         G. DAILY NUTRITION TRACKER BLOCK
+         ========================================================================= -->
+    <div id="nutrition-tracker-section" class="card">
+      <h2>Daily Nutrition Tracker</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 16px;">Log your daily intake to stay on top of your macro splits.</p>
+      
+      <div id="tracker-summary" style="display: flex; justify-content: space-between; align-items: center; background: #0b0c10; padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #45f3ff11;">
+        <div>
+          <span style="font-size: 0.8rem; color: var(--text-muted); display: block; text-transform: uppercase;">Logged Today</span>
+          <span id="total-calories" style="font-size: 1.4rem; font-weight: bold; color: var(--text-color);">0</span> <span style="font-size: 0.85rem; color: var(--text-muted);">kcal</span>
+        </div>
+        <button class="action-btn" onclick="resetNutritionTracker()" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #262626; border: 1px solid var(--border-color);">Reset Day</button>
+      </div>
+
+      <div class="form-group">
+        <label for="meal-type">Meal Type</label>
+        <select id="meal-type" style="width: 100%; padding: 12px; border: 1px solid #45f3ff33; background-color: #0b0c10; color: #ffffff; border-radius: 8px;">
+          <option value="Breakfast">Breakfast 🍳</option>
+          <option value="Lunch">Lunch 🥗</option>
+          <option value="Dinner">Dinner 🥩</option>
+          <option value="Snack">Snack / Shake 🍌</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div style="flex: 2;">
+          <label for="meal-desc">Food Description</label>
+          <input type="text" id="meal-desc" placeholder="e.g., Chicken breast & rice">
+        </div>
+        <div style="flex: 1;">
+          <label for="meal-cals">Calories (kcal)</label>
+          <input type="number" id="meal-cals" placeholder="e.g., 450">
+        </div>
+      </div>
+
+      <button id="add-meal-btn" class="action-btn" onclick="addMealLog()">Log Food Asset</button>
+
+      <div id="meal-log-list" style="margin-top: 16px; max-height: 180px; overflow-y: auto;">
+        <!-- Logged meals will be appended here dynamically -->
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         H. MEMBER SESSION HISTORY LOG
+         ========================================================================= -->
+    <div id="booking-history-section" class="card">
+      <h2>Your Session History Log</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 12px;">Review verified group classes and private gym allocations.</p>
+      
+      <div id="history-log-display" style="display: flex; flex-direction: column; gap: 8px;">
+        <p class="empty-text" style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 10px 0;">No sessions scheduled in this browser session yet.</p>
+      </div>
+    </div>
 
      
 
