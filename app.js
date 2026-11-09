@@ -144,7 +144,8 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         console.log("Server response:", result);
         if (result.status === "success") {
           button.textContent = "Booked! ✓";
-          saveToHistoryLog(className, "Group");
+          saveToHistoryLog(className, "Group", bookingDate.toISOString());
+
 
           button.style.backgroundColor = "#28a745";
           button.style.color = "white";
@@ -225,7 +226,7 @@ function bookIndividualSession() {
     .then(result => {
       if (result.status === "success") {
         handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-        saveToHistoryLog(`Gym Session (${memberId})`, "Individual");
+        saveToHistoryLog(`Gym Session (${memberId})`, "Individual", startDateTime.toISOString());
 
 
       } else {
