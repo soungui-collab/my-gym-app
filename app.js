@@ -541,7 +541,7 @@ function closeNutritionModal() {
   if (modal) modal.style.display = "none";
 }
 // =========================================================================
-// 7. SESSION HISTORY LOG SUBSYSTEM (PERSISTENT & SEPARATED)
+// 7. SESSION HISTORY LOG SUBSYSTEM (LOCAL + GOOGLE SHEETS SYNC)
 // =========================================================================
 function getHistoryLogKey() {
   const user = localStorage.getItem("iron_pulse_username") || "anon";
@@ -598,22 +598,34 @@ function loadHistoryLog() {
   if (individualCountEl) individualCountEl.textContent = individualCount;
 }
 
-function saveToHistoryLog(sessionName, typeLabel) {
+function saveToHistoryLog(sessionName, typeLabel, scheduledStartISO = "") {
   const key = getHistoryLogKey();
   const currentHistory = JSON.parse(localStorage.getItem(key)) || [];
+  const nowISO = new Date().toISOString();
   
   currentHistory.unshift({
     name: sessionName,
     type: typeLabel,
-    timestamp: new Date().toISOString()
+    timestamp: nowISO
   });
 
   localStorage.setItem(key, JSON.stringify(currentHistory));
   loadHistoryLog();
+
+  // Sync silently to Google Sheets
+  syncDataToGoogleSheets({
+    action: "logSessionHistory",
+    memberId: localStorage.getItem("iron_pulse_id") || "ID-TEMP",
+    name: localStorage.getItem("iron_pulse_name") || "Gym Member",
+    username: localStorage.getItem("iron_pulse_username") || "anon",
+    sessionName: sessionName,
+    sessionType: typeLabel,
+    scheduledStart: scheduledStartISO ? new Date(scheduledStartISO).toLocaleString() : new Date(nowISO).toLocaleString()
+  });
 }
 
 // =========================================================================
-// 8. PERSISTENT DAY-LOCK NUTRITION TRACKER LOGIC
+// 8. PERSISTENT NUTRITION TRACKER (LOCAL + GOOGLE SHEETS SYNC)
 // =========================================================================
 function getTrackerDateKey() {
   const user = localStorage.getItem("iron_pulse_username") || "anon";
@@ -634,7 +646,7 @@ function loadNutritionTracker() {
     totalCals += item.calories;
     const itemRow = document.createElement("div");
     itemRow.style.display = "flex";
-    itemRow.style.justify = "space-between";
+    itemRow.style.justifyContent = "space-between";
     itemRow.style.fontSize = "0.85rem";
     itemRow.style.padding = "6px 0";
     itemRow.style.borderBottom = "1px solid #ffffff05";
@@ -659,19 +671,34 @@ function addMealLog() {
     return;
   }
 
+  const mealType = typeSelect.value;
+  const description = descInput.value.trim();
+  const calories = parseInt(calsInput.value, 10);
+
   const dateKey = getTrackerDateKey();
   const currentLogs = JSON.parse(localStorage.getItem(dateKey)) || [];
 
   currentLogs.push({
-    type: typeSelect.value,
-    description: descInput.value.trim(),
-    calories: parseInt(calsInput.value, 10)
+    type: mealType,
+    description: description,
+    calories: calories
   });
 
   localStorage.setItem(dateKey, JSON.stringify(currentLogs));
   descInput.value = "";
   calsInput.value = "";
   loadNutritionTracker();
+
+  // Sync silently to Google Sheets
+  syncDataToGoogleSheets({
+    action: "logNutrition",
+    memberId: localStorage.getItem("iron_pulse_id") || "ID-TEMP",
+    name: localStorage.getItem("iron_pulse_name") || "Gym Member",
+    username: localStorage.getItem("iron_pulse_username") || "anon",
+    mealType: mealType,
+    description: description,
+    calories: calories
+  });
 }
 
 function resetNutritionTracker() {
@@ -681,16 +708,30 @@ function resetNutritionTracker() {
   }
 }
 
-// 🍏 RE-WROTE LOGOUT ENGINE TO PREVENT NUTRITION WIPE
+// =========================================================================
+// 9. BACKGROUND GOOGLE SHEETS SYNC HELPER
+// =========================================================================
+function syncDataToGoogleSheets(payload) {
+  fetch(GOOGLE_API_URL, {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => console.log(`Synced ${payload.action} to Google Sheets:`, data))
+  .catch(err => console.warn(`Handled redirect during ${payload.action} sync:`, err));
+}
+
 function secureLogout() {
-  // Only remove authentication tracking vectors, leave local storage files safe
   localStorage.removeItem("iron_pulse_id");
   localStorage.removeItem("iron_pulse_name");
   localStorage.removeItem("iron_pulse_username");
   window.location.reload();
 }
 
-// Initialize persistent views upon complete auth gate synchronization
 const originalSetupDashboardView = window.setupDashboardView;
 window.setupDashboardView = function(id, name, username) {
   if (typeof originalSetupDashboardView === "function") {
@@ -699,6 +740,10 @@ window.setupDashboardView = function(id, name, username) {
   loadNutritionTracker();
   loadHistoryLog();
 };
+
+window.addMealLog = addMealLog;
+window.resetNutritionTracker = resetNutritionTracker;
+window.secureLogout = secureLogout;
 
 window.addMealLog = addMealLog;
 window.resetNutritionTracker = resetNutritionTracker;
