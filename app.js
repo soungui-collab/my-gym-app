@@ -144,7 +144,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         console.log("Server response:", result);
         if (result.status === "success") {
           button.textContent = "Booked! ✓";
-          appendToHistoryLog(className, bookingDate.toISOString(), "Group");
+          saveToHistoryLog(className, "Group");
 
           button.style.backgroundColor = "#28a745";
           button.style.color = "white";
@@ -157,7 +157,6 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       .catch(netError => {
         console.error("Network connection error:", netError);
         button.textContent = "Booked! ✓";
-        appendToHistoryLog(className, bookingDate.toISOString(), "Group");
         button.style.backgroundColor = "#28a745";
         button.style.color = "white";
       });
@@ -226,7 +225,8 @@ function bookIndividualSession() {
     .then(result => {
       if (result.status === "success") {
         handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-        appendToHistoryLog(`Gym Session (${memberId})`, startDateTime.toISOString(), "Individual");
+        saveToHistoryLog(`Gym Session (${memberId})`, "Individual");
+
 
       } else {
         alert("Booking failed: " + result.message);
@@ -237,7 +237,7 @@ function bookIndividualSession() {
     .catch(netError => {
       console.warn("Handled Google redirect exception. Syncing display state...", netError);
       handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
-      appendToHistoryLog(`Gym Session (${memberId})`, startDateTime.toISOString(), "Individual");
+      
     });
     
   } catch (err) {
