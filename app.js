@@ -225,6 +225,8 @@ function bookIndividualSession() {
     .then(result => {
       if (result.status === "success") {
         handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
+        appendToHistoryLog(`Gym Session (${memberId})`, startDateTime.toISOString(), "Individual");
+
       } else {
         alert("Booking failed: " + result.message);
         bookBtn.textContent = originalText;
