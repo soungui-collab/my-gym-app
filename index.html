@@ -392,7 +392,7 @@
 
       <button id="book-session-btn" class="action-btn" onclick="bookIndividualSession()" style="margin-top: 8px;">Book Gym Slot</button>
     </div>
-
+ <div id="booking-section" class="card">
     <!-- =========================================================================
          G. DAILY NUTRITION TRACKER BLOCK
          ========================================================================= -->
@@ -436,21 +436,31 @@
       </div>
     </div>
 
-    <!-- =========================================================================
+        <!-- =========================================================================
          H. MEMBER SESSION HISTORY LOG
          ========================================================================= -->
     <div id="booking-history-section" class="card">
       <h2>Your Session History Log</h2>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 12px;">Review verified group classes and private gym allocations.</p>
       
-      <div id="history-log-display" style="display: flex; flex-direction: column; gap: 8px;">
-        <p class="empty-text" style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 10px 0;">No sessions scheduled in this browser session yet.</p>
+      <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+        <div style="flex: 1; background: #0b0c10; padding: 10px; border-radius: 6px; border: 1px solid #45f3ff11; text-align: center;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Group Classes</span>
+          <span id="group-count" style="font-size: 1.2rem; font-weight: bold; color: #28a745;">0</span>
+        </div>
+        <div style="flex: 1; background: #0b0c10; padding: 10px; border-radius: 6px; border: 1px solid #45f3ff11; text-align: center;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Private Slots</span>
+          <span id="individual-count" style="font-size: 1.2rem; font-weight: bold; color: var(--accent-color);">0</span>
+        </div>
+      </div>
+
+      <div id="history-log-display" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
+        <p class="empty-text" style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 10px 0;">No sessions recorded for this profile yet.</p>
       </div>
     </div>
 
      
-
-     <div id="booking-section" class="card">
+    
   <h2>Book Gym Classes</h2>
   
   <div class="class-item">
