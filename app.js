@@ -541,63 +541,84 @@ function closeNutritionModal() {
   if (modal) modal.style.display = "none";
 }
 // =========================================================================
-// 7. SESSION HISTORY LOG SUBSYSTEM
+// 7. SESSION HISTORY LOG SUBSYSTEM (PERSISTENT & SEPARATED)
 // =========================================================================
-function appendToHistoryLog(sessionName, isoStartTime, typeLabel) {
-  const displayContainer = document.getElementById("history-log-display");
-  if (!displayContainer) return;
-
-  // Clear default placeholder text if it's the first log
-  const placeholder = displayContainer.querySelector(".empty-text");
-  if (placeholder) container.innerHTML = "";
-
-  const eventDate = new Date(isoStartTime);
-  const formattedDate = eventDate.toLocaleDateString('en-CA', { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric' 
-  });
-  const formattedTime = eventDate.toLocaleTimeString('en-CA', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
-
-  const logItem = document.createElement("div");
-  logItem.className = "class-item";
-  logItem.style.background = "rgba(255,255,255,0.02)";
-  logItem.style.padding = "10px";
-  logItem.style.borderRadius = "6px";
-  logItem.style.marginBottom = "4px";
-  logItem.style.borderLeft = typeLabel === "Individual" ? "3px solid var(--accent-color)" : "3px solid #28a745";
-
-  logItem.innerHTML = `
-    <div class="class-info">
-      <h3 style="font-size: 0.9rem; margin: 0;">${sessionName}</h3>
-      <p style="font-size: 0.75rem; margin: 2px 0 0 0; color: var(--text-muted);">${formattedDate} • ${formattedTime} • Verified Slot</p>
-    </div>
-    <span style="font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: #fff; background: ${typeLabel === 'Individual' ? 'var(--accent-color)' : '#28a745'};">${typeLabel}</span>
-  `;
-
-  // Always insert latest scheduling logs at the top
-  if (displayContainer.firstChild && displayContainer.firstChild.className === "empty-text") {
-    displayContainer.innerHTML = "";
-  }
-  displayContainer.insertBefore(logItem, displayContainer.firstChild);
+function getHistoryLogKey() {
+  const user = localStorage.getItem("iron_pulse_username") || "anon";
+  return `iron_pulse_history_${user.replace(/[^a-zA-Z0-9]/g, '')}`;
 }
 
-// Hook into Group Booking inside section 2 (Modify your bookClass fetch success to run this):
-// appendToHistoryLog(className, bookingDate.toISOString(), "Group");
+function loadHistoryLog() {
+  const displayContainer = document.getElementById("history-log-display");
+  const groupCountEl = document.getElementById("group-count");
+  const individualCountEl = document.getElementById("individual-count");
+  
+  if (!displayContainer) return;
 
-// Hook into Individual Booking inside section 5 (Modify your bookIndividualSession fetch success to run this):
-// appendToHistoryLog(`Gym Session (${memberId})`, startDateTime.toISOString(), "Individual");
+  const historyData = JSON.parse(localStorage.getItem(getHistoryLogKey())) || [];
+  displayContainer.innerHTML = "";
 
+  let groupCount = 0;
+  let individualCount = 0;
+
+  if (historyData.length === 0) {
+    displayContainer.innerHTML = `<p class="empty-text" style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 10px 0;">No sessions recorded for this profile yet.</p>`;
+    if (groupCountEl) groupCountEl.textContent = "0";
+    if (individualCountEl) individualCountEl.textContent = "0";
+    return;
+  }
+
+  historyData.forEach(item => {
+    if (item.type === "Group") groupCount++;
+    if (item.type === "Individual") individualCount++;
+
+    const eventDate = new Date(item.timestamp);
+    const formattedDate = eventDate.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+    const formattedTime = eventDate.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' });
+
+    const logItem = document.createElement("div");
+    logItem.className = "class-item";
+    logItem.style.background = "rgba(255,255,255,0.02)";
+    logItem.style.padding = "10px";
+    logItem.style.borderRadius = "6px";
+    logItem.style.marginBottom = "4px";
+    logItem.style.borderLeft = item.type === "Individual" ? "3px solid var(--accent-color)" : "3px solid #28a745";
+
+    logItem.innerHTML = `
+      <div class="class-info">
+        <h3 style="font-size: 0.9rem; margin: 0;">${item.name}</h3>
+        <p style="font-size: 0.75rem; margin: 2px 0 0 0; color: var(--text-muted);">${formattedDate} • ${formattedTime} • Verified Slot</p>
+      </div>
+      <span style="font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: #fff; background: ${item.type === 'Individual' ? 'var(--accent-color)' : '#28a745'};">${item.type}</span>
+    `;
+    displayContainer.appendChild(logItem);
+  });
+
+  if (groupCountEl) groupCountEl.textContent = groupCount;
+  if (individualCountEl) individualCountEl.textContent = individualCount;
+}
+
+function saveToHistoryLog(sessionName, typeLabel) {
+  const key = getHistoryLogKey();
+  const currentHistory = JSON.parse(localStorage.getItem(key)) || [];
+  
+  currentHistory.unshift({
+    name: sessionName,
+    type: typeLabel,
+    timestamp: new Date().toISOString()
+  });
+
+  localStorage.setItem(key, JSON.stringify(currentHistory));
+  loadHistoryLog();
+}
 
 // =========================================================================
-// 8. LOCAL COGNITIVE NUTRITION TRACKER LOGIC
+// 8. PERSISTENT DAY-LOCK NUTRITION TRACKER LOGIC
 // =========================================================================
 function getTrackerDateKey() {
-  const today = new Date();
-  return `iron_pulse_cals_${localStorage.getItem("iron_pulse_username") || "anon"}_${today.toISOString().split('T')[0]}`;
+  const user = localStorage.getItem("iron_pulse_username") || "anon";
+  const dateString = new Date().toISOString().split('T')[0];
+  return `iron_pulse_cals_${user.replace(/[^a-zA-Z0-9]/g, '')}_${dateString}`;
 }
 
 function loadNutritionTracker() {
@@ -605,13 +626,11 @@ function loadNutritionTracker() {
   const totalDisplay = document.getElementById("total-calories");
   if (!listContainer || !totalDisplay) return;
 
-  const dateKey = getTrackerDateKey();
-  const savedData = JSON.parse(localStorage.getItem(dateKey)) || [];
-  
+  const savedData = JSON.parse(localStorage.getItem(getTrackerDateKey())) || [];
   listContainer.innerHTML = "";
   let totalCals = 0;
 
-  savedData.forEach((item, index) => {
+  savedData.forEach(item => {
     totalCals += item.calories;
     const itemRow = document.createElement("div");
     itemRow.style.display = "flex";
@@ -636,45 +655,52 @@ function addMealLog() {
   const calsInput = document.getElementById("meal-cals");
 
   if (!descInput || !calsInput || !descInput.value.trim() || !calsInput.value) {
-    alert("Please provide food description parameters and accurate caloric metrics.");
+    alert("Please provide a food description and accurate calories.");
     return;
   }
 
   const dateKey = getTrackerDateKey();
   const currentLogs = JSON.parse(localStorage.getItem(dateKey)) || [];
 
-  const newLog = {
+  currentLogs.push({
     type: typeSelect.value,
     description: descInput.value.trim(),
     calories: parseInt(calsInput.value, 10)
-  };
+  });
 
-  currentLogs.push(newLog);
   localStorage.setItem(dateKey, JSON.stringify(currentLogs));
-
-  // Reset inputs safely
   descInput.value = "";
   calsInput.value = "";
-
-  // Reload views instantly
   loadNutritionTracker();
 }
 
 function resetNutritionTracker() {
-  if (confirm("Are you sure you want to clear your caloric splits for today?")) {
+  if (confirm("Are you sure you want to clear your calories for today?")) {
     localStorage.removeItem(getTrackerDateKey());
     loadNutritionTracker();
   }
 }
 
-// Ensure data loads gracefully right on authorization sync initialization
+// 🍏 RE-WROTE LOGOUT ENGINE TO PREVENT NUTRITION WIPE
+function secureLogout() {
+  // Only remove authentication tracking vectors, leave local storage files safe
+  localStorage.removeItem("iron_pulse_id");
+  localStorage.removeItem("iron_pulse_name");
+  localStorage.removeItem("iron_pulse_username");
+  window.location.reload();
+}
+
+// Initialize persistent views upon complete auth gate synchronization
 const originalSetupDashboardView = window.setupDashboardView;
 window.setupDashboardView = function(id, name, username) {
   if (typeof originalSetupDashboardView === "function") {
     originalSetupDashboardView(id, name, username);
   }
   loadNutritionTracker();
+  loadHistoryLog();
 };
 
 window.addMealLog = addMealLog;
 window.resetNutritionTracker = resetNutritionTracker;
+window.secureLogout = secureLogout;
+
