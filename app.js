@@ -157,6 +157,7 @@ document.getElementById('booking-section').addEventListener('click', function(ev
       .catch(netError => {
         console.error("Network connection error:", netError);
         button.textContent = "Booked! ✓";
+        appendToHistoryLog(className, bookingDate.toISOString(), "Group");
         button.style.backgroundColor = "#28a745";
         button.style.color = "white";
       });
@@ -236,6 +237,7 @@ function bookIndividualSession() {
     .catch(netError => {
       console.warn("Handled Google redirect exception. Syncing display state...", netError);
       handleBookingSuccess(bookBtn, originalText, dateInput, timeSelect);
+      appendToHistoryLog(`Gym Session (${memberId})`, startDateTime.toISOString(), "Individual");
     });
     
   } catch (err) {
