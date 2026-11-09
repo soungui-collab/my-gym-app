@@ -144,6 +144,8 @@ document.getElementById('booking-section').addEventListener('click', function(ev
         console.log("Server response:", result);
         if (result.status === "success") {
           button.textContent = "Booked! ✓";
+          appendToHistoryLog(className, bookingDate.toISOString(), "Group");
+
           button.style.backgroundColor = "#28a745";
           button.style.color = "white";
         } else {
