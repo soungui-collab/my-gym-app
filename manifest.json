@@ -11,7 +11,7 @@
   "orientation": "portrait",
   "categories": ["fitness", "health", "lifestyle"],
   "prefer_related_applications": false,
-  "related_applications"
+  "related_applications": [],
   "icons": [
     {
       "src": "/my-gym-app/logo-192.png",
