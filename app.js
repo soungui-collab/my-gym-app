@@ -781,3 +781,43 @@ function populateSessionDates() {
 
 document.addEventListener("DOMContentLoaded", populateSessionDates);
 
+// =========================================================================
+// 11. CLOUD HISTORY SYNC (PULLS LOGS FROM GOOGLE SHEETS ON LOGIN)
+// =========================================================================
+async function syncHistoryFromCloud() {
+  const username = localStorage.getItem("iron_pulse_username");
+  if (!username) return;
+
+  try {
+    const fetchUrl = `${GOOGLE_API_URL}?action=fetchHistory&username=${encodeURIComponent(username)}`;
+    const response = await fetch(fetchUrl, { method: 'GET' });
+    const data = await response.json();
+
+    if (data.status === "success") {
+      // 1. Update local storage with cloud sessions and re-render
+      if (Array.isArray(data.sessions)) {
+        localStorage.setItem(getHistoryLogKey(), JSON.stringify(data.sessions));
+        loadHistoryLog();
+      }
+
+      // 2. Update local storage with today's cloud nutrition and re-render
+      if (Array.isArray(data.nutrition)) {
+        localStorage.setItem(getTrackerDateKey(), JSON.stringify(data.nutrition));
+        loadNutritionTracker();
+      }
+    }
+  } catch (err) {
+    console.warn("Cloud history sync skipped (using local cache):", err);
+  }
+}
+
+// Hook cloud sync into dashboard initialization
+const previousSetupDashboardView = window.setupDashboardView;
+window.setupDashboardView = function(id, name, username) {
+  if (typeof previousSetupDashboardView === "function") {
+    previousSetupDashboardView(id, name, username);
+  }
+  loadNutritionTracker();
+  loadHistoryLog();
+  syncHistoryFromCloud();
+};
