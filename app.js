@@ -821,3 +821,53 @@ window.setupDashboardView = function(id, name, username) {
   loadHistoryLog();
   syncHistoryFromCloud();
 };
+
+// =========================================================================
+// 12. ACCOUNT DELETION PIPELINE (REQUIRED FOR APPLE APP STORE)
+// =========================================================================
+async function deleteMemberAccount() {
+  const username = localStorage.getItem("iron_pulse_username");
+  if (!username) return;
+
+  const firstConfirm = confirm("Are you sure you want to permanently delete your account? This will remove your profile and log you out.");
+  if (!firstConfirm) return;
+
+  const deleteBtn = document.getElementById("delete-account-btn");
+  if (deleteBtn) {
+    deleteBtn.innerText = "Deleting Account...";
+    deleteBtn.disabled = true;
+  }
+
+  try {
+    const deleteUrl = `${GOOGLE_API_URL}?action=deleteUser&username=${encodeURIComponent(username)}`;
+    const response = await fetch(deleteUrl, { method: 'GET' });
+    const result = await response.json();
+
+    if (result.success) {
+      // Wipe all local storage keys tied to this user
+      localStorage.removeItem(getHistoryLogKey());
+      localStorage.removeItem(getTrackerDateKey());
+      localStorage.removeItem("iron_pulse_id");
+      localStorage.removeItem("iron_pulse_name");
+      localStorage.removeItem("iron_pulse_username");
+
+      alert("Your account has been permanently deleted.");
+      window.location.reload();
+    } else {
+      alert("Error deleting account: " + (result.message || "Please contact your trainer."));
+      if (deleteBtn) {
+        deleteBtn.innerText = "Delete Account & Data";
+        deleteBtn.disabled = false;
+      }
+    }
+  } catch (err) {
+    console.error("Account deletion error:", err);
+    alert("Connection error while trying to delete account.");
+    if (deleteBtn) {
+      deleteBtn.innerText = "Delete Account & Data";
+      deleteBtn.disabled = false;
+    }
+  }
+}
+
+window.deleteMemberAccount = deleteMemberAccount;
