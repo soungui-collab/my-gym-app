@@ -2,6 +2,7 @@
   "name": "Soungui Fitness Gym Portal",
   "short_name": "Soungui Fitness",
   "description": "Member Access and Class Booking Portal",
+  "id": "/my-gym-app/index.html"
   "start_url": "/my-gym-app/index.html",
   "scope": "/my-gym-app/",
   "display": "standalone",
