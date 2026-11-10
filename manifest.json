@@ -9,6 +9,7 @@
   "background_color": "#050505",
   "theme_color": "#e50914",
   "orientation": "portrait",
+  "categories": ["fitness", "health", "lifestyle"],
   "icons": [
     {
       "src": "/my-gym-app/logo-192.png",
