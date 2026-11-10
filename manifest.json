@@ -23,7 +23,7 @@
     },
     {
       "src": "/my-gym-app/logo.png",
-      "sizes": "512x512",
+      "sizes": "1512x1361",
       "type": "image/png",
       "purpose": "maskable"
     }
