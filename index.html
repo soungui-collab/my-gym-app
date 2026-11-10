@@ -371,10 +371,13 @@
       <h2>Book Individual Gym Session</h2>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 16px;">Reserve a 1-hour open training slot below.</p>
       
-      <div class="form-group">
+            <div class="form-group">
         <label for="session-date">Select Date</label>
-            <input type="date" id="session-date">
+        <select id="session-date" style="width: 100%; padding: 12px; border: 1px solid #45f3ff33; background-color: #0b0c10; color: #ffffff; border-radius: 8px; box-sizing: border-box; font-size: 0.95rem;">
+          <option value="" disabled selected>Choose a date...</option>
+        </select>
       </div>
+
 
       <div class="form-group">
         <label for="session-time">Select Time Slot</label>
