@@ -45,6 +45,13 @@
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Class Booking & Daily Nutrition Tracker"
+    },
+    {
+      "src": "/my-gym-app/screenshot-wide.png",
+      "sizes": "2858x1444",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Soungui Fitness Desktop Member Portal"
     }
   ]
 }
