@@ -750,3 +750,34 @@ window.addMealLog = addMealLog;
 window.resetNutritionTracker = resetNutritionTracker;
 window.secureLogout = secureLogout;
 
+function populateSessionDates() {
+  const dateSelect = document.getElementById("session-date");
+  if (!dateSelect) return;
+
+  dateSelect.innerHTML = '<option value="" disabled selected>Choose a date...</option>';
+  const today = new Date();
+
+  for (let i = 0; i < 14; i++) {
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + i);
+
+    const year = futureDate.getFullYear();
+    const month = String(futureDate.getMonth() + 1).padStart(2, '0');
+    const day = String(futureDate.getDate()).padStart(2, '0');
+    const isoValue = `${year}-${month}-${day}`;
+
+    const readableLabel = futureDate.toLocaleDateString('en-CA', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+
+    const option = document.createElement("option");
+    option.value = isoValue;
+    option.textContent = i === 0 ? `Today (${readableLabel})` : readableLabel;
+    dateSelect.appendChild(option);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", populateSessionDates);
+
