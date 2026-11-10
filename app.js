@@ -871,3 +871,54 @@ async function deleteMemberAccount() {
 }
 
 window.deleteMemberAccount = deleteMemberAccount;
+// =========================================================================
+// 13. PUSH NOTIFICATION PERMISSION & LOCAL REMINDER HANDLER
+// =========================================================================
+async function requestNotificationPermission() {
+  const notifBtn = document.getElementById("enable-notifications-btn");
+
+  if (!("Notification" in window)) {
+    alert("This browser does not support push notifications. On iPhone, make sure you have added the app to your Home Screen first.");
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      if (notifBtn) {
+        notifBtn.textContent = "🔔 Reminders Active ✓";
+        notifBtn.style.backgroundColor = "#28a745";
+        notifBtn.style.borderColor = "#28a745";
+        notifBtn.disabled = true;
+      }
+
+      // Send a welcome confirmation notification through the active Service Worker
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        registration.showNotification("Soungui Fitness", {
+          body: "Class reminders and booking alerts are now active!",
+          icon: "/my-gym-app/logo.png",
+          badge: "/my-gym-app/logo.png"
+        });
+      }
+    } else if (permission === "denied") {
+      alert("Notifications are blocked. You can enable them anytime in your browser or phone settings.");
+    }
+  } catch (err) {
+    console.error("Notification permission error:", err);
+  }
+}
+
+// Automatically update the button if permission was already granted previously
+document.addEventListener("DOMContentLoaded", () => {
+  const notifBtn = document.getElementById("enable-notifications-btn");
+  if (notifBtn && "Notification" in window && Notification.permission === "granted") {
+    notifBtn.textContent = "🔔 Reminders Active ✓";
+    notifBtn.style.backgroundColor = "#28a745";
+    notifBtn.style.borderColor = "#28a745";
+    notifBtn.disabled = true;
+  }
+});
+
+window.requestNotificationPermission = requestNotificationPermission;
