@@ -28,4 +28,20 @@
       "purpose": "maskable"
     }
   ]
-}
+},
+"screenshots": [
+    {
+      "src": "/my-gym-app/screenshot-1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Member Dashboard & Personalized Plans"
+    },
+    {
+      "src": "/my-gym-app/screenshot-2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Class Booking & Daily Nutrition Tracker"
+    }
+  ]
