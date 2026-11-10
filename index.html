@@ -560,5 +560,16 @@
   <!-- 🔑 THE CRITICAL HOOKS THAT TELL THE BROWSER TO CLOSE SECURELY -->
   <script src="app.js"></script>
 
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/my-gym-app/sw.js')
+          .then(reg => console.log('Service Worker registered:', reg.scope))
+          .catch(err => console.warn('Service Worker failed:', err));
+      });
+    }
+  </script>
+
+  
 </body>
 </html>
