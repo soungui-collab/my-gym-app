@@ -11,7 +11,7 @@
   "icons": [
     {
       "src": "/my-gym-app/logo.png",
-      "sizes": "192x192",
+      "sizes": "1512x1361",
       "type": "image/png",
       "purpose": "any"
     },
