@@ -10,6 +10,7 @@
   "theme_color": "#e50914",
   "orientation": "portrait",
   "categories": ["fitness", "health", "lifestyle"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/my-gym-app/logo-192.png",
