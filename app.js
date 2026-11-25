@@ -922,3 +922,44 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.requestNotificationPermission = requestNotificationPermission;
+
+function renderGoogleSheet(data, containerElement) {
+  let html = `<h3 style="margin-bottom: 12px;">${data.title}</h3>
+    <div style="overflow-x: auto;">
+      <table border="1" style="width: 100%; border-collapse: collapse;">`;
+
+  data.rows.forEach((row, rowIndex) => {
+    html += "<tr>";
+    row.forEach((cell, colIndex) => {
+      if (rowIndex === 0) {
+        html += `<th style="padding: 8px; text-align: left;">${cell}</th>`;
+      } else if (cell === "TRUE" || cell === "FALSE") {
+        const checkedAttr = cell === "TRUE" ? "checked" : "";
+        html += `<td style="padding: 8px; text-align: center;">
+          <input type="checkbox" ${checkedAttr} style="width: 18px; height: 18px; cursor: pointer;"
+            onchange="toggleSheetCheckbox('${data.sheetId}', '${data.sheetName}', ${rowIndex + 1}, ${colIndex + 1}, this.checked)">
+        </td>`;
+      } else {
+        html += `<td style="padding: 8px;">${cell}</td>`;
+      }
+    });
+    html += "</tr>";
+  });
+
+  html += "</table></div>";
+  containerElement.innerHTML = html;
+}
+
+function toggleSheetCheckbox(sheetId, sheetName, row, col, isChecked) {
+  const url = `${GOOGLE_API_URL}?action=toggleCheckbox&sheetId=${encodeURIComponent(sheetId)}&sheetName=${encodeURIComponent(sheetName)}&row=${row}&col=${col}&checked=${isChecked}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(response => {
+      if (response.status !== "success") {
+        alert("Could not save checkbox: " + response.message);
+      }
+    })
+    .catch(err => console.error("Checkbox sync error:", err));
+}
+
