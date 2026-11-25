@@ -409,10 +409,12 @@ async function loadAssessmentPlan() {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
     const result = await response.json();
 
-    if (result.status === "success") {
-      if (result.html) {
-        // 1. Render the fully formatted HTML for both Sheets and Docs
-        displayContainer.innerHTML = result.html;
+        if (result.status === "success") {
+      renderFormattedContent(result, displayContainer);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
+    }
+
 
         // 2. Wire up interactive checkboxes inside rendered Sheets to your toggleCheckbox backend route
         const checkboxes = displayContainer.querySelectorAll('input[type="checkbox"][data-sheet-id]');
