@@ -410,7 +410,8 @@ async function loadAssessmentPlan() {
     const result = await response.json();
 
         if (result.status === "success") {
-      renderFormattedContent(result, displayContainer);
+      renderFormattedContent(result, displayContainer); 
+        }
     } else {
       displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
     }
@@ -437,6 +438,7 @@ async function loadAssessmentPlan() {
         });
       } else if (result.type === "sheet") {
         renderGoogleSheet(result, displayContainer);
+}
       } else {
         renderDocumentElements(displayContainer, result.elements);
       }
