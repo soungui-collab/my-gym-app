@@ -515,40 +515,23 @@ async function loadDocumentStreamIntoElement(docType, displayContainer) {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`);
     const result = await response.json();
 
-           if (result.status === "success") {
+        if (result.status === "success") {
       if (result.html) {
         displayContainer.innerHTML = `<div class="google-formatted-wrapper" style="background: #ffffff; color: #1f2328; padding: 16px; border-radius: 8px; overflow-x: auto;">${result.html}</div>`;
-
-        // Wire up interactive checkboxes inside rendered Sheets to your toggleCheckbox backend route
-        const checkboxes = displayContainer.querySelectorAll('input[type="checkbox"][data-sheet-id]');
-        checkboxes.forEach(cb => {
-          cb.addEventListener('change', async (e) => {
-            const target = e.target;
-            const sheetId = target.getAttribute('data-sheet-id');
-            const sheetName = target.getAttribute('data-sheet-name');
-            const row = target.getAttribute('data-row');
-            const col = target.getAttribute('data-col');
-            const checked = target.checked;
-
-            try {
-              const res = await fetch(`${GOOGLE_API_URL}?action=toggleCheckbox&sheetId=${encodeURIComponent(sheetId)}&sheetName=${encodeURIComponent(sheetName)}&row=${row}&col=${col}&checked=${checked}`);
-              const syncResult = await res.json();
-              if (syncResult.status !== "success") {
-                throw new Error(syncResult.message || "Sync failed");
-              }
-            } catch (cbErr) {
-              console.error("Failed to sync checkbox:", cbErr);
-              target.checked = !checked; // Revert checkbox in UI if saving fails
-            }
-          });
-        });
       } else if (result.type === "sheet") {
         renderGoogleSheet(result, displayContainer);
       } else {
         renderDocumentElements(displayContainer, result.elements);
       }
     }
-
+ else {
+      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message || "Unknown error occurred."}</p>`;
+    }
+  } catch (err) {
+    console.error(`Streaming infrastructure connection issue for ${docType}:`, err);
+    displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>`;
+  }
+}
 /**
  * C. NUTRITION BLUEPRINT POP-UP MODAL CONTROLLERS
  */
