@@ -409,8 +409,31 @@ async function loadAssessmentPlan() {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
     const result = await response.json();
 
-        if (result.status === "success") {
-      if (result.type === "sheet") {
+            if (result.status === "success") {
+      if (result.html) {
+        // 1. Render the fully formatted HTML for both Sheets and Docs
+        displayContainer.innerHTML = result.html;
+
+        // 2. Wire up interactive checkboxes inside rendered Sheets to your toggleCheckbox backend route
+        const checkboxes = displayContainer.querySelectorAll('input[type="checkbox"][data-sheet-id]');
+        checkboxes.forEach(cb => {
+          cb.addEventListener('change', async (e) => {
+            const target = e.target;
+            const sheetId = target.getAttribute('data-sheet-id');
+            const sheetName = target.getAttribute('data-sheet-name');
+            const row = target.getAttribute('data-row');
+            const col = target.getAttribute('data-col');
+            const checked = target.checked;
+
+            try {
+              await fetch(`${GOOGLE_API_URL}?action=toggleCheckbox&sheetId=${encodeURIComponent(sheetId)}&sheetName=${encodeURIComponent(sheetName)}&row=${row}&col=${col}&checked=${checked}`);
+            } catch (cbErr) {
+              console.error("Failed to sync checkbox:", cbErr);
+              target.checked = !checked; // Revert UI if sync fails
+            }
+          });
+        });
+      } else if (result.type === "sheet") {
         renderGoogleSheet(result, displayContainer);
       } else {
         renderDocumentElements(displayContainer, result.elements);
@@ -418,11 +441,7 @@ async function loadAssessmentPlan() {
     } else {
       displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
     }
-  } catch (err) {
-    console.error("Assessment stream engine failure:", err);
-    displayContainer.innerHTML = "<p class='error-text'>Failed to render biometric history logs.</p>";
-  }
-}
+
 
 
 
