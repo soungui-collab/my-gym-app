@@ -974,3 +974,25 @@ function toggleSheetCheckbox(sheetId, sheetName, row, col, isChecked) {
     })
     .catch(err => console.error("Checkbox sync error:", err));
 }
+// =========================================================================
+// SAFE GLOBAL CHECKBOX SYNC LISTENER (DOES NOT TOUCH EXISTING FUNCTIONS)
+// =========================================================================
+document.addEventListener("change", async function(event) {
+  const target = event.target;
+  if (target && target.matches('input[type="checkbox"][data-sheet-id]')) {
+    const sheetId = target.getAttribute("data-sheet-id");
+    const sheetName = target.getAttribute("data-sheet-name");
+    const row = target.getAttribute("data-row");
+    const col = target.getAttribute("data-col");
+    const checked = target.checked;
+
+    try {
+      const res = await fetch(`${GOOGLE_API_URL}?action=toggleCheckbox&sheetId=${encodeURIComponent(sheetId)}&sheetName=${encodeURIComponent(sheetName)}&row=${row}&col=${col}&checked=${checked}`);
+      const data = await res.json();
+      if (data.status !== "success") throw new Error(data.message);
+    } catch (err) {
+      console.error("Checkbox sync failed:", err);
+      target.checked = !checked;
+    }
+  }
+});
