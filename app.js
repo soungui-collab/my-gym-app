@@ -1021,9 +1021,32 @@ function renderFormattedContent(result, displayContainer) {
       });
     });
   } else if (result.type === "sheet") {
+      } else if (result.html) {
+    displayContainer.innerHTML = `<div class="google-formatted-wrapper" style="background: #ffffff; color: #1f2328; padding: 16px; border-radius: 8px; overflow-x: auto;">${result.html}</div>`;
+
+    const checkboxes = displayContainer.querySelectorAll('input[type="checkbox"][data-sheet-id]');
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', async (e) => {
+        const target = e.target;
+        const sheetId = target.getAttribute('data-sheet-id');
+        const sheetName = target.getAttribute('data-sheet-name');
+        const row = target.getAttribute('data-row');
+        const col = target.getAttribute('data-col');
+        const checked = target.checked;
+
+        try {
+          await fetch(`${GOOGLE_API_URL}?action=toggleCheckbox&sheetId=${encodeURIComponent(sheetId)}&sheetName=${encodeURIComponent(sheetName)}&row=${row}&col=${col}&checked=${checked}`);
+        } catch (cbErr) {
+          console.error("Failed to sync checkbox:", cbErr);
+          target.checked = !checked;
+        }
+      });
+    });
+  } else if (result.type === "sheet") {
     renderGoogleSheet(result, displayContainer);
   } else {
     renderDocumentElements(displayContainer, result.elements);
   }
+
 }
 
