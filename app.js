@@ -409,7 +409,7 @@ async function loadAssessmentPlan() {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
     const result = await response.json();
 
-            if (result.status === "success") {
+               if (result.status === "success") {
       if (result.html) {
         // 1. Render the fully formatted HTML for both Sheets and Docs
         displayContainer.innerHTML = result.html;
@@ -438,7 +438,10 @@ async function loadAssessmentPlan() {
       } else {
         renderDocumentElements(displayContainer, result.elements);
       }
-    } } 
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
+    }
+
 } else {
       displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
     }
