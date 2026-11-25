@@ -438,7 +438,7 @@ async function loadAssessmentPlan() {
       } else {
         renderDocumentElements(displayContainer, result.elements);
       }
-    } else {
+    } } else {
       displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
     }
 
