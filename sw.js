@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-app-v2';
+const CACHE_NAME = 'gym-app-v3';
 
 // Ensure all paths match your exact GitHub repository structure
 const ASSETS_TO_CACHE = [
