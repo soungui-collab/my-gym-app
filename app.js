@@ -965,6 +965,11 @@ document.addEventListener("DOMContentLoaded", () => {
 window.requestNotificationPermission = requestNotificationPermission;
 
 function renderGoogleSheet(data, containerElement) {
+  if (data && data.html) {
+    renderFormattedContent(data, containerElement);
+    return;
+  }
+
   let html = `<h3 style="margin-bottom: 12px;">${data.title}</h3>
     <div style="overflow-x: auto;">
       <table border="1" style="width: 100%; border-collapse: collapse;">`;
@@ -974,7 +979,7 @@ function renderGoogleSheet(data, containerElement) {
     row.forEach((cell, colIndex) => {
       if (rowIndex === 0) {
         html += `<th style="padding: 8px; text-align: left;">${cell}</th>`;
-      }  if (cell === "TRUE" || cell === "FALSE") {
+      } else if (cell === "TRUE" || cell === "FALSE") {
         const checkedAttr = cell === "TRUE" ? "checked" : "";
         html += `<td style="padding: 8px; text-align: center;">
           <input type="checkbox" ${checkedAttr} style="width: 18px; height: 18px; cursor: pointer;"
@@ -1003,8 +1008,9 @@ function toggleSheetCheckbox(sheetId, sheetName, row, col, isChecked) {
     })
     .catch(err => console.error("Checkbox sync error:", err));
 }
+
 function renderFormattedContent(result, displayContainer) {
-  if (result.html) {
+  if (result && result.html) {
     // Wrap in a clean container so white/light Google Docs & Sheets remain readable on dark backgrounds
     displayContainer.innerHTML = `<div class="google-formatted-wrapper" style="background: #ffffff; color: #1f2328; padding: 16px; border-radius: 8px; overflow-x: auto;">${result.html}</div>`;
 
@@ -1027,7 +1033,7 @@ function renderFormattedContent(result, displayContainer) {
         }
       });
     });
-  } if (result.type === "sheet") {
+  } else if (result.type === "sheet") {
     renderGoogleSheet(result, displayContainer);
   } else {
     renderDocumentElements(displayContainer, result.elements);
