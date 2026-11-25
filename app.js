@@ -544,15 +544,8 @@ async function loadDocumentStreamIntoElement(docType, displayContainer) {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`);
     const result = await response.json();
 
-        if (result.status === "success") {
+    if (result.status === "success") {
       renderFormattedContent(result, displayContainer);
-    } else {
-      displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
-    }
-
-      } else {
-        renderDocumentElements(displayContainer, result.elements);
-      }
     } else {
       displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message || "Unknown error occurred."}</p>`;
     }
@@ -561,6 +554,7 @@ async function loadDocumentStreamIntoElement(docType, displayContainer) {
     displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Failed to establish data link to document stream server.</p>`;
   }
 }
+
 /**
  * C. NUTRITION BLUEPRINT POP-UP MODAL CONTROLLERS
  */
