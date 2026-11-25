@@ -542,9 +542,12 @@ async function loadDocumentStreamIntoElement(docType, displayContainer) {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=${docType}`);
     const result = await response.json();
 
-    if (result.status === "success") {
-      if (result.type === "sheet") {
-        renderGoogleSheet(result, displayContainer);
+        if (result.status === "success") {
+      renderFormattedContent(result, displayContainer);
+    } else {
+      displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
+    }
+
       } else {
         renderDocumentElements(displayContainer, result.elements);
       }
