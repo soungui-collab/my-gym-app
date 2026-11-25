@@ -409,16 +409,21 @@ async function loadAssessmentPlan() {
     const response = await fetch(`${GOOGLE_API_URL}?action=fetchDoc&username=${encodeURIComponent(username)}&docType=assessment`);
     const result = await response.json();
 
-    if (result.status === "success") {
-      renderDocumentElements(displayContainer, result.elements);
+        if (result.status === "success") {
+      if (result.type === "sheet") {
+        renderGoogleSheet(result, displayContainer);
+      } else {
+        renderDocumentElements(displayContainer, result.elements);
+      }
     } else {
-      displayContainer.innerHTML = `<p class='error-text'>${result.message}</p>`;
+      displayContainer.innerHTML = `<p class='error-text'>${result.message || "Unknown error occurred."}</p>`;
     }
   } catch (err) {
     console.error("Assessment stream engine failure:", err);
     displayContainer.innerHTML = "<p class='error-text'>Failed to render biometric history logs.</p>";
   }
 }
+
 
 
 /**
