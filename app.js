@@ -511,9 +511,13 @@ async function loadDocumentStreamIntoElement(docType, displayContainer) {
     const result = await response.json();
 
     if (result.status === "success") {
-      renderDocumentElements(displayContainer, result.elements);
+      if (result.type === "sheet") {
+        renderGoogleSheet(result, displayContainer);
+      } else {
+        renderDocumentElements(displayContainer, result.elements);
+      }
     } else {
-      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message}</p>`;
+      displayContainer.innerHTML = `<p class='error-text' style='color: #ff4757;'>Info: ${result.message || "Unknown error occurred."}</p>`;
     }
   } catch (err) {
     console.error(`Streaming infrastructure connection issue for ${docType}:`, err);
