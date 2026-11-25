@@ -943,7 +943,7 @@ async function requestNotificationPermission() {
           badge: "/my-gym-app/logo.png"
         });
       }
-    } else if (permission === "denied") {
+    }  if (permission === "denied") {
       alert("Notifications are blocked. You can enable them anytime in your browser or phone settings.");
     }
   } catch (err) {
@@ -974,7 +974,7 @@ function renderGoogleSheet(data, containerElement) {
     row.forEach((cell, colIndex) => {
       if (rowIndex === 0) {
         html += `<th style="padding: 8px; text-align: left;">${cell}</th>`;
-      } else if (cell === "TRUE" || cell === "FALSE") {
+      }  if (cell === "TRUE" || cell === "FALSE") {
         const checkedAttr = cell === "TRUE" ? "checked" : "";
         html += `<td style="padding: 8px; text-align: center;">
           <input type="checkbox" ${checkedAttr} style="width: 18px; height: 18px; cursor: pointer;"
@@ -1027,7 +1027,7 @@ function renderFormattedContent(result, displayContainer) {
         }
       });
     });
-  } else if (result.type === "sheet") {
+  } if (result.type === "sheet") {
     renderGoogleSheet(result, displayContainer);
   } else {
     renderDocumentElements(displayContainer, result.elements);
